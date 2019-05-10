@@ -14,6 +14,14 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
         DIRECTORY msg
         FILES
+            ## new add
+            GnssSurfaceSpeed.msg
+            GnssStandardDeviation.msg
+            NdtPoseAndRTKPose.msg
+            PositionChecker.msg
+            WaypointParam.msg
+            Format7Info.msg
+
             ControlCommandStamped.msg
             CloudCluster.msg
             CloudClusterArray.msg

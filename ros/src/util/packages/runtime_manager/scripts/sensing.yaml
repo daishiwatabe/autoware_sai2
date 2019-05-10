@@ -27,6 +27,12 @@ subs :
         run  : roslaunch autoware_pointgrey_drivers grasshopper3.launch
         param: grasshopper3_params
 
+      - name : PointGrey Grasshoper 3 single (USB1)
+        desc : PointGrey Grasshoper 3 single (USB1) desc sample
+        probe: 'lsusb -d 1e10: > /dev/null'
+        run  : roslaunch autoware_pointgrey_drivers grasshopper3_single.launch
+        param: grasshopper3_params
+
       - name : PointGrey Generic
         desc : PointGrey Generic desc sample
         probe:
@@ -102,6 +108,11 @@ subs :
         probe:
         run  : roslaunch nmea_navsat nmea_navsat.launch
         param: serial
+      - name : novatel_oem7_1
+        desc : novatel_oem7_1 desc sample
+        probe:
+        run  : roslaunch novatel_oem7 novatel_oem7.launch nodename:=novatel_oem7_1
+        param: novatel
 
   - name : IMU
     desc : IMU desc sample
@@ -1723,3 +1734,24 @@ params :
       cmd_param :
         dash        : ''
         delim       : ':='
+
+  - name : novatel
+    vars :
+    - name      : port
+      desc      : port desc sample
+      label     : 'Device name:'
+      kind      : path
+      v         : /dev/ttyUSB0
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : baud
+      desc      : baud desc sample
+      label     : 'Baud:'
+      kind      : menu
+      choices   : [ '1200', '2400', '4800', '9600', '19200', '38400', '57600', '115200', '230400' ]
+      choices_type : str
+      v         : '115200'
+      cmd_param :
+        dash      : ''
+        delim     : ':='

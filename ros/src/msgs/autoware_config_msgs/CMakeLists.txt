@@ -43,6 +43,8 @@ add_message_files(
   ConfigVoxelGridFilter.msg
   ConfigWaypointFollower.msg
   ConfigWaypointReplanner.msg
+  ConfigCameraROI.msg
+  ConfigLocalizerSwitchFusion.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

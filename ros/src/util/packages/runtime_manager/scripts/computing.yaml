@@ -19,6 +19,12 @@ subs :
         param: gnss
         gui  :
           stat_topic : [ gnss ]
+      - name : nmea2tfpose_RTK
+        desc : nmea2tfpose_RTK desc sample
+        cmd  : roslaunch gnss_localizer nmea2tfpose_RTK.launch
+        param: gnss
+        gui  :
+          stat_topic : [ gnss ]
     - name : lidar_localizer
       desc : lidar_localizer desc sample
       subs :
@@ -101,6 +107,34 @@ subs :
              depend_bool : 'lambda v : v == 0'
              flags : [ nl ]
              prop  : 1
+      - name : localizer_switch
+        desc : localizer_switch desc sample
+        cmd  : roslaunch autoware_connector localizer_switch.launch
+        param: localizer_switch
+        gui  :
+          dialog : MyDialogLocalizerSwitch
+          dialog_width  : 900
+          dialog_height : 600
+          fusion_select:
+            flags : [nl]
+          localizer_pose_topic1:
+            flags : [ nl ]
+          ndt_status_topic1:
+            depend : alignment_mechanism1
+            depend_bool : 'lambda v : v == 0'
+          gnss_deviation_topic1:
+            depend : alignment_mechanism1
+            depend_bool : 'lambda v : v == 1'
+            flags : [ nl ]
+          localizer_pose_topic2:
+            flags : [ nl ]
+          ndt_status_topic2:
+            depend : alignment_mechanism2
+            depend_bool : 'lambda v : v == 0'
+          gnss_deviation_topic2:
+            depend : alignment_mechanism2
+            depend_bool : 'lambda v : v == 1'
+            flags : [ nl ]
 
   - name : Detection
     desc : Detection desc sample
@@ -5655,3 +5689,119 @@ params :
       cmd_param:
         dash     : ''
         delim    : ':='
+
+  - name  : localizer_switch
+    topic : /config/fusion_select
+    msg   : ConfigLocalizerSwitchFusion
+    vars  :
+    - name  : fusion_select
+      desc  : fusion select desc sample
+      label     : fusion select
+      kind  : radio_box
+      choices:
+      - Pose1 Only
+      - Pose2 Only
+      descs :
+      - Waypoint desc sample
+      - Dialog desc sample
+      v     : 1
+    - name      : base_link_pose_topic1
+      label     : base_link_pose_topic1
+      v         : /ndt_pose
+      kind  : topic
+      topic_type : geometry_msgs/PoseStamped
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : estimate_twist_topic1
+      label     : estimate_twist_topic1
+      v         : /ndt_estimate_twist
+      kind  : topic
+      topic_type : geometry_msgs/TwistStamped
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : localizer_pose_topic1
+      label     : localizer_pose_topic1
+      v         : /ndt_localizer_pose
+      kind  : topic
+      topic_type : geometry_msgs/PoseStamped
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name  : alignment_mechanism1
+      label : alignment_mechanism1
+      kind  : radio_box
+      choices:
+      - NDT
+      - GNSS(RTK)
+      v     : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name      : ndt_status_topic1
+      label     : ndt_status_topic1
+      v         : /ndt_stat
+      kind  : topic
+      topic_type : autoware_msgs/NDTStat
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : gnss_deviation_topic1
+      label     : gnss_deviation_topic1
+      v         : /gnss_standard_deviation
+      kind  : topic
+      topic_type : autoware_msgs/GnssStandardDeviation
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : base_link_pose_topic2
+      label     : base_link_pose_topic2
+      v         : /RTK_gnss_pose
+      kind  : topic
+      topic_type : geometry_msgs/PoseStamped
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : estimate_twist_topic2
+      label     : estimate_twist_topic2
+      v         : /gnss_estimate_twist
+      kind  : topic
+      topic_type : geometry_msgs/TwistStamped
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : localizer_pose_topic2
+      label     : localizer_pose_topic2
+      v         : /gnss_localizer_pose
+      kind  : topic
+      topic_type : geometry_msgs/PoseStamped
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name  : alignment_mechanism2
+      label : alignment_mechanism2
+      kind  : radio_box
+      choices:
+      - NDT
+      - GNSS(RTK)
+      v     : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name      : ndt_status_topic2
+      label     : ndt_status_topic2
+      v         : /ndt_stat
+      kind  : topic
+      topic_type : autoware_msgs/NDTStat
+      cmd_param :
+        dash      : ''
+        delim     : ':='
+    - name      : gnss_deviation_topic2
+      label     : gnss_deviation_topic2
+      v         : /gnss_standard_deviation
+      kind  : topic
+      topic_type : autoware_msgs/GnssStandardDeviation
+      cmd_param :
+        dash      : ''
+        delim     : ':='

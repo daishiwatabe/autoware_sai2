@@ -1,0 +1,15 @@
+Header header
+uint32 mode
+uint32 max_width
+uint32 max_height
+uint32 offset_hstep_size
+uint32 offset_vstep_size
+uint32 image_hstep_size
+uint32 image_vstep_size
+uint32 pixel_format_bit_field
+uint32 vendor_pixel_format_bit_field
+uint32 packet_size
+uint32 min_packet_size
+uint32 max_packet_size
+uint32 percentage
+

@@ -1,0 +1,31 @@
+<launch>
+
+	<!-- declare arguments with default values -->
+	<arg name="serial" default="17274614" />
+	<arg name="fps" default="24"/>                  <!--frame per second to try to acquire the image -->
+	<arg name="CalibrationFile" default=""/>        <!--Path to Autoware calibration format file-->
+	<arg name="mode" default="4"/>                  <!--Valid Camera Mode -->
+	<arg name="format" default="raw"/>              <!--Pixel Format to acquire the image "raw" or "rgb"-->
+	<arg name="timeout" default="1000"/>            <!--Timeout in mili seconds-->
+	<arg name="size_extension_flag" default="true" />
+	<arg name="roi_left" default="0" />
+	<arg name="roi_top" default="0" />
+	<arg name="roi_width" default="960" />
+	<arg name="roi_height" default="600" />
+	<arg name="signal_roi_extension" default="32" />
+
+	<node pkg="autoware_pointgrey_drivers" type="grasshopper3_camera_single" name="grasshopper_single" output="screen">
+		<param name="serial" value="$(arg serial)"/>
+		<param name="fps" value="$(arg fps)"/>
+		<param name="calibrationfile" value="$(arg CalibrationFile)"/>
+		<param name="mode" value="$(arg mode)"/>
+		<param name="format" value="$(arg format)"/>
+		<param name="timeout" value="$(arg timeout)"/>
+		<param name="size_extension_flag" value="$(arg size_extension_flag)"/>
+		<param name="roi_left" value="$(arg roi_left)"/>
+		<param name="roi_top" value="$(arg roi_top)"/>
+		<param name="roi_width" value="$(arg roi_width)"/>
+		<param name="roi_height" value="$(arg roi_height)"/>
+		<param name="signal_roi_extension" value="$(arg signal_roi_extension)" />
+	</node>
+</launch>

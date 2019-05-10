@@ -1,0 +1,13 @@
+Header header
+float32 weight
+int32 blinker
+int32 velocity_KPPlus
+int32 velocity_KPMinus
+int32 velocity_punchPlus
+int32 velocity_punchMinus
+int32 velocity_windowPlus
+int32 velocity_windowMinus
+int32 pause
+int32 pauseGroup
+ExtractedPosition[] signals
+int32 curve_flag

@@ -12,6 +12,8 @@ find_package(catkin REQUIRED COMPONENTS
 	    camera_info_manager
     	image_transport
     	cv_bridge
+        autoware_config_msgs
+        autoware_msgs
 )
 
 set(CMAKE_CXX_FLAGS "-O2 -Wall ${CMAKE_CXX_FLAGS}")
@@ -33,8 +35,16 @@ if (EXISTS "/usr/include/flycapture")
     add_executable(grasshopper3_camera
             nodes/grasshopper3/grasshopper3.cpp
             )
+    add_executable(grasshopper3_camera_single
+            nodes/grasshopper3/grasshopper3_single.cpp
+            )
 
     target_link_libraries(grasshopper3_camera
+            ${catkin_LIBRARIES}
+            ${OpenCV_LIBS}
+            flycapture
+            )
+    target_link_libraries(grasshopper3_camera_single
             ${catkin_LIBRARIES}
             ${OpenCV_LIBS}
             flycapture
@@ -45,11 +55,20 @@ if (EXISTS "/usr/include/flycapture")
             LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
             RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
             )
+    install(TARGETS
+            grasshopper3_camera_single
+            ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+            LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+            RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+            )
     install(FILES
             scripts/grasshopper3.launch
             DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
             )
-
+    install(FILES
+            scripts/grasshopper3_single.launch
+            DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+            )
 else ()
     message("'FlyCapture SDK' is not installed. 'grasshopper3_camera' will not be built.")
 endif ()
