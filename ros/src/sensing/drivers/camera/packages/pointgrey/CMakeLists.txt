@@ -4,6 +4,8 @@ project(autoware_pointgrey_drivers)
 
 find_package(catkin REQUIRED COMPONENTS
         autoware_build_flags
+        autoware_config_msgs
+        autoware_msgs
         roscpp
         std_msgs
         message_generation
@@ -12,8 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 	    camera_info_manager
     	image_transport
     	cv_bridge
-        autoware_config_msgs
-        autoware_msgs
 )
 
 set(CMAKE_CXX_FLAGS "-O2 -Wall ${CMAKE_CXX_FLAGS}")

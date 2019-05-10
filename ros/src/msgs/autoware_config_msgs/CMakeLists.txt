@@ -11,6 +11,9 @@ add_message_files(
   DIRECTORY msg
   FILES
 
+  ConfigCameraROI.msg
+  ConfigLocalizerSwitchFusion.msg
+
   ## Runtime Manager ##
   ConfigApproximateNDTMapping.msg
   ConfigCarDPM.msg
@@ -43,8 +46,6 @@ add_message_files(
   ConfigVoxelGridFilter.msg
   ConfigWaypointFollower.msg
   ConfigWaypointReplanner.msg
-  ConfigCameraROI.msg
-  ConfigLocalizerSwitchFusion.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

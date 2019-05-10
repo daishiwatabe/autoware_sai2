@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
         geometry_msgs
         autoware_msgs
         autoware_can_msgs
+        autoware_config_msgs
         nav_msgs
         std_msgs
         )

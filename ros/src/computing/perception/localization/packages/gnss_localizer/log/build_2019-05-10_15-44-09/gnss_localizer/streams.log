@@ -1,0 +1,327 @@
+Invoking command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer': /usr/bin/cmake /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer -DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer
+-- The C compiler identification is GNU 5.4.0
+-- The CXX compiler identification is GNU 5.4.0
+-- Check for working C compiler: /usr/bin/cc
+-- Check for working C compiler: /usr/bin/cc -- works
+-- Detecting C compiler ABI info
+-- Detecting C compiler ABI info - done
+-- Detecting C compile features
+-- Detecting C compile features - done
+-- Check for working CXX compiler: /usr/bin/c++
+-- Check for working CXX compiler: /usr/bin/c++ -- works
+-- Detecting CXX compiler ABI info
+-- Detecting CXX compiler ABI info - done
+-- Detecting CXX compile features
+-- Detecting CXX compile features - done
+-- Using CATKIN_DEVEL_PREFIX: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer/devel
+-- Using CMAKE_PREFIX_PATH: /home/autoware/Autoware/ros/install/ymc;/home/autoware/Autoware/ros/install/xsens_driver;/home/autoware/Autoware/ros/install/lattice_planner;/home/autoware/Autoware/ros/install/waypoint_planner;/home/autoware/Autoware/ros/install/waypoint_maker;/home/autoware/Autoware/ros/install/way_planner;/home/autoware/Autoware/ros/install/trafficlight_recognizer;/home/autoware/Autoware/ros/install/op_utilities;/home/autoware/Autoware/ros/install/op_simulation_package;/home/autoware/Autoware/ros/install/op_local_planner;/home/autoware/Autoware/ros/install/op_global_planner;/home/autoware/Autoware/ros/install/lidar_kf_contour_track;/home/autoware/Autoware/ros/install/op_ros_helpers;/home/autoware/Autoware/ros/install/lane_planner;/home/autoware/Autoware/ros/install/ff_waypoint_follower;/home/autoware/Autoware/ros/install/dp_planner;/home/autoware/Autoware/ros/install/waypoint_follower;/home/autoware/Autoware/ros/install/vlg22c_cam;/home/autoware/Autoware/ros/install/vision_ssd_detect;/home/autoware/Autoware/ros/install/vision_segment_enet_detect;/home/autoware/Autoware/ros/install/vision_lane_detect;/home/autoware/Autoware/ros/install/vision_dpm_ttic_detect;/home/autoware/Autoware/ros/install/vision_darknet_detect;/home/autoware/Autoware/ros/install/vision_beyond_track;/home/autoware/Autoware/ros/install/vehicle_socket;/home/autoware/Autoware/ros/install/vehicle_model;/home/autoware/Autoware/ros/install/vehicle_gazebo_simulation_launcher;/home/autoware/Autoware/ros/install/vehicle_gazebo_simulation_interface;/home/autoware/Autoware/ros/install/vehicle_description;/home/autoware/Autoware/ros/install/op_simu;/home/autoware/Autoware/ros/install/op_planner;/home/autoware/Autoware/ros/install/op_utility;/home/autoware/Autoware/ros/install/lidar_euclidean_cluster_detect;/home/autoware/Autoware/ros/install/vector_map_server;/home/autoware/Autoware/ros/install/road_occupancy_processor;/home/autoware/Autoware/ros/install/costmap_generator;/home/autoware/Autoware/ros/install/object_map;/home/autoware/Autoware/ros/install/naive_motion_predict;/home/autoware/Autoware/ros/install/map_file;/home/autoware/Autoware/ros/install/libvectormap;/home/autoware/Autoware/ros/install/imm_ukf_pda_track;/home/autoware/Autoware/ros/install/decision_maker;/home/autoware/Autoware/ros/install/vector_map;/home/autoware/Autoware/ros/install/vector_map_msgs;/home/autoware/Autoware/ros/install/vectacam;/home/autoware/Autoware/ros/install/udon_socket;/home/autoware/Autoware/ros/install/tablet_socket;/home/autoware/Autoware/ros/install/runtime_manager;/home/autoware/Autoware/ros/install/mqtt_socket;/home/autoware/Autoware/ros/install/tablet_socket_msgs;/home/autoware/Autoware/ros/install/state_machine_lib;/home/autoware/Autoware/ros/install/sound_player;/home/autoware/Autoware/ros/install/sick_lms5xx;/home/autoware/Autoware/ros/install/sick_ldmrs_tools;/home/autoware/Autoware/ros/install/sick_ldmrs_driver;/home/autoware/Autoware/ros/install/sick_ldmrs_msgs;/home/autoware/Autoware/ros/install/sick_ldmrs_description;/home/autoware/Autoware/ros/install/rslidar_driver;/home/autoware/Autoware/ros/install/rslidar_msgs;/home/autoware/Autoware/ros/install/points2image;/home/autoware/Autoware/ros/install/rosinterface;/home/autoware/Autoware/ros/install/rosbag_controller;/home/autoware/Autoware/ros/install/roi_object_filter;/home/autoware/Autoware/ros/install/range_vision_fusion;/home/autoware/Autoware/ros/install/pos_db;/home/autoware/Autoware/ros/install/points_preprocessor;/home/autoware/Autoware/ros/install/points_downsampler;/home/autoware/Autoware/ros/install/pixel_cloud_fusion;/home/autoware/Autoware/ros/install/lidar_localizer;/home/autoware/Autoware/ros/install/pcl_omp_registration;/home/autoware/Autoware/ros/install/pc2_downsampler;/home/autoware/Autoware/ros/install/ouster_ros;/home/autoware/Autoware/ros/install/oculus_socket;/home/autoware/Autoware/ros/install/obj_db;/home/autoware/Autoware/ros/install/novatel_oem7;/home/autoware/Autoware/ros/install/nmea_navsat;/home/autoware/Autoware/ros/install/ndt_tku;/home/autoware/Autoware/ros/install/ndt_gpu;/home/autoware/Autoware/ros/install/ndt_cpu;/home/autoware/Autoware/ros/install/multi_lidar_calibrator;/home/autoware/Autoware/ros/install/microstrain_driver;/home/autoware/Autoware/ros/install/memsic_imu;/home/autoware/Autoware/ros/install/marker_downsampler;/home/autoware/Autoware/ros/install/map_tools;/home/autoware/Autoware/ros/install/map_tf_generator;/home/autoware/Autoware/ros/install/log_tools;/home/autoware/Autoware/ros/install/lidar_shape_estimation;/home/autoware/Autoware/ros/install/lidar_point_pillars;/home/autoware/Autoware/ros/install/lidar_naive_l_shape_detect;/home/autoware/Autoware/ros/install/lidar_fake_perception;/home/autoware/Autoware/ros/install/lidar_apollo_cnn_seg_detect;/home/autoware/Autoware/ros/install/libdpm_ttic;/home/autoware/Autoware/ros/install/lgsvl_simulator_bridge;/home/autoware/Autoware/ros/install/lgsvl_msgs;/home/autoware/Autoware/ros/install/kvaser;/home/autoware/Autoware/ros/install/kitti_launch;/home/autoware/Autoware/ros/install/kitti_player;/home/autoware/Autoware/ros/install/kitti_box_publisher;/home/autoware/Autoware/ros/install/javad_navsat_driver;/home/autoware/Autoware/ros/install/integrated_viewer;/home/autoware/Autoware/ros/install/image_processor;/home/autoware/Autoware/ros/install/hokuyo;/home/autoware/Autoware/ros/install/graph_tools;/home/autoware/Autoware/ros/install/gnss_localizer;/home/autoware/Autoware/ros/install/gnss;/home/autoware/Autoware/ros/install/glviewer;/home/autoware/Autoware/ros/install/gazebo_world_description;/home/autoware/Autoware/ros/install/gazebo_imu_description;/home/autoware/Autoware/ros/install/gazebo_camera_description;/home/autoware/Autoware/ros/install/garmin;/home/autoware/Autoware/ros/install/freespace_planner;/home/autoware/Autoware/ros/install/fastvirtualscan;/home/autoware/Autoware/ros/install/detected_objects_visualizer;/home/autoware/Autoware/ros/install/decision_maker_panel;/home/autoware/Autoware/ros/install/dbw_mkz_msgs;/home/autoware/Autoware/ros/install/data_preprocessor;/home/autoware/Autoware/ros/install/custom_msgs;/home/autoware/Autoware/ros/install/calibration_publisher;/home/autoware/Autoware/ros/install/autoware_health_checker;/home/autoware/Autoware/ros/install/autoware_system_msgs;/home/autoware/Autoware/ros/install/autoware_rviz_plugins;/home/autoware/Autoware/ros/install/autoware_pointgrey_drivers;/home/autoware/Autoware/ros/install/autoware_driveworks_interface;/home/autoware/Autoware/ros/install/autoware_connector;/home/autoware/Autoware/ros/install/autoware_camera_lidar_calibrator;/home/autoware/Autoware/ros/install/astar_search;/home/autoware/Autoware/ros/install/as;/home/autoware/Autoware/ros/install/amathutils_lib;/home/autoware/Autoware/ros/install/autoware_msgs;/home/autoware/Autoware/ros/install/autoware_launcher_rviz;/home/autoware/Autoware/ros/install/autoware_launcher;/home/autoware/Autoware/ros/install/autoware_driveworks_gmsl_interface;/home/autoware/Autoware/ros/install/autoware_config_msgs;/home/autoware/Autoware/ros/install/autoware_can_msgs;/home/autoware/Autoware/ros/install/autoware_build_flags;/home/autoware/Autoware/ros/install/autoware_bag_tools;/home/autoware/Autoware/ros/install/adi_driver;/home/autoware/sai_ros/devel;/opt/ros/kinetic;/home/autoware/as_drivers/install
+-- This workspace overlays: /home/autoware/Autoware/ros/install/ymc;/home/autoware/Autoware/ros/install/xsens_driver;/home/autoware/Autoware/ros/install/lattice_planner;/home/autoware/Autoware/ros/install/waypoint_planner;/home/autoware/Autoware/ros/install/waypoint_maker;/home/autoware/Autoware/ros/install/way_planner;/home/autoware/Autoware/ros/install/trafficlight_recognizer;/home/autoware/Autoware/ros/install/op_utilities;/home/autoware/Autoware/ros/install/op_simulation_package;/home/autoware/Autoware/ros/install/op_local_planner;/home/autoware/Autoware/ros/install/op_global_planner;/home/autoware/Autoware/ros/install/lidar_kf_contour_track;/home/autoware/Autoware/ros/install/op_ros_helpers;/home/autoware/Autoware/ros/install/lane_planner;/home/autoware/Autoware/ros/install/ff_waypoint_follower;/home/autoware/Autoware/ros/install/dp_planner;/home/autoware/Autoware/ros/install/waypoint_follower;/home/autoware/Autoware/ros/install/vlg22c_cam;/home/autoware/Autoware/ros/install/vision_ssd_detect;/home/autoware/Autoware/ros/install/vision_segment_enet_detect;/home/autoware/Autoware/ros/install/vision_lane_detect;/home/autoware/Autoware/ros/install/vision_dpm_ttic_detect;/home/autoware/Autoware/ros/install/vision_darknet_detect;/home/autoware/Autoware/ros/install/vision_beyond_track;/home/autoware/Autoware/ros/install/vehicle_socket;/home/autoware/Autoware/ros/install/vehicle_model;/home/autoware/Autoware/ros/install/vehicle_gazebo_simulation_launcher;/home/autoware/Autoware/ros/install/vehicle_gazebo_simulation_interface;/home/autoware/Autoware/ros/install/vehicle_description;/home/autoware/Autoware/ros/install/op_simu;/home/autoware/Autoware/ros/install/op_planner;/home/autoware/Autoware/ros/install/op_utility;/home/autoware/Autoware/ros/install/lidar_euclidean_cluster_detect;/home/autoware/Autoware/ros/install/vector_map_server;/home/autoware/Autoware/ros/install/road_occupancy_processor;/home/autoware/Autoware/ros/install/costmap_generator;/home/autoware/Autoware/ros/install/object_map;/home/autoware/Autoware/ros/install/naive_motion_predict;/home/autoware/Autoware/ros/install/map_file;/home/autoware/Autoware/ros/install/libvectormap;/home/autoware/Autoware/ros/install/imm_ukf_pda_track;/home/autoware/Autoware/ros/install/decision_maker;/home/autoware/Autoware/ros/install/vector_map;/home/autoware/Autoware/ros/install/vector_map_msgs;/home/autoware/Autoware/ros/install/vectacam;/home/autoware/Autoware/ros/install/udon_socket;/home/autoware/Autoware/ros/install/tablet_socket;/home/autoware/Autoware/ros/install/runtime_manager;/home/autoware/Autoware/ros/install/mqtt_socket;/home/autoware/Autoware/ros/install/tablet_socket_msgs;/home/autoware/Autoware/ros/install/state_machine_lib;/home/autoware/Autoware/ros/install/sound_player;/home/autoware/Autoware/ros/install/sick_lms5xx;/home/autoware/Autoware/ros/install/sick_ldmrs_tools;/home/autoware/Autoware/ros/install/sick_ldmrs_driver;/home/autoware/Autoware/ros/install/sick_ldmrs_msgs;/home/autoware/Autoware/ros/install/sick_ldmrs_description;/home/autoware/Autoware/ros/install/rslidar_driver;/home/autoware/Autoware/ros/install/rslidar_msgs;/home/autoware/Autoware/ros/install/points2image;/home/autoware/Autoware/ros/install/rosinterface;/home/autoware/Autoware/ros/install/rosbag_controller;/home/autoware/Autoware/ros/install/roi_object_filter;/home/autoware/Autoware/ros/install/range_vision_fusion;/home/autoware/Autoware/ros/install/pos_db;/home/autoware/Autoware/ros/install/points_preprocessor;/home/autoware/Autoware/ros/install/points_downsampler;/home/autoware/Autoware/ros/install/pixel_cloud_fusion;/home/autoware/Autoware/ros/install/lidar_localizer;/home/autoware/Autoware/ros/install/pcl_omp_registration;/home/autoware/Autoware/ros/install/pc2_downsampler;/home/autoware/Autoware/ros/install/ouster_ros;/home/autoware/Autoware/ros/install/oculus_socket;/home/autoware/Autoware/ros/install/obj_db;/home/autoware/Autoware/ros/install/novatel_oem7;/home/autoware/Autoware/ros/install/nmea_navsat;/home/autoware/Autoware/ros/install/ndt_tku;/home/autoware/Autoware/ros/install/ndt_gpu;/home/autoware/Autoware/ros/install/ndt_cpu;/home/autoware/Autoware/ros/install/multi_lidar_calibrator;/home/autoware/Autoware/ros/install/microstrain_driver;/home/autoware/Autoware/ros/install/memsic_imu;/home/autoware/Autoware/ros/install/marker_downsampler;/home/autoware/Autoware/ros/install/map_tools;/home/autoware/Autoware/ros/install/map_tf_generator;/home/autoware/Autoware/ros/install/log_tools;/home/autoware/Autoware/ros/install/lidar_shape_estimation;/home/autoware/Autoware/ros/install/lidar_point_pillars;/home/autoware/Autoware/ros/install/lidar_naive_l_shape_detect;/home/autoware/Autoware/ros/install/lidar_fake_perception;/home/autoware/Autoware/ros/install/lidar_apollo_cnn_seg_detect;/home/autoware/Autoware/ros/install/libdpm_ttic;/home/autoware/Autoware/ros/install/lgsvl_simulator_bridge;/home/autoware/Autoware/ros/install/lgsvl_msgs;/home/autoware/Autoware/ros/install/kvaser;/home/autoware/Autoware/ros/install/kitti_launch;/home/autoware/Autoware/ros/install/kitti_player;/home/autoware/Autoware/ros/install/kitti_box_publisher;/home/autoware/Autoware/ros/install/javad_navsat_driver;/home/autoware/Autoware/ros/install/integrated_viewer;/home/autoware/Autoware/ros/install/image_processor;/home/autoware/Autoware/ros/install/hokuyo;/home/autoware/Autoware/ros/install/graph_tools;/home/autoware/Autoware/ros/install/gnss_localizer;/home/autoware/Autoware/ros/install/gnss;/home/autoware/Autoware/ros/install/glviewer;/home/autoware/Autoware/ros/install/gazebo_world_description;/home/autoware/Autoware/ros/install/gazebo_imu_description;/home/autoware/Autoware/ros/install/gazebo_camera_description;/home/autoware/Autoware/ros/install/garmin;/home/autoware/Autoware/ros/install/freespace_planner;/home/autoware/Autoware/ros/install/fastvirtualscan;/home/autoware/Autoware/ros/install/detected_objects_visualizer;/home/autoware/Autoware/ros/install/decision_maker_panel;/home/autoware/Autoware/ros/install/dbw_mkz_msgs;/home/autoware/Autoware/ros/install/data_preprocessor;/home/autoware/Autoware/ros/install/custom_msgs;/home/autoware/Autoware/ros/install/calibration_publisher;/home/autoware/Autoware/ros/install/autoware_health_checker;/home/autoware/Autoware/ros/install/autoware_system_msgs;/home/autoware/Autoware/ros/install/autoware_rviz_plugins;/home/autoware/Autoware/ros/install/autoware_pointgrey_drivers;/home/autoware/Autoware/ros/install/autoware_driveworks_interface;/home/autoware/Autoware/ros/install/autoware_connector;/home/autoware/Autoware/ros/install/autoware_camera_lidar_calibrator;/home/autoware/Autoware/ros/install/astar_search;/home/autoware/Autoware/ros/install/as;/home/autoware/Autoware/ros/install/amathutils_lib;/home/autoware/Autoware/ros/install/autoware_msgs;/home/autoware/Autoware/ros/install/autoware_launcher_rviz;/home/autoware/Autoware/ros/install/autoware_launcher;/home/autoware/Autoware/ros/install/autoware_driveworks_gmsl_interface;/home/autoware/Autoware/ros/install/autoware_config_msgs;/home/autoware/Autoware/ros/install/autoware_can_msgs;/home/autoware/Autoware/ros/install/autoware_build_flags;/home/autoware/Autoware/ros/install/autoware_bag_tools;/home/autoware/Autoware/ros/install/adi_driver;/home/autoware/sai_ros/devel;/opt/ros/kinetic
+-- Found PythonInterp: /usr/bin/python (found version "2.7.12") 
+-- Using PYTHON_EXECUTABLE: /usr/bin/python
+-- Using Debian Python package layout
+-- Using empy: /usr/bin/empy
+-- Using CATKIN_ENABLE_TESTING: ON
+-- Call enable_testing()
+-- Using CATKIN_TEST_RESULTS_DIR: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer/test_results
+-- Found gmock sources under '/usr/src/gmock': gmock will be built
+-- Looking for pthread.h
+-- Looking for pthread.h - found
+-- Looking for pthread_create
+-- Looking for pthread_create - not found
+-- Looking for pthread_create in pthreads
+-- Looking for pthread_create in pthreads - not found
+-- Looking for pthread_create in pthread
+-- Looking for pthread_create in pthread - found
+-- Found Threads: TRUE  
+-- Found gtest sources under '/usr/src/gmock': gtests will be built
+-- Using Python nosetests: /usr/bin/nosetests-2.7
+-- catkin 0.7.14
+-- Using these message generators: gencpp;geneus;genlisp;gennodejs;genpy
+-- Configuring done
+-- Generating done
+-- Build files have been written to: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer
+Invoked command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer' returned '0': /usr/bin/cmake /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer -DCMAKE_BUILD_TYPE=Release -DCMAKE_LIBRARY_PATH=/usr/local/cuda/lib64/stubs -DCATKIN_INSTALL_INTO_PREFIX_ROOT=0 -DCMAKE_INSTALL_PREFIX=/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer
+Invoking command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer': /usr/bin/cmake --build /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer -- -j8 -l8
+[35m[1mScanning dependencies of target jsk_footstep_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target actionlib_generate_messages_py[0m
+[35m[1mScanning dependencies of target jsk_footstep_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target pcl_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target jsk_recognition_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target pcl_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target jsk_recognition_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target pcl_msgs_generate_messages_lisp[0m
+[  0%] Built target jsk_recognition_msgs_generate_messages_py
+[  0%] Built target actionlib_generate_messages_py
+[  0%] Built target pcl_msgs_generate_messages_py
+[  0%] Built target jsk_footstep_msgs_generate_messages_nodejs
+[  0%] Built target pcl_msgs_generate_messages_cpp
+[  0%] Built target jsk_footstep_msgs_generate_messages_lisp
+[  0%] Built target pcl_msgs_generate_messages_lisp
+[  0%] Built target jsk_recognition_msgs_generate_messages_nodejs
+[35m[1mScanning dependencies of target jsk_footstep_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target tf2_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target jsk_recognition_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target tf2_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target autoware_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target tf2_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target actionlib_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target tf2_msgs_generate_messages_nodejs[0m
+[  0%] Built target tf2_msgs_generate_messages_eus
+[  0%] Built target jsk_footstep_msgs_generate_messages_eus
+[  0%] Built target autoware_msgs_generate_messages_nodejs
+[  0%] Built target tf2_msgs_generate_messages_lisp
+[  0%] Built target tf2_msgs_generate_messages_cpp
+[  0%] Built target actionlib_msgs_generate_messages_py
+[  0%] Built target tf2_msgs_generate_messages_nodejs
+[  0%] Built target jsk_recognition_msgs_generate_messages_lisp
+[35m[1mScanning dependencies of target actionlib_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target tf2_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target roscpp_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target actionlib_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target nmea_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target rosgraph_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_py[0m
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target tf2_msgs_generate_messages_py
+[  0%] Built target actionlib_msgs_generate_messages_nodejs
+[  0%] Built target actionlib_msgs_generate_messages_lisp
+[  0%] Built target nmea_msgs_generate_messages_cpp
+[  0%] Built target roscpp_generate_messages_lisp
+[  0%] Built target rosgraph_msgs_generate_messages_lisp
+[35m[1mScanning dependencies of target roscpp_generate_messages_nodejs[0m
+[  0%] Built target std_msgs_generate_messages_py
+[35m[1mScanning dependencies of target pcl_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target tf_generate_messages_eus[0m
+[35m[1mScanning dependencies of target rosgraph_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target autoware_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target pcl_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target rosgraph_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target std_msgs_generate_messages_lisp[0m
+[  0%] Built target roscpp_generate_messages_nodejs
+[  0%] Built target pcl_msgs_generate_messages_nodejs
+[  0%] Built target tf_generate_messages_eus
+[  0%] Built target rosgraph_msgs_generate_messages_nodejs
+[  0%] Built target rosgraph_msgs_generate_messages_cpp
+[  0%] Built target pcl_msgs_generate_messages_eus
+[  0%] Built target autoware_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_lisp
+[35m[1mScanning dependencies of target roscpp_generate_messages_eus[0m
+[35m[1mScanning dependencies of target jsk_footstep_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target roscpp_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target jsk_recognition_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_nodejs[0m
+[  0%] Built target roscpp_generate_messages_eus
+[35m[1mScanning dependencies of target autoware_msgs_generate_messages_eus[0m
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[  0%] Built target jsk_footstep_msgs_generate_messages_cpp
+[  0%] Built target roscpp_generate_messages_cpp
+[  0%] Built target jsk_recognition_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target autoware_msgs_generate_messages_eus
+[35m[1mScanning dependencies of target nmea_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target rosgraph_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target autoware_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target tf_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target actionlib_generate_messages_eus[0m
+[35m[1mScanning dependencies of target nmea_msgs_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target nmea_msgs_generate_messages_lisp[0m
+[  0%] Built target nmea_msgs_generate_messages_eus
+[35m[1mScanning dependencies of target nmea_msgs_generate_messages_py[0m
+[  0%] Built target rosgraph_msgs_generate_messages_eus
+[  0%] Built target autoware_msgs_generate_messages_py
+[  0%] Built target tf_generate_messages_cpp
+[  0%] Built target actionlib_generate_messages_eus
+[  0%] Built target nmea_msgs_generate_messages_nodejs
+[  0%] Built target nmea_msgs_generate_messages_lisp
+[35m[1mScanning dependencies of target tf_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target rosgraph_msgs_generate_messages_py[0m
+[  0%] Built target nmea_msgs_generate_messages_py
+[35m[1mScanning dependencies of target roscpp_generate_messages_py[0m
+[35m[1mScanning dependencies of target tf_generate_messages_nodejs[0m
+[35m[1mScanning dependencies of target tf_generate_messages_py[0m
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_nodejs[0m
+[  0%] Built target tf_generate_messages_lisp
+[  0%] Built target rosgraph_msgs_generate_messages_py
+[  0%] Built target roscpp_generate_messages_py
+[35m[1mScanning dependencies of target std_msgs_generate_messages_nodejs[0m
+[  0%] Built target tf_generate_messages_nodejs
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target tf_generate_messages_py
+[35m[1mScanning dependencies of target geometry_msgs_generate_messages_py[0m
+[  0%] Built target sensor_msgs_generate_messages_nodejs
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_cpp[0m
+[  0%] Built target std_msgs_generate_messages_nodejs
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_py[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target actionlib_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target jsk_footstep_msgs_generate_messages_py[0m
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_cpp
+[35m[1mScanning dependencies of target actionlib_generate_messages_lisp[0m
+[35m[1mScanning dependencies of target actionlib_msgs_generate_messages_eus[0m
+[  0%] Built target sensor_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_lisp
+[  0%] Built target actionlib_generate_messages_cpp
+[  0%] Built target jsk_footstep_msgs_generate_messages_py
+[35m[1mScanning dependencies of target actionlib_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target jsk_recognition_msgs_generate_messages_eus[0m
+[  0%] Built target actionlib_msgs_generate_messages_eus
+[  0%] Built target actionlib_generate_messages_lisp
+[35m[1mScanning dependencies of target std_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target autoware_msgs_generate_messages_cpp[0m
+[35m[1mScanning dependencies of target sensor_msgs_generate_messages_eus[0m
+[35m[1mScanning dependencies of target actionlib_generate_messages_nodejs[0m
+[  0%] Built target jsk_recognition_msgs_generate_messages_eus
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target actionlib_msgs_generate_messages_cpp
+[  0%] Built target autoware_msgs_generate_messages_cpp
+[  0%] Built target sensor_msgs_generate_messages_eus
+[  0%] Built target actionlib_generate_messages_nodejs
+[35m[1mScanning dependencies of target fix2tfpose[0m
+[35m[1mScanning dependencies of target nmea2tfpose[0m
+[35m[1mScanning dependencies of target nmea2tfpose_RTK[0m
+[ 11%] [32mBuilding CXX object CMakeFiles/fix2tfpose.dir/nodes/fix2tfpose/fix2tfpose.cpp.o[0m
+[ 22%] [32mBuilding CXX object CMakeFiles/nmea2tfpose.dir/nodes/nmea2tfpose/nmea2tfpose_core.cpp.o[0m
+[ 33%] [32mBuilding CXX object CMakeFiles/nmea2tfpose.dir/nodes/nmea2tfpose/nmea2tfpose_node.cpp.o[0m
+[ 44%] [32mBuilding CXX object CMakeFiles/nmea2tfpose_RTK.dir/nodes/nmea2tfpose/geo_array.cpp.o[0m
+[ 55%] [32mBuilding CXX object CMakeFiles/nmea2tfpose_RTK.dir/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp.o[0m
+[ 66%] [32mBuilding CXX object CMakeFiles/nmea2tfpose_RTK.dir/nodes/nmea2tfpose/nmea2tfpose_node.cpp.o[0m
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:[m[K In function ‘[01m[Kdouble gnss_localizer::degrees_minutes_seconds(double)[m[K’:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:47:12:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kseconds[m[K’ [-Wunused-variable]
+     double seconds = (d_minutes-minutes)*60.0;
+[01;32m[K            ^[m[K
+In file included from [01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:32:0[m[K:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:[m[K In constructor ‘[01m[Kgnss_localizer::Nmea2TFPoseNode::Nmea2TFPoseNode()[m[K’:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:111:28:[m[K [01;35m[Kwarning: [m[K‘[01m[Kgnss_localizer::Nmea2TFPoseNode::orientation_stamp_[m[K’ will be initialized after [-Wreorder]
+   ros::Time current_time_, orientation_stamp_;
+[01;32m[K                            ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:105:13:[m[K [01;35m[Kwarning: [m[K  ‘[01m[Kgnss_localizer::geo_array gnss_localizer::Nmea2TFPoseNode::last_geo_[m[K’ [-Wreorder]
+   geo_array last_geo_;
+[01;32m[K             ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:53:1:[m[K [01;35m[Kwarning: [m[K  when initialized here [-Wreorder]
+ Nmea2TFPoseNode::Nmea2TFPoseNode()
+[01;32m[K ^[m[K
+In file included from [01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:32:0[m[K:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:110:26:[m[K [01;35m[Kwarning: [m[K‘[01m[Kgnss_localizer::Nmea2TFPoseNode::alt_std[m[K’ will be initialized after [-Wreorder]
+   double lat_std,lon_std,alt_std;
+[01;32m[K                          ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:108:10:[m[K [01;35m[Kwarning: [m[K  ‘[01m[Kdouble gnss_localizer::Nmea2TFPoseNode::surface_speed_[m[K’ [-Wreorder]
+   double surface_speed_;
+[01;32m[K          ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:53:1:[m[K [01;35m[Kwarning: [m[K  when initialized here [-Wreorder]
+ Nmea2TFPoseNode::Nmea2TFPoseNode()
+[01;32m[K ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:[m[K In member function ‘[01m[Kvoid gnss_localizer::Nmea2TFPoseNode::callbackFromNmeaSentence(const ConstPtr&)[m[K’:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:384:12:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kdt[m[K’ [-Wunused-variable]
+     double dt = sqrt(pow(geo_.x() - last_geo_[0].x(), 2) + pow(geo_.y() - last_
+[01;32m[K            ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:385:12:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kthreshold[m[K’ [-Wunused-variable]
+     double threshold = 0.10;
+[01;32m[K            ^[m[K
+[ 77%] [32m[1mLinking CXX executable devel/lib/gnss_localizer/fix2tfpose[0m
+[ 77%] Built target fix2tfpose
+[ 88%] [32m[1mLinking CXX executable devel/lib/gnss_localizer/nmea2tfpose[0m
+[ 88%] Built target nmea2tfpose
+[100%] [32m[1mLinking CXX executable devel/lib/gnss_localizer/nmea2tfpose_RTK[0m
+[100%] Built target nmea2tfpose_RTK
+Invoked command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer' returned '0': /usr/bin/cmake --build /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer -- -j8 -l8
+Invoking command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer': /usr/bin/cmake --build /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer --target tests -- -j8 -l8
+[35m[1mScanning dependencies of target tests[0m
+Built target tests
+Invoked command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer' returned '0': /usr/bin/cmake --build /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer --target tests -- -j8 -l8
+Invoking command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer': /usr/bin/cmake --build /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer --target install
+[  0%] Built target actionlib_generate_messages_py
+[  0%] Built target jsk_footstep_msgs_generate_messages_nodejs
+[  0%] Built target jsk_footstep_msgs_generate_messages_lisp
+[  0%] Built target pcl_msgs_generate_messages_py
+[  0%] Built target pcl_msgs_generate_messages_lisp
+[  0%] Built target pcl_msgs_generate_messages_cpp
+[  0%] Built target jsk_recognition_msgs_generate_messages_py
+[  0%] Built target jsk_recognition_msgs_generate_messages_nodejs
+[  0%] Built target jsk_recognition_msgs_generate_messages_lisp
+[  0%] Built target jsk_footstep_msgs_generate_messages_eus
+[  0%] Built target autoware_msgs_generate_messages_nodejs
+[  0%] Built target tf2_msgs_generate_messages_nodejs
+[  0%] Built target tf2_msgs_generate_messages_lisp
+[  0%] Built target tf2_msgs_generate_messages_eus
+[  0%] Built target tf2_msgs_generate_messages_cpp
+[  0%] Built target actionlib_msgs_generate_messages_py
+[  0%] Built target tf2_msgs_generate_messages_py
+[  0%] Built target actionlib_msgs_generate_messages_nodejs
+[  0%] Built target actionlib_msgs_generate_messages_lisp
+[  0%] Built target std_msgs_generate_messages_eus
+[  0%] Built target roscpp_generate_messages_lisp
+[  0%] Built target nmea_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_py
+[  0%] Built target rosgraph_msgs_generate_messages_lisp
+[  0%] Built target pcl_msgs_generate_messages_nodejs
+[  0%] Built target roscpp_generate_messages_nodejs
+[  0%] Built target tf_generate_messages_eus
+[  0%] Built target rosgraph_msgs_generate_messages_nodejs
+[  0%] Built target pcl_msgs_generate_messages_eus
+[  0%] Built target autoware_msgs_generate_messages_lisp
+[  0%] Built target rosgraph_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_lisp
+[  0%] Built target jsk_footstep_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_lisp
+[  0%] Built target roscpp_generate_messages_eus
+[  0%] Built target roscpp_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_eus
+[  0%] Built target jsk_recognition_msgs_generate_messages_cpp
+[  0%] Built target geometry_msgs_generate_messages_nodejs
+[  0%] Built target autoware_msgs_generate_messages_eus
+[  0%] Built target nmea_msgs_generate_messages_eus
+[  0%] Built target rosgraph_msgs_generate_messages_eus
+[  0%] Built target autoware_msgs_generate_messages_py
+[  0%] Built target tf_generate_messages_cpp
+[  0%] Built target nmea_msgs_generate_messages_nodejs
+[  0%] Built target actionlib_generate_messages_eus
+[  0%] Built target nmea_msgs_generate_messages_lisp
+[  0%] Built target nmea_msgs_generate_messages_py
+[  0%] Built target rosgraph_msgs_generate_messages_py
+[  0%] Built target tf_generate_messages_lisp
+[  0%] Built target roscpp_generate_messages_py
+[  0%] Built target tf_generate_messages_nodejs
+[  0%] Built target tf_generate_messages_py
+[  0%] Built target geometry_msgs_generate_messages_cpp
+[  0%] Built target sensor_msgs_generate_messages_nodejs
+[  0%] Built target std_msgs_generate_messages_nodejs
+[  0%] Built target geometry_msgs_generate_messages_py
+[  0%] Built target sensor_msgs_generate_messages_cpp
+[  0%] Built target sensor_msgs_generate_messages_lisp
+[  0%] Built target sensor_msgs_generate_messages_py
+[  0%] Built target actionlib_generate_messages_cpp
+[  0%] Built target jsk_footstep_msgs_generate_messages_py
+[  0%] Built target actionlib_msgs_generate_messages_eus
+[  0%] Built target actionlib_generate_messages_lisp
+[  0%] Built target jsk_recognition_msgs_generate_messages_eus
+[  0%] Built target actionlib_msgs_generate_messages_cpp
+[  0%] Built target std_msgs_generate_messages_cpp
+[  0%] Built target sensor_msgs_generate_messages_eus
+[  0%] Built target actionlib_generate_messages_nodejs
+[  0%] Built target autoware_msgs_generate_messages_cpp
+[ 44%] Built target nmea2tfpose_RTK
+[ 77%] Built target nmea2tfpose
+[100%] Built target fix2tfpose
+[36mInstall the project...[0m
+-- Install configuration: "Release"
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/pkgconfig/gnss_localizer.pc
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/cmake/gnss_localizerConfig.cmake
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/cmake/gnss_localizerConfig-version.cmake
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/package.xml
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/gnss_localizer/nmea2tfpose
+-- Set runtime path of "/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/gnss_localizer/nmea2tfpose" to ""
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/gnss_localizer/nmea2tfpose_RTK
+-- Set runtime path of "/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/gnss_localizer/nmea2tfpose_RTK" to ""
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/gnss_localizer/fix2tfpose
+-- Set runtime path of "/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/lib/gnss_localizer/fix2tfpose" to ""
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/launch
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/launch/nmea2tfpose.launch
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/launch/fix2tfpose.launch
+-- Installing: /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/install/gnss_localizer/share/gnss_localizer/launch/nmea2tfpose_RTK.launch
+Invoked command in '/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer' returned '0': /usr/bin/cmake --build /home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/build/gnss_localizer --target install

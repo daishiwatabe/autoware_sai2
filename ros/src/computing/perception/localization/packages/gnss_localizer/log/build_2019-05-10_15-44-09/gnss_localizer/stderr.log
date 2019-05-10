@@ -1,0 +1,32 @@
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:[m[K In function ‘[01m[Kdouble gnss_localizer::degrees_minutes_seconds(double)[m[K’:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:47:12:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kseconds[m[K’ [-Wunused-variable]
+     double seconds = (d_minutes-minutes)*60.0;
+[01;32m[K            ^[m[K
+In file included from [01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:32:0[m[K:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:[m[K In constructor ‘[01m[Kgnss_localizer::Nmea2TFPoseNode::Nmea2TFPoseNode()[m[K’:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:111:28:[m[K [01;35m[Kwarning: [m[K‘[01m[Kgnss_localizer::Nmea2TFPoseNode::orientation_stamp_[m[K’ will be initialized after [-Wreorder]
+   ros::Time current_time_, orientation_stamp_;
+[01;32m[K                            ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:105:13:[m[K [01;35m[Kwarning: [m[K  ‘[01m[Kgnss_localizer::geo_array gnss_localizer::Nmea2TFPoseNode::last_geo_[m[K’ [-Wreorder]
+   geo_array last_geo_;
+[01;32m[K             ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:53:1:[m[K [01;35m[Kwarning: [m[K  when initialized here [-Wreorder]
+ Nmea2TFPoseNode::Nmea2TFPoseNode()
+[01;32m[K ^[m[K
+In file included from [01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:32:0[m[K:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:110:26:[m[K [01;35m[Kwarning: [m[K‘[01m[Kgnss_localizer::Nmea2TFPoseNode::alt_std[m[K’ will be initialized after [-Wreorder]
+   double lat_std,lon_std,alt_std;
+[01;32m[K                          ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.h:108:10:[m[K [01;35m[Kwarning: [m[K  ‘[01m[Kdouble gnss_localizer::Nmea2TFPoseNode::surface_speed_[m[K’ [-Wreorder]
+   double surface_speed_;
+[01;32m[K          ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:53:1:[m[K [01;35m[Kwarning: [m[K  when initialized here [-Wreorder]
+ Nmea2TFPoseNode::Nmea2TFPoseNode()
+[01;32m[K ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:[m[K In member function ‘[01m[Kvoid gnss_localizer::Nmea2TFPoseNode::callbackFromNmeaSentence(const ConstPtr&)[m[K’:
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:384:12:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kdt[m[K’ [-Wunused-variable]
+     double dt = sqrt(pow(geo_.x() - last_geo_[0].x(), 2) + pow(geo_.y() - last_
+[01;32m[K            ^[m[K
+[01m[K/home/autoware/Autoware/ros/src/computing/perception/localization/packages/gnss_localizer/nodes/nmea2tfpose/nmea2tfpose_core_RTK.cpp:385:12:[m[K [01;35m[Kwarning: [m[Kunused variable ‘[01m[Kthreshold[m[K’ [-Wunused-variable]
+     double threshold = 0.10;
+[01;32m[K            ^[m[K
