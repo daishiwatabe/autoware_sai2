@@ -52,7 +52,7 @@ add_executable(RTK_localizer
 target_link_libraries(RTK_localizer ${catkin_LIBRARIES})
 add_dependencies(RTK_localizer ${catkin_EXPORTED_TARGETS})
 
-install(TARGETS nmea2tfpose nmea2tfpose_RTK fix2tfpose
+install(TARGETS nmea2tfpose nmea2tfpose_RTK fix2tfpose RTK_localizer
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
