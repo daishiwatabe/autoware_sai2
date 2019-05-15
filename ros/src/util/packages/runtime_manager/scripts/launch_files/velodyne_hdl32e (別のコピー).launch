@@ -10,7 +10,7 @@
   <arg name="calibration" default="$(find velodyne_pointcloud)/params/32db.yaml"/>
   <arg name="min_range" default="0.1"/>
   <arg name="max_range" default="130.0"/>
-  <arg name="topic_name" default="points_raw"/>
+  <arg name="topic_name" default="points_raw3"/>
   <arg name="port" default="2370" />
   <arg name="frame_id" default="velodyne3" />
 

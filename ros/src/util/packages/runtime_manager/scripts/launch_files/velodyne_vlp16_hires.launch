@@ -15,16 +15,20 @@ $Id$
   <arg name="max_range" default="130.0" />
   <arg name="model" default="VLP16"/>
   <arg name="topic_name" default="points_raw"/>
+  <arg name="port" default="2368" />
+  <arg name="frame_id" default="velodyne1" />
 
   <!-- start nodelet manager and driver nodelets -->
-  <include file="$(find velodyne_driver)/launch/nodelet_manager.launch">
+  <include file="$(find velodyne_driver)/launch/nodelet_manager.launch" ns="$(arg frame_id)">
     <arg name="model" value="$(arg model)"/>
     <arg name="pcap" value="$(arg pcap)"/>
+    <arg name="port" value="$(arg port)"/>
+    <arg name="frame_id" value="$(arg frame_id)"/>
   </include>
 
   <!-- start cloud nodelet -->
-  <node pkg="nodelet" type="nodelet" name="cloud_nodelet"
-        args="load velodyne_pointcloud/CloudNodelet velodyne_nodelet_manager">
+  <node pkg="nodelet" type="nodelet" name="$(arg frame_id)_nodelet"
+        args="load velodyne_pointcloud/CloudNodelet $(arg frame_id)_nodelet_manager" ns="$(arg frame_id)">
     <param name="calibration" value="$(arg calibration)"/>
     <param name="min_range" value="$(arg min_range)"/>
     <param name="max_range" value="$(arg max_range)"/>
