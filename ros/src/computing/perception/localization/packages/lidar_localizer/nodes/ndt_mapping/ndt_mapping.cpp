@@ -674,7 +674,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
   q.setRPY(current_pose.roll, current_pose.pitch, current_pose.yaw);
   transform.setRotation(q);
 
-  br.sendTransform(tf::StampedTransform(transform, current_scan_time, "map", "base_link"));
+  br.sendTransform(tf::StampedTransform(transform, current_scan_time, "map", "ndt_base_link"));
 
   scan_duration = current_scan_time - previous_scan_time;
   double secs = scan_duration.toSec();

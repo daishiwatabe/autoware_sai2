@@ -1,0 +1,5 @@
+<!-- -->
+<launch>
+	<node pkg="waypoint_maker" type="waypoint_param_sender" name="waypoint_param_sender" output="screen"/>
+
+</launch>

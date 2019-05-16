@@ -669,6 +669,9 @@ subs :
          desc : waypoint_velocity_visualizer desc sample
          cmd  : roslaunch waypoint_maker waypoint_velocity_visualizer.launch
          param: waypoint_velocity_visualizer
+       - name : waypoint_param_sender
+         desc : waypoint_param_sender desc sample
+         cmd  : roslaunch waypoint_maker waypoint_param_sender.launch
 
     - name : waypoint_planner
       desc : waypoint_planner desc sample
