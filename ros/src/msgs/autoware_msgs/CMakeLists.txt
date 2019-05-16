@@ -14,14 +14,6 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
         DIRECTORY msg
         FILES
-            ## new add
-            GnssSurfaceSpeed.msg
-            GnssStandardDeviation.msg
-            NdtPoseAndRTKPose.msg
-            PositionChecker.msg
-            WaypointParam.msg
-            Format7Info.msg
-
             ControlCommandStamped.msg
             CloudCluster.msg
             CloudClusterArray.msg
@@ -77,6 +69,14 @@ add_message_files(
 
             ## Remote Control
             RemoteCmd.msg
+
+            ## new add
+            GnssSurfaceSpeed.msg
+            GnssStandardDeviation.msg
+            NdtPoseAndRTKPose.msg
+            PositionChecker.msg
+            WaypointParam.msg
+            Format7Info.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

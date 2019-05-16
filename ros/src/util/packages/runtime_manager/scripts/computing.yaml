@@ -572,6 +572,75 @@ subs :
              depend_bool : 'lambda v : v == 1'
              flags : [ nl ]
 
+       - name : waypoint_loader_show_id
+         desc : waypoint_loader_show_id desc sample
+         cmd  : roslaunch waypoint_maker waypoint_loader_show_id.launch
+         param: waypoint_loader
+         gui  :
+           dialog_width  : 600
+           dialog_height : 450
+           multi_lane_csv :
+             depend      : load_csv
+             depend_bool : 'lambda v : v == 1'
+             prop  : 1
+           realtime_tuning_mode:
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           resample_mode :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+           resample_interval :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           replan_curve_mode :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+           overwrite_vmax_mode :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+           replan_endpoint_mode :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           velocity_max :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           radius_thresh :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           radius_min :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           velocity_min :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           accel_limit :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           decel_limit :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           velocity_offset :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           end_point_offset :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+           braking_distance :
+             depend      : replanning_mode
+             depend_bool : 'lambda v : v == 1'
+             flags : [ nl ]
+
        - name : waypoint_saver
          desc : waypoint_saver desc sample
          cmd  : roslaunch waypoint_maker waypoint_saver.launch

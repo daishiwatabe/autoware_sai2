@@ -1,6 +1,8 @@
 Header header
 float32 weight
 int32 blinker
+int32 feat_proj_x
+int32 feat_proj_y
 int32 velocity_KPPlus
 int32 velocity_KPMinus
 int32 velocity_punchPlus
@@ -9,5 +11,7 @@ int32 velocity_windowPlus
 int32 velocity_windowMinus
 int32 pause
 int32 pauseGroup
+float32 vgf_leafsize
+float32 vgf_measurement_range
 ExtractedPosition[] signals
 int32 curve_flag

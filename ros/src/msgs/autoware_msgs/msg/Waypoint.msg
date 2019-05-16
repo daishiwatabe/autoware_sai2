@@ -24,3 +24,5 @@ float32 time_cost
 # BACKWARD_RIGHT		= 5
 # STANDSTILL	 		= 6
 uint32 direction
+
+WaypointParam waypoint_param
