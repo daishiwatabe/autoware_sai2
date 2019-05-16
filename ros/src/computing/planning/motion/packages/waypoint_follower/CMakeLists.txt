@@ -92,8 +92,13 @@ target_link_libraries(twist_gate ${catkin_LIBRARIES})
 add_dependencies(twist_gate
         ${catkin_EXPORTED_TARGETS})
 
+add_executable(position_checker nodes/position_checker/position_checker.cpp)
+target_link_libraries(position_checker ${catkin_LIBRARIES})
+add_dependencies(position_checker
+        ${catkin_EXPORTED_TARGETS})
+
 ## Install executables and/or libraries
-install(TARGETS libwaypoint_follower pure_pursuit wf_simulator twist_filter twist_gate
+install(TARGETS libwaypoint_follower pure_pursuit wf_simulator twist_filter twist_gate position_checker
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})

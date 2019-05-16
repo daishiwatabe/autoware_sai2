@@ -725,6 +725,9 @@ subs :
              flags : [ nl ]
            position_error :
              flags : [ nl ]
+       - name : position_checker
+         desc : position_checker desc sample
+         cmd  : roslaunch waypoint_follower position_checker.launch
 
     - name : OpenPlanner - Local planning
       desc : Local Planner for OpenPlanner
@@ -844,7 +847,12 @@ subs :
             depend : use_fms
             depend_bool : 'lambda v : v == 0'
 
-
+  - name : Original
+    desc : Original groups
+    subs : 
+    - name : signal creator
+      desc : signal creator desc sample
+      cmd  : roslaunch signal_creator signal_creator.launch
 
 buttons:
   car_dpm :
