@@ -79,6 +79,31 @@ subs :
             flags : [ nl ]
           sync :
             func : self.button_synchronization.GetValue()
+      - name : ndt_matching_gnss_subscribe
+        desc : ndt_matching_gnss_subscribe desc sample
+        cmd  : roslaunch lidar_localizer ndt_matching_gnss_subscribe.launch
+        param: ndt
+        gui  :
+          dialog_height : 550
+          stat_topic : [ /NDTStat.ndt_stat.exe_time ]
+          x  :
+            user_category : ''
+          yaw:
+            flags : [ nl ]
+          max:
+            user_category : ''
+          layer:
+            flags : [ nl ]
+          method_type:
+            flags : [ nl ]
+          use_odom:
+            flags : [ nl ]
+          imu_topic:
+            flags : [ nl ]
+          get_height:
+            flags : [ nl ]
+          sync :
+            func : self.button_synchronization.GetValue()
       - name : ndt_matching_monitor
         desc : Monitors NDT localizer. Halts or resets localization if algorithm fails. Works better with GNSS.
         cmd  : roslaunch lidar_localizer ndt_matching_monitor.launch
@@ -661,6 +686,47 @@ subs :
            lane_topic    :
              depend      : input_type
              depend_bool : 'lambda v : v == 1'
+       - name : waypoint_saver_RTKplus
+         desc : waypoint_saver_RTKplus desc sample
+         cmd  : roslaunch waypoint_maker waypoint_saver_RTKplus.launch
+         param: waypoint_saver
+         gui  :
+           input_type    :
+             flags       : [ nl ]
+           save_filename :
+             prop        : 1
+             flags       : [ nl ]
+           save_velocity :
+             depend      : input_type
+             depend_bool : 'lambda v : v == 0'
+           interval      :
+             depend      : input_type
+             depend_bool : 'lambda v : v == 0'
+             flags       : [ nl ]
+           lane_topic    :
+             depend      : input_type
+             depend_bool : 'lambda v : v == 1'
+       - name : waypoint_saver_signal_plus
+         desc : waypoint_saver_signal_plus desc sample
+         cmd  : roslaunch waypoint_maker waypoint_saver_signal_plus.launch
+         param: waypoint_saver
+         gui  :
+           input_type    :
+             flags       : [ nl ]
+           save_filename :
+             prop        : 1
+             flags       : [ nl ]
+           save_velocity :
+             depend      : input_type
+             depend_bool : 'lambda v : v == 0'
+           interval      :
+             depend      : input_type
+             depend_bool : 'lambda v : v == 0'
+             flags       : [ nl ]
+           lane_topic    :
+             depend      : input_type
+             depend_bool : 'lambda v : v == 1'
+
        - name : waypoint_clicker
          desc : waypoint_clicker desc sample
          cmd  : rosrun waypoint_maker waypoint_clicker
@@ -672,6 +738,10 @@ subs :
        - name : waypoint_param_sender
          desc : waypoint_param_sender desc sample
          cmd  : roslaunch waypoint_maker waypoint_param_sender.launch
+       - name : map_normalizer
+         desc : map_normalizer desc sample
+         cmd  : roslaunch waypoint_maker map_normalizer.launch
+         param: map_normalizer
 
     - name : waypoint_planner
       desc : waypoint_planner desc sample
@@ -5888,3 +5958,83 @@ params :
       cmd_param :
         dash      : ''
         delim     : ':='
+
+  - name  : map_normalizer
+    vars  :
+    - name      : load_map_filename
+      desc      : load_map_filename desc sample
+      label     : Load_Map_FileName
+      kind      : path
+      path_type : multi
+      v         : ''
+      cmd_param :
+        var_name    : load_map_name
+        dash        : ''
+        delim       : ':='
+    - name      : load_csv_filename
+      desc      : load_csv_filename desc sample
+      label     : Load_Csv_FileName
+      kind      : path
+      path_type : multi
+      v         : ''
+      cmd_param :
+        var_name    : load_csv_name
+        dash        : ''
+        delim       : ':='
+    - name      : save_map_filename
+      desc      : save_map_filename desc sample
+      label     : Save_Map_FileName
+      kind      : path
+      path_type : save
+      v         : '/tmp/normalize_map.pcd'
+      cmd_param :
+        var_name    : save_map_name
+        dash        : ''
+        delim       : ':='
+    - name      : save_use_csv_filename
+      desc      : save_use_csv_filename desc sample
+      label     : Save_Use_Csv_FileName
+      kind      : path
+      path_type : save
+      v         : '/tmp/normalize_use_path.csv'
+      cmd_param :
+        var_name    : save_use_csv_name
+        dash        : ''
+        delim       : ':='
+    - name      : save_all_csv_filename
+      desc      : save_all_csv_filename desc sample
+      label     : Save_All_Csv_FileName
+      kind      : path
+      path_type : save
+      v         : '/tmp/normalize_all_path.csv'
+      cmd_param :
+        var_name    : save_all_csv_name
+        dash        : ''
+        delim       : ':='
+    - name : limit_deviation_lat
+      desc : limit_deviation_lat each two waypoints
+      label: Limit Deviation Lat
+      min  : 0.0
+      max  : 5.0
+      v    : 0.01
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : limit_deviation_lon
+      desc : limit_deviation_lon each two waypoints
+      label: Limit Deviation Lon
+      min  : 0.0
+      max  : 5.0
+      v    : 0.01
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : limit_deviation_alt
+      desc : limit_deviation_alt each two waypoints
+      label: Limit Deviation Alt
+      min  : 0.0
+      max  : 5.0
+      v    : 0.01
+      cmd_param:
+        dash     : ''
+        delim    : ':='

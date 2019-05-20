@@ -64,6 +64,16 @@ target_link_libraries(waypoint_saver ${catkin_LIBRARIES})
 add_dependencies(waypoint_saver
         ${catkin_EXPORTED_TARGETS})
 
+add_executable(waypoint_saver_RTKplus nodes/waypoint_saver/waypoint_saver_RTKplus.cpp)
+target_link_libraries(waypoint_saver_RTKplus ${catkin_LIBRARIES})
+add_dependencies(waypoint_saver_RTKplus
+        ${catkin_EXPORTED_TARGETS})
+
+add_executable(waypoint_saver_signal_plus nodes/waypoint_saver/waypoint_saver_signal_plus.cpp)
+target_link_libraries(waypoint_saver_signal_plus ${catkin_LIBRARIES})
+add_dependencies(waypoint_saver_signal_plus
+        ${catkin_EXPORTED_TARGETS})
+
 add_executable(waypoint_extractor nodes/waypoint_extractor/waypoint_extractor.cpp)
 target_link_libraries(waypoint_extractor ${catkin_LIBRARIES})
 add_dependencies(waypoint_extractor
@@ -92,16 +102,22 @@ target_link_libraries(waypoint_param_sender ${catkin_LIBRARIES})
 add_dependencies(waypoint_param_sender
         ${catkin_EXPORTED_TARGETS})
 
+add_executable(map_normalizer nodes/map_normalizer/map_normalizer.cpp)
+target_link_libraries(map_normalizer ${catkin_LIBRARIES})
+
 install(TARGETS
         waypoint_loader
         waypoint_loader_show_id
         waypoint_replanner
         waypoint_saver
+        waypoint_saver_RTKplus
+        waypoint_saver_signal_plus
         waypoint_clicker
         waypoint_marker_publisher
         waypoint_marker_publisher_show_id
         waypoint_velocity_visualizer
         waypoint_param_sender
+        map_normalizer
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
