@@ -42,13 +42,13 @@ RegionTLRSSDROSNode::~RegionTLRSSDROSNode() {
 void RegionTLRSSDROSNode::RunRecognition() {
   // Get execution parameters from ROS parameter server
   GetROSParam();
-
+std::cout << "aaa" << std::endl;
   // Initialize recognizer
   recognizer.Init(network_definition_file_name_,
                   pretrained_model_file_name_,
                   use_gpu_,
                   gpu_id_);
-
+std::cout << "aaa" << std::endl;
   // Start subscribing and publishing
   StartSubscribersAndPublishers();
   ros::spin();
