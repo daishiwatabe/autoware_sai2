@@ -23,24 +23,24 @@ void TrafficLightRecognizer::Init(const std::string &network_definition_file_nam
                                   const bool use_gpu,
                                   const unsigned int gpu_id) {
   // If user attempt to use GPU, set mode and specify the GPU ID
-  if (use_gpu) {
-    caffe::Caffe::set_mode(caffe::Caffe::GPU);
+  if (use_gpu) {std::cout << "0" << std::endl;
+    caffe::Caffe::set_mode(caffe::Caffe::GPU);std::cout << "0" << std::endl;
     caffe::Caffe::SetDevice(gpu_id);
-  } else {
+  } else {std::cout << "1" << std::endl;
     caffe::Caffe::set_mode(caffe::Caffe::CPU);
   }
-
+std::cout << "bbb" << std::endl;
   // Load the network
   network_.reset(new caffe::Net<float>(network_definition_file_name, caffe::TEST));
   network_->CopyTrainedLayersFrom(pretrained_model_file_name);
-
+std::cout << "ccc" << std::endl;
   CHECK_EQ(network_->num_inputs(), 1) << "Network should have exactly one input.";
   CHECK_EQ(network_->num_outputs(), 1) << "Network should have exactly one output.";
-
+std::cout << "ddd" << std::endl;
   caffe::Blob<float>* input_layer = network_->input_blobs()[0];
   num_channels_ = input_layer->channels();
   CHECK(num_channels_ == 3 || num_channels_ == 1);
-
+std::cout << "eee" << std::endl;
   input_geometry_ = cv::Size(input_layer->width(), input_layer->height());
 
   //SetMean(kPixelMean_);

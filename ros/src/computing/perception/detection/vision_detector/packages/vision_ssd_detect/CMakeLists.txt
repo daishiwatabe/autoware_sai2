@@ -55,7 +55,7 @@ ENDIF ()
 
 #####SSD########
 ##############################SSD'sFORK of CAFFE NEEDS TO BE PREVIOUSLY COMPILED####################
-set(SSD_CAFFE_PATH "$ENV{HOME}/ssdcaffe/distribute")
+set(SSD_CAFFE_PATH "$ENV{HOME}/ssdcaffe/build")
 ####################################################################################################
 if (EXISTS "${SSD_CAFFE_PATH}")
 

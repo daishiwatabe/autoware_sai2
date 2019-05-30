@@ -26,6 +26,7 @@ catkin_package(CATKIN_DEPENDS
 )
 
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
   ${tablet_socket_msgs_INCLUDE_DIRS}
   ${autoware_msgs_INCLUDE_DIRS}
@@ -43,7 +44,41 @@ add_dependencies(vehicle_sender
   ${catkin_EXPORTED_TARGETS}
   )
 
-install(TARGETS vehicle_sender vehicle_receiver
+add_executable(bus_socket
+	nodes/bus_socket/bus_socket.cpp
+	nodes/bus_socket/canif.cpp
+	nodes/bus_socket/estima.cpp)
+target_link_libraries(bus_socket ${catkin_LIBRARIES})
+add_dependencies(bus_socket
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+add_executable(kvaser_can_receiver
+	nodes/kvaser_can_receiver/kvaser_can_receiver.cpp)
+target_link_libraries(kvaser_can_receiver
+  ${catkin_LIBRARIES}
+  canlib)
+add_dependencies(kvaser_can_receiver
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+add_executable(kvaser_can_sender
+	nodes/kvaser_can_sender/kvaser_can_sender.cpp)
+target_link_libraries(kvaser_can_sender
+  ${catkin_LIBRARIES}
+  canlib)
+add_dependencies(kvaser_can_sender
+  ${catkin_EXPORTED_TARGETS}
+  )
+
+install(TARGETS vehicle_sender vehicle_receiver bus_socket kvaser_can_receiver kvaser_can_sender
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
+
+install(FILES
+		scripts/bus_socket.launch
+		scripts/kvaser_can_receiver.launch
+		scripts/kvaser_can_sender.launch
+		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+		)

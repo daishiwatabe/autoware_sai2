@@ -1,0 +1,15 @@
+<launch>
+
+	<!-- declare arguments with default values -->
+	<arg name="device" default="vcan0"/>
+	<arg name="timeout" default="1.0"/>
+	<arg name="timeout_disabled" default="true"/>
+	<arg name="autodrive" default="true"/>
+
+	<node pkg="vehicle_socket" type="bus_socket" name="bus_socket" output="screen">
+		<param name="device" value="$(arg device)"/>
+		<param name="timeout" value="$(arg timeout)"/>
+		<param name="timeout_disabled" value="$(arg timeout_disabled)"/>
+		<param name="autodrive" value="$(arg autodrive)"/>
+	</node>
+</launch>
