@@ -244,13 +244,15 @@ EControl crossWalkDetection(const pcl::PointCloud<pcl::PointXYZ>& points, const 
   return EControl::KEEP;  // find no obstacles
 }
 
-int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const int closest_waypoint,
+int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points,
+                       const std::vector<mobileye_560_660_msgs::ObstacleData>& mobileye_obstacle, const int closest_waypoint,
                        const autoware_msgs::Lane& lane, const CrossWalk& crosswalk, double stop_range,
                        double points_threshold, const geometry_msgs::PoseStamped& localizer_pose,
                        ObstaclePoints* obstacle_points, EObstacleType* obstacle_type,
-                       const int wpidx_detection_result_by_other_nodes)
+                       const int wpidx_detection_result_by_other_nodes, bool enable_mobileye)
 {
   int stop_obstacle_waypoint = -1;
+
   *obstacle_type = EObstacleType::NONE;
   // start search from the closest waypoint
   for (int i = closest_waypoint; i < closest_waypoint + STOP_SEARCH_DISTANCE; i++)
@@ -263,7 +265,7 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const int c
     if (wpidx_detection_result_by_other_nodes >= 0 &&
         lane.waypoints.at(i).gid == wpidx_detection_result_by_other_nodes)
     {
-      stop_obstacle_waypoint = i;
+		stop_obstacle_waypoint = i;
       *obstacle_type = EObstacleType::STOPLINE;
       obstacle_points->setStopPoint(lane.waypoints.at(i).pose.pose.position); // for vizuialization
       break;
@@ -275,7 +277,7 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const int c
       // found an obstacle in the cross walk
       if (crossWalkDetection(points, crosswalk, localizer_pose, points_threshold, obstacle_points) == EControl::STOP)
       {
-        stop_obstacle_waypoint = i;
+		stop_obstacle_waypoint = i;
         *obstacle_type = EObstacleType::ON_CROSSWALK;
         break;
       }
@@ -286,7 +288,7 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const int c
     tf::Vector3 tf_waypoint = point2vector(waypoint);
     tf_waypoint.setZ(0);
 
-    int stop_point_count = 0;
+	/*int stop_point_count = 0;
     for (const auto& p : points)
     {
       tf::Vector3 point_vector(p.x, p.y, 0);
@@ -294,7 +296,7 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const int c
       // 2D distance between waypoint and points (obstacle)
       double dt = tf::tfDistance(point_vector, tf_waypoint);
       if (dt < stop_range)
-      {
+	  {
         stop_point_count++;
         geometry_msgs::Point point_temp;
         point_temp.x = p.x;
@@ -304,15 +306,28 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const int c
       }
     }
 
-    // there is an obstacle if the number of points exceeded the threshold
-    if (stop_point_count > points_threshold)
-    {
-      stop_obstacle_waypoint = i;
-      *obstacle_type = EObstacleType::ON_WAYPOINTS;
-      break;
-    }
+	// there is an obstacle if the number of points exceeded the threshold
+	if (stop_point_count > points_threshold)
+	{
+		stop_obstacle_waypoint = i;
+	  *obstacle_type = EObstacleType::ON_WAYPOINTS;
+	  break;
+	}*/
 
-    obstacle_points->clearStopPoints();
+	obstacle_points->clearStopPoints();
+
+	for(const auto& m : mobileye_obstacle)
+	{
+		tf::Vector3 mobileye_vector(m.obstacle_pos_x , m.obstacle_pos_y, 0);
+
+		// 2D distance between waypoint and points (obstacle)
+		double dt = tf::tfDistance(mobileye_vector, tf_waypoint);
+		if (dt < stop_range)
+		{
+			stop_obstacle_waypoint = i;
+			*obstacle_type = EObstacleType::ON_WAYPOINTS;
+		}
+	}
 
     // check next waypoint...
   }
@@ -338,6 +353,7 @@ int detectDecelerateObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const
     tf::Vector3 tf_waypoint = point2vector(waypoint);
     tf_waypoint.setZ(0);
 
+	// point cloud
     int decelerate_point_count = 0;
     for (const auto& p : points)
     {
@@ -372,19 +388,26 @@ int detectDecelerateObstacle(const pcl::PointCloud<pcl::PointXYZ>& points, const
 }
 
 // Detect an obstacle by using pointcloud
-EControl pointsDetection(const pcl::PointCloud<pcl::PointXYZ>& points, const int closest_waypoint,
+EControl pointsDetection(const pcl::PointCloud<pcl::PointXYZ>& points,
+                         const std::vector<mobileye_560_660_msgs::ObstacleData>& mobileye_obstacle, const int closest_waypoint,
                          const autoware_msgs::Lane& lane, const CrossWalk& crosswalk, const VelocitySetInfo& vs_info,
-                         int* obstacle_waypoint, ObstaclePoints* obstacle_points)
+                         int* obstacle_waypoint, ObstaclePoints* obstacle_points, bool enableMobileye)
 {
   // no input for detection || no closest waypoint
-  if ((points.empty() == true && vs_info.getDetectionResultByOtherNodes() == -1) || closest_waypoint < 0)
-    return EControl::KEEP;
-
+  if(enableMobileye)
+  {
+	if ((points.empty() == true && mobileye_obstacle.empty() && vs_info.getDetectionResultByOtherNodes() == -1) || closest_waypoint < 0)
+		return EControl::KEEP;
+  }
+  else {
+	if ((points.empty() == true && vs_info.getDetectionResultByOtherNodes() == -1) || closest_waypoint < 0)
+		return EControl::KEEP;
+  }
   EObstacleType obstacle_type = EObstacleType::NONE;
   int stop_obstacle_waypoint =
-      detectStopObstacle(points, closest_waypoint, lane, crosswalk, vs_info.getStopRange(),
+      detectStopObstacle(points, mobileye_obstacle, closest_waypoint, lane, crosswalk, vs_info.getStopRange(),
                          vs_info.getPointsThreshold(), vs_info.getLocalizerPose(),
-                         obstacle_points, &obstacle_type, vs_info.getDetectionResultByOtherNodes());
+                         obstacle_points, &obstacle_type, vs_info.getDetectionResultByOtherNodes(), enableMobileye);
 
   // skip searching deceleration range
   if (vs_info.getDecelerationRange() < 0.01)
@@ -438,11 +461,12 @@ EControl pointsDetection(const pcl::PointCloud<pcl::PointXYZ>& points, const int
 
 EControl obstacleDetection(int closest_waypoint, const autoware_msgs::Lane& lane, const CrossWalk& crosswalk,
                            const VelocitySetInfo vs_info, const ros::Publisher& detection_range_pub,
-                           const ros::Publisher& obstacle_pub, int* obstacle_waypoint)
+                           const ros::Publisher& obstacle_pub, int* obstacle_waypoint, bool enableMobileye)
 {
   ObstaclePoints obstacle_points;
-  EControl detection_result = pointsDetection(vs_info.getPoints(), closest_waypoint, lane, crosswalk, vs_info,
-                                              obstacle_waypoint, &obstacle_points);
+  EControl detection_result = pointsDetection(vs_info.getPoints(), vs_info.getMobileyeObstacle(),
+                                              closest_waypoint, lane, crosswalk, vs_info,
+                                              obstacle_waypoint, &obstacle_points, enableMobileye);
   displayDetectionRange(lane, crosswalk, closest_waypoint, detection_result, *obstacle_waypoint, vs_info.getStopRange(),
                         vs_info.getDecelerationRange(), detection_range_pub);
 
@@ -530,12 +554,13 @@ int main(int argc, char** argv)
   bool use_crosswalk_detection;
   bool enable_multiple_crosswalk_detection;
   bool enablePlannerDynamicSwitch;
+  bool enableMobileye;
 
   std::string points_topic;
   private_nh.param<bool>("use_crosswalk_detection", use_crosswalk_detection, true);
   private_nh.param<bool>("enable_multiple_crosswalk_detection", enable_multiple_crosswalk_detection, true);
   private_nh.param<bool>("enablePlannerDynamicSwitch", enablePlannerDynamicSwitch, false);
-
+  private_nh.param<bool>("enableMobileye", enableMobileye, false);
 
   private_nh.param<std::string>("points_topic", points_topic, "points_lanes");
 
@@ -557,6 +582,7 @@ int main(int argc, char** argv)
   ros::Subscriber localizer_sub = nh.subscribe("localizer_pose", 1, &VelocitySetInfo::localizerPoseCallback, &vs_info);
   ros::Subscriber control_pose_sub = nh.subscribe("current_pose", 1, &VelocitySetInfo::controlPoseCallback, &vs_info);
   ros::Subscriber detectionresult_sub = nh.subscribe("/state/stopline_wpidx", 1, &VelocitySetInfo::detectionCallback, &vs_info);
+  ros::Subscriber mobileye_obstacle_sub = nh.subscribe("/parsed_tx/obstacle_data", 1, &VelocitySetInfo::mobileyeObstacleCallback, &vs_info);
 
   // vector map subscriber
   ros::Subscriber sub_dtlane = nh.subscribe("vector_map_info/cross_walk", 1, &CrossWalk::crossWalkCallback, &crosswalk);
@@ -600,12 +626,13 @@ int main(int argc, char** argv)
 
     int obstacle_waypoint = -1;
     EControl detection_result = obstacleDetection(closest_waypoint, vs_path.getPrevWaypoints(), crosswalk, vs_info,
-                                                  detection_range_pub, obstacle_pub, &obstacle_waypoint);
+	                                              detection_range_pub, obstacle_pub, &obstacle_waypoint, enableMobileye);
 
     changeWaypoints(vs_info, detection_result, closest_waypoint,
                     obstacle_waypoint, final_waypoints_pub, &vs_path);
 
     vs_info.clearPoints();
+	vs_info.clearMobileyeObstacle();
 
     // publish obstacle waypoint index
     std_msgs::Int32 obstacle_waypoint_index;

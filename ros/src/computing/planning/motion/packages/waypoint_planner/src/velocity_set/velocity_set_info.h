@@ -20,6 +20,7 @@
 #include <ros/ros.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <mobileye_560_660_msgs/ObstacleData.h>
 #include <std_msgs/Int32.h>
 
 #include "autoware_config_msgs/ConfigVelocitySet.h"
@@ -48,6 +49,7 @@ class VelocitySetInfo
   double remove_points_upto_;
 
   pcl::PointCloud<pcl::PointXYZ> points_;
+  std::vector<mobileye_560_660_msgs::ObstacleData> mobileye_obstacle_;
   geometry_msgs::PoseStamped localizer_pose_;  // pose of sensor
   geometry_msgs::PoseStamped control_pose_;    // pose of base_link
   bool set_pose_;
@@ -64,9 +66,10 @@ class VelocitySetInfo
   void controlPoseCallback(const geometry_msgs::PoseStampedConstPtr &msg);
   void localizerPoseCallback(const geometry_msgs::PoseStampedConstPtr &msg);
   void detectionCallback(const std_msgs::Int32 &msg);
+  void mobileyeObstacleCallback(const mobileye_560_660_msgs::ObstacleData &msg);
 
   void clearPoints();
-
+  void clearMobileyeObstacle();
 
   int getDetectionResultByOtherNodes() const
   {
@@ -131,6 +134,11 @@ class VelocitySetInfo
   pcl::PointCloud<pcl::PointXYZ> getPoints() const
   {
     return points_;
+  }
+
+  std::vector<mobileye_560_660_msgs::ObstacleData> getMobileyeObstacle() const
+  {
+	return mobileye_obstacle_;
   }
 
   geometry_msgs::PoseStamped getControlPose() const

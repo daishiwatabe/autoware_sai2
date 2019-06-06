@@ -18,6 +18,10 @@
 
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer" args="$(arg x) $(arg y) $(arg z) $(arg yaw) $(arg pitch) $(arg roll) $(arg frame_id) $(arg child_frame_id) $(arg period_in_ms)"/>
 
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_me" args="1.9 0.0 1.2 0.0 0.0 0.0 base_link me_viz 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_esr" args="3.54 0.0 0.455 0.0 0.0 0.0 base_link esr_1 10"/>
+
   <param name="/gx" value="0.58"/>
   <param name="/gy" value="0.0"/>
   <param name="/gz" value="1.63"/>

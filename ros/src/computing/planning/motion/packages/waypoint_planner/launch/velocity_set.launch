@@ -7,6 +7,7 @@
   <arg name="remove_points_upto" default="2.3" />
   <arg name="enable_multiple_crosswalk_detection" default="true" />
   <arg name="enablePlannerDynamicSwitch" default="false" />
+  <arg name="enableMobileye" default="true" />
 
   <node pkg="waypoint_planner" type="velocity_set" name="velocity_set" output="screen">
     <param name="use_crosswalk_detection" value="$(arg use_crosswalk_detection)" />
@@ -16,6 +17,7 @@
     <param name="decelerate_vel_min" value="$(arg decelerate_vel_min)" />
     <param name="remove_points_upto" value="$(arg remove_points_upto)" />
     <param name="enablePlannerDynamicSwitch" value="$(arg enablePlannerDynamicSwitch)" />
+    <param name="enableMobileye" value="$(arg enableMobileye)" />
   </node>
 
 </launch>

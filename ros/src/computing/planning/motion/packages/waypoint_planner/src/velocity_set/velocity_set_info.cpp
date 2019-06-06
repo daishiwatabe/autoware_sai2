@@ -55,6 +55,11 @@ void VelocitySetInfo::clearPoints()
   points_.clear();
 }
 
+void VelocitySetInfo::clearMobileyeObstacle()
+{
+  mobileye_obstacle_.clear();
+}
+
 void VelocitySetInfo::configCallback(const autoware_config_msgs::ConfigVelocitySetConstPtr &config)
 {
   stop_distance_obstacle_ = config->stop_distance_obstacle;
@@ -112,4 +117,9 @@ void VelocitySetInfo::localizerPoseCallback(const geometry_msgs::PoseStampedCons
   node_status_publisher_ptr_->NODE_ACTIVATE();
   node_status_publisher_ptr_->CHECK_RATE("/topic/rate/current_pose/slow",8,5,1,"topic current_pose subscribe rate low.");
   localizer_pose_ = *msg;
+}
+
+void VelocitySetInfo::mobileyeObstacleCallback(const mobileye_560_660_msgs::ObstacleData &msg)
+{
+	mobileye_obstacle_.push_back(msg);
 }
