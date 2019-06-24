@@ -1,6 +1,8 @@
 Header header
-bool steer_mode
+bool emergency
 bool drive_mode
-int16 steering_angle
+bool steer_mode
 int16 velocity
+int16 steering_angle
+uint32 read_counter
 

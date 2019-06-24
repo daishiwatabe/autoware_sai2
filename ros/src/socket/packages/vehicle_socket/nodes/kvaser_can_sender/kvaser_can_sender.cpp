@@ -93,7 +93,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "kvaser_can_receiver");
+	ros::init(argc, argv, "kvaser_can_sender");
 	ros::NodeHandle nh;
 	ros::NodeHandle private_nh("~");
 

@@ -18,7 +18,7 @@ public:
 
 	void read_wait()
 	{
-		kc.read_wait();
+		kc.read_wait(KVASER_CAN::READ_WAIT_INFINITE);
 	}
 };
 

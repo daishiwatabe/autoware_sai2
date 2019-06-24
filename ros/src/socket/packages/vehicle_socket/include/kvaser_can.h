@@ -1,13 +1,16 @@
 #include <canlib.h>
 
-const unsigned long READ_WAIT_INFINITE = -1;
-
 class KVASER_CAN
 {
+public:
+	static const unsigned int READ_DATA_SIZE = 8;
+	static const unsigned long READ_WAIT_INFINITE = -1;
 private:
 	canHandle can_handle_;
 	bool open_flag_;
 	unsigned int msgCounter_;
+	unsigned char read_data_[READ_DATA_SIZE];
+	long id_;
 public:
 	KVASER_CAN()
 	    : can_handle_(NULL)
@@ -40,44 +43,42 @@ public:
 
 	bool isOpen() {return open_flag_;}
 
-	canStatus read_wait()
+	canStatus read_wait(unsigned long wait_time)
 	{
-		long id;
-		unsigned char msg[8];
 		unsigned int dlc;
 		unsigned int flag;
 		unsigned long time;
 
-		canStatus res = canReadWait(can_handle_, &id, &msg, &dlc, &flag, &time, READ_WAIT_INFINITE);
+		canStatus res = canReadWait(can_handle_, &id_, &read_data_, &dlc, &flag, &time, wait_time);
 		if(canStatus::canOK != res) return res;
 
+		msgCounter_++;
 		if (flag & canMSG_ERROR_FRAME)
 		{
 			std::cerr << "error frame" << std::endl;
-			return canStatus::canOK;
+			return res;
 		}
 
-		msgCounter_++;
-		printf("(%u) id:%lx dlc:%u data: ", msgCounter_, id, dlc);
-		if (dlc > 8) {
-		  dlc = 8;
+		printf("(%u) id:%lx dlc:%u data: ", msgCounter_, id_, dlc);
+		if (dlc > READ_DATA_SIZE) {
+		  dlc = READ_DATA_SIZE;
 		}
 		for (unsigned int j = 0; j < dlc; j++) {
-		  printf("%2.2x ", msg[j]);
+		  printf("%2.2x ", read_data_[j]);
 		}
 		printf(" flags:0x%x time:%lu\n", flag, time);
 		fflush(stdout);
 
-		/*if(id == 0x501)
+		/*if(id_ == 0x501)
 		{
 			short *short_buf = (short*)msg;
-			unsigned short *ushort_buf = (unsigned short*)msg;
+			unsigned short *ushort_buf = (unsigned short*)read_data_;
 			std::cout << "デジタル出力状態 : " << ushort_buf[0] << std::endl;
-			std::cout << "操舵角度実際値 : " << short_buf[1] << std::endl;
-			std::cout << "車両速度実際値 : " << short_buf[2] << std::endl;
+			std::cout << "車両速度実際値 : " << short_buf[1] << std::endl;
+			std::cout << "操舵角度実際値 : " << short_buf[2] << std::endl;
 			std::cout << "運転状態 : " << ushort_buf[3] << std::endl;
 		}*/
-		return canStatus::canOK;
+		return res;
 	}
 
 	canStatus write(long id, char *data, unsigned int size)
@@ -87,4 +88,14 @@ public:
 
 		return canStatus::canOK;
 	}
+
+	void get_read_data(unsigned char* buf)
+	{
+		for(unsigned int i=0; i<READ_DATA_SIZE; i++)
+			buf[i] = read_data_[i];
+	}
+
+	long get_id() { return id_; }
+
+	unsigned int get_read_counter() { return msgCounter_; }
 };
