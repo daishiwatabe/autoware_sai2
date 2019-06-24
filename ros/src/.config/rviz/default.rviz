@@ -4,6 +4,8 @@ Panels:
     Name: Displays
     Property Tree Widget:
       Expanded:
+        - /TF1
+        - /TF1/Frames1
         - /Camera1/Visibility1
         - /Points Raw1
         - /Points Raw1/Status1
@@ -12,8 +14,9 @@ Panels:
         - /Global Path1/Namespaces1
         - /Local Rollouts1/Namespaces1
         - /GlobalPathAnimation1/Status1
+        - /MarkerArray2
       Splitter Ratio: 0.695804
-    Tree Height: 255
+    Tree Height: 161
   - Class: rviz/Selection
     Name: Selection
   - Class: rviz/Tool Properties
@@ -44,6 +47,13 @@ Panels:
     Point size: 3
     Point topic: -----
     Rect topic: -----
+  - Class: integrated_viewer/ImageViewerPlugin
+    Image topic: /image_raw
+    Lane topic: -----
+    Name: ImageViewerPlugin
+    Point size: 3
+    Point topic: -----
+    Rect topic: /detection/fusion_tools/objects
 Visualization Manager:
   Class: ""
   Displays:
@@ -146,13 +156,7 @@ Visualization Manager:
       Marker Topic: /vector_map
       Name: Vector Map
       Namespaces:
-        cross_walk: true
-        curb: true
-        road_edge: true
-        road_pole: true
-        signal: true
-        stop_line: true
-        white_line: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Camera
@@ -166,7 +170,6 @@ Visualization Manager:
       Unreliable: false
       Value: false
       Visibility:
-        "": true
         A* Sim Obstacle: true
         Behavior State: true
         Control Pose: true
@@ -181,6 +184,7 @@ Visualization Manager:
         Image: true
         Local Rollouts: true
         Local Waypoints: true
+        Marker: true
         MarkerArray: true
         Next Waypoint Mark: true
         OK: true
@@ -208,8 +212,8 @@ Visualization Manager:
     - Alpha: 0.300000012
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 80.6700745
-        Min Value: 61.090168
+        Max Value: 19.151329
+        Min Value: -1.7912128
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -227,7 +231,7 @@ Visualization Manager:
       Position Transformer: XYZ
       Queue Size: 10
       Selectable: true
-      Size (Pixels): 1
+      Size (Pixels): 2
       Size (m): 0.00999999978
       Style: Points
       Topic: /points_raw
@@ -300,10 +304,7 @@ Visualization Manager:
       Marker Topic: /detection_range
       Name: Detection Range
       Namespaces:
-        Crosswalk Detection: true
-        Decelerate Detection: true
-        Stop Detection: true
-        Stop Line: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -311,7 +312,7 @@ Visualization Manager:
       Marker Topic: /next_target_mark
       Name: Next Waypoint Mark
       Namespaces:
-        next_target_marker: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -319,7 +320,7 @@ Visualization Manager:
       Marker Topic: /trajectory_circle_mark
       Name: PP Trajectory Mark
       Namespaces:
-        trajectory_circle_marker: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -340,6 +341,11 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: Vehicle Model
       Robot Description: robot_description
       TF Prefix: ""
@@ -381,9 +387,7 @@ Visualization Manager:
       Marker Topic: /local_waypoints_mark
       Name: Local Waypoints
       Namespaces:
-        local_path_marker: true
-        local_point_marker: true
-        local_waypoint_velocity: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -391,9 +395,7 @@ Visualization Manager:
       Marker Topic: /global_waypoints_mark
       Name: Global Waypoints
       Namespaces:
-        global_change_flag_lane_1: true
-        global_lane_waypoint_orientation_marker_1: true
-        global_velocity_lane_1: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -641,8 +643,7 @@ Visualization Manager:
       Marker Topic: /as_tx/object_markers
       Name: Marker
       Namespaces:
-        me_obstacles: true
-        me_obstacles_text: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -650,9 +651,7 @@ Visualization Manager:
       Marker Topic: /as_tx/lane_markers
       Name: Marker
       Namespaces:
-        additional: true
-        left: true
-        right: true
+        {}
       Queue Size: 100
       Value: true
     - Background Alpha: 0.800000012
@@ -673,6 +672,14 @@ Visualization Manager:
       text size: 12
       top: 0
       width: 128
+    - Class: rviz/MarkerArray
+      Enabled: true
+      Marker Topic: /detection/fusion_tools/objects_markers
+      Name: MarkerArray
+      Namespaces:
+        {}
+      Queue Size: 100
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -697,21 +704,26 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 0
-      Class: rviz/TopDownOrtho
+      Class: rviz/ThirdPersonFollower
+      Distance: 11.2789869
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: false
+      Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 10
-      Target Frame: <Fixed Frame>
-      Value: TopDownOrtho (rviz)
-      X: 0
-      Y: 0
+      Pitch: 0.565398157
+      Target Frame: base_link
+      Value: ThirdPersonFollower (rviz)
+      Yaw: 3.16539931
     Saved: ~
 Window Geometry:
   Camera:
@@ -720,14 +732,14 @@ Window Geometry:
     collapsed: false
   Displays:
     collapsed: false
-  Height: 1056
+  Height: 1028
   Hide Left Dock: false
-  Hide Right Dock: false
+  Hide Right Dock: true
   Image:
     collapsed: false
   ImageViewerPlugin:
     collapsed: false
-  QMainWindow State: 000000ff00000000fd00000004000000000000021c00000399fc0200000011fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006100fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc0000002800000140000000d700fffffffa000000020100000003fb0000000a0049006d0061006700650000000000ffffffff0000005c00fffffffb0000000c00430061006d0065007200610000000000ffffffff0000006700fffffffb000000100044006900730070006c0061007900730100000000000001360000016a00fffffffb0000000a0049006d006100670065010000028e000000d20000000000000000fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120049006d006100670065005f0072006100770000000000ffffffff0000000000000000fb0000000c00430061006d006500720061000000024e000001710000000000000000fb000000120049006d00610067006500200052006100770100000421000000160000000000000000fb0000000a0049006d00610067006501000002f4000000cb0000000000000000fb0000000a0049006d006100670065010000056c0000026c0000000000000000fb00000024004400650063006900730069006f006e004d0061006b0065007200500061006e0065006c010000016e000002530000018f00fffffffb00000024004400650063006900730069006f006e004d0061006b0065007200500061006e0065006c000000029a0000018f0000018f00fffffffb000000220049006d0061006700650056006900650077006500720050006c007500670069006e00000003370000008a0000008700ffffff000000010000016300000399fc0200000003fb0000000a00560069006500770073010000002800000399000000ad00fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000073f000000a8fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073f0000003bfc0100000002fb0000000800540069006d006501000000000000073f0000030000fffffffb0000000800540069006d00650100000000000004500000000000000000000003b40000039900000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
+  QMainWindow State: 000000ff00000000fd0000000400000000000002840000037dfc0200000012fb0000001200530065006c0065006300740069006f006e00000001e10000009b0000006100fffffffb0000001e0054006f006f006c002000500072006f007000650072007400690065007302000001ed000001df00000185000000a3fb000000120056006900650077007300200054006f006f02000001df000002110000018500000122fb000000200054006f006f006c002000500072006f0070006500720074006900650073003203000002880000011d000002210000017afc00000028000000e2000000d700fffffffa000000020100000003fb0000000a0049006d0061006700650000000000ffffffff0000005c00fffffffb0000000c00430061006d0065007200610000000000ffffffff0000006700fffffffb000000100044006900730070006c0061007900730100000000000001360000016a00fffffffb0000000a0049006d006100670065010000028e000000d20000000000000000fb0000002000730065006c0065006300740069006f006e00200062007500660066006500720200000138000000aa0000023a00000294fb00000014005700690064006500530074006500720065006f02000000e6000000d2000003ee0000030bfb0000000c004b0069006e0065006300740200000186000001060000030c00000261fb000000120049006d006100670065005f0072006100770000000000ffffffff0000000000000000fb0000000c00430061006d006500720061000000024e000001710000000000000000fb000000120049006d00610067006500200052006100770100000421000000160000000000000000fb0000000a0049006d00610067006501000002f4000000cb0000000000000000fb0000000a0049006d006100670065010000056c0000026c0000000000000000fb00000024004400650063006900730069006f006e004d0061006b0065007200500061006e0065006c0000000164000002410000018f00fffffffb00000024004400650063006900730069006f006e004d0061006b0065007200500061006e0065006c000000029a0000018f0000018f00fffffffb000000220049006d0061006700650056006900650077006500720050006c007500670069006e00000003370000008a0000008700fffffffb000000220049006d0061006700650056006900650077006500720050006c007500670069006e0100000110000002950000008700ffffff00000001000001630000037dfc0200000003fb0000000a0056006900650077007300000000280000037d000000ad00fffffffb0000001e0054006f006f006c002000500072006f00700065007200740069006500730100000041000000780000000000000000fb0000001200530065006c0065006300740069006f006e010000025a000000b20000000000000000000000020000073f000000a8fc0100000001fb0000000a00560069006500770073030000004e00000080000002e100000197000000030000073f0000003bfc0100000002fb0000000800540069006d006501000000000000073f0000030000fffffffb0000000800540069006d00650100000000000004500000000000000000000004b50000037d00000004000000040000000800000008fc0000000100000002000000010000000a0054006f006f006c00730100000000ffffffff0000000000000000
   Selection:
     collapsed: false
   Time:
@@ -735,7 +747,7 @@ Window Geometry:
   Tool Properties:
     collapsed: false
   Views:
-    collapsed: false
+    collapsed: true
   Width: 1855
-  X: 65
-  Y: 24
+  X: 75
+  Y: 34

@@ -318,15 +318,29 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points,
 
 	for(const auto& m : mobileye_obstacle)
 	{
-		tf::Vector3 mobileye_vector(m.obstacle_pos_x , m.obstacle_pos_y, 0);
+		for(double wid=-m.obstacle_width/2; wid<m.obstacle_width/2; wid+=0.1)
+		{
+			tf::Vector3 mobileye_vector(m.obstacle_pos_x+wid , m.obstacle_pos_y, 0);
+
+			double dt = tf::tfDistance(mobileye_vector, tf_waypoint);
+			if (dt < stop_range)
+			{
+				stop_obstacle_waypoint = i;
+				*obstacle_type = EObstacleType::ON_WAYPOINTS;
+				break;
+			}
+		}
+		if(stop_obstacle_waypoint >= 0) break;
 
 		// 2D distance between waypoint and points (obstacle)
+		/*tf::Vector3 mobileye_vector(m.obstacle_pos_x , m.obstacle_pos_y, 0);
+
 		double dt = tf::tfDistance(mobileye_vector, tf_waypoint);
 		if (dt < stop_range)
 		{
 			stop_obstacle_waypoint = i;
 			*obstacle_type = EObstacleType::ON_WAYPOINTS;
-		}
+		}*/
 	}
 
     // check next waypoint...

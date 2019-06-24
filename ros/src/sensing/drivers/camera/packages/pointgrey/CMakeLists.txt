@@ -24,6 +24,7 @@ catkin_package()
 ###########
 ## Build ##
 ###########
+message(STATUS "aaa")
 
 if (EXISTS "/usr/include/flycapture")
     include_directories(

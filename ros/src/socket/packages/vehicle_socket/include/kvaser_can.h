@@ -68,6 +68,15 @@ public:
 		printf(" flags:0x%x time:%lu\n", flag, time);
 		fflush(stdout);
 
+		/*if(id == 0x501)
+		{
+			short *short_buf = (short*)msg;
+			unsigned short *ushort_buf = (unsigned short*)msg;
+			std::cout << "デジタル出力状態 : " << ushort_buf[0] << std::endl;
+			std::cout << "操舵角度実際値 : " << short_buf[1] << std::endl;
+			std::cout << "車両速度実際値 : " << short_buf[2] << std::endl;
+			std::cout << "運転状態 : " << ushort_buf[3] << std::endl;
+		}*/
 		return canStatus::canOK;
 	}
 
