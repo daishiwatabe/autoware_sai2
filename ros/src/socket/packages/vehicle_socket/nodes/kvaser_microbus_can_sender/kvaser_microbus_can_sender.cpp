@@ -1,6 +1,7 @@
 #include <ros/ros.h>
 #include <std_msgs/Bool.h>
 #include <std_msgs/UInt8.h>
+#include <std_msgs/Empty.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <autoware_can_msgs/MicroBusCan.h>
 #include "kvaser_can.h"
@@ -16,11 +17,23 @@ private:
 
 	ros::NodeHandle nh_, private_nh_;
 	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_, sub_microbus_can_;
+	ros::Subscriber sub_emergency_reset_;
 
 	KVASER_CAN kc;
 	bool drive_mode_, steer_mode_;
 	autoware_can_msgs::MicroBusCan can_receive;
 	geometry_msgs::TwistStamped twist;
+
+	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
+	{
+		char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
+		buf[7] = 0x55;
+		kc.write(0x100, buf, SEND_DATA_SIZE);
+		ros::Rate rate(1);
+		rate.sleep();
+		buf[7] = 0x00;
+		kc.write(0x100, buf, SEND_DATA_SIZE);
+	}
 
 	void callbackDModeSend(const std_msgs::Bool::ConstPtr &msg)
 	{
@@ -55,21 +68,10 @@ public:
 		sub_microbus_steer_mode_ = nh_.subscribe("/microbus/steer_mode_send", 10, &kvaser_can_sender::callbackSModeSend, this);
 		sub_twist_cmd_ = nh_.subscribe("/twist_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
 		sub_microbus_can_ = nh_.subscribe("/microbus/can_receive", 10, &kvaser_can_sender::callbackMicrobusCan, this);
+		sub_emergency_reset_ = nh_.subscribe("/microbus/emergency_reset", 10, &kvaser_can_sender::callbackEmergencyReset, this);
 	}
 
 	bool isOpen() {return kc.isOpen();}
-
-	bool emergency_reset()
-	{
-		char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
-		buf[7] = 0x55;
-		kc.write(0x100, buf, SEND_DATA_SIZE);
-		ros::Rate rate(1);
-		rate.sleep();
-		buf[7] = 0x00;
-		kc.write(0x100, buf, SEND_DATA_SIZE);
-		return true;
-	}
 
 	void can_send()
 	{
