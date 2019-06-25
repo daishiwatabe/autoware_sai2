@@ -1,4 +1,5 @@
 #include <ros/ros.h>
+#include <queue>
 #include <std_msgs/Bool.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Empty.h>
@@ -9,10 +10,18 @@
 class kvaser_can_sender
 {
 private:
+	//drive params
+	const int PEDAL_ACCEL_MAX = 2000;
+	const int PEDAL_BRAKE_MAX = 2000;
+	const double VELOCITY_MAX = 160;
+
+	//steer params
 	const int HANDLE_RIGHT_MAX = 2000;
 	const int HANDLE_LEFT_MAX  = 2000;
 	const double WHEEL_RIGHT_MAX  = 40;
 	const double WHEEL_LEFT_MAX   = 40;
+
+	//other params
 	const unsigned int SEND_DATA_SIZE = 8;
 
 	ros::NodeHandle nh_, private_nh_;
@@ -54,6 +63,34 @@ private:
 	{
 		twist = *msg;
 	}
+
+	void bufset_mode(unsigned char *buf)
+	{
+		unsigned char mode = 0;
+		if(drive_mode_ == true) mode |= 0x0A;
+		if(steer_mode_ == true) mode |= 0xA0;
+		buf[0] = mode;  buf[1] = 0;
+	}
+
+	void bufset_steer(unsigned char *buf)
+	{
+		double twist_ang = twist.twist.angular.z*180.0/M_PI;
+		short steer_val;
+		if(twist_ang >= 0)
+			steer_val = (twist_ang / WHEEL_RIGHT_MAX) * HANDLE_RIGHT_MAX;
+		else
+			steer_val = (twist_ang / WHEEL_LEFT_MAX) * HANDLE_LEFT_MAX;
+		unsigned char *steer_pointer = (unsigned char*)&steer_val;
+		buf[2] = steer_pointer[1];  buf[3] = steer_pointer[0];
+	}
+
+	void bufset_drive(unsigned char *buf)
+	{
+		double twist_drv = twist.twist.linear.x;
+		short drive_val = (twist_drv / PEDAL_ACCEL_MAX) * VELOCITY_MAX;
+		unsigned char *drive_point = (unsigned char*)&drive_val;
+		buf[4] = drive_point[1];  buf[5] = drive_point[0];
+	}
 public:
 	kvaser_can_sender(ros::NodeHandle nh, ros::NodeHandle p_nh, int kvaser_channel)
 	    : nh_(nh)
@@ -77,22 +114,9 @@ public:
 	{
 		unsigned char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
 
-		unsigned char mode = 0;
-		if(drive_mode_ == true) mode |= 0x0A;
-		if(steer_mode_ == true) mode |= 0xA0;
-		buf[0] = mode;  buf[1] = 0;
-
-		double twist_ang = twist.twist.angular.z*180.0/M_PI;
-		short steer_val;
-		if(twist_ang >= 0)
-			steer_val = (twist_ang / WHEEL_RIGHT_MAX) * HANDLE_RIGHT_MAX;
-		else
-			steer_val = (twist_ang / WHEEL_LEFT_MAX) * HANDLE_LEFT_MAX;
-		unsigned char *steer_pointer = (unsigned char*)&steer_val;
-		buf[2] = steer_pointer[1];  buf[3] = steer_pointer[0];
-
-		double twist_drv = twist.twist.linear.x;
-
+		bufset_mode(buf);
+		bufset_steer(buf);
+		bufset_drive(buf);
 		kc.write(0x100, (char*)buf, SEND_DATA_SIZE);
 	}
 };
