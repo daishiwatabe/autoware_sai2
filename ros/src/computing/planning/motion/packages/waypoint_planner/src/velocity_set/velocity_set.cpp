@@ -288,7 +288,7 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points,
     tf::Vector3 tf_waypoint = point2vector(waypoint);
     tf_waypoint.setZ(0);
 
-	/*int stop_point_count = 0;
+	int stop_point_count = 0;
     for (const auto& p : points)
     {
       tf::Vector3 point_vector(p.x, p.y, 0);
@@ -312,10 +312,11 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points,
 		stop_obstacle_waypoint = i;
 	  *obstacle_type = EObstacleType::ON_WAYPOINTS;
 	  break;
-	}*/
+	}
 
 	obstacle_points->clearStopPoints();
 
+	static int count = 0;
 	for(const auto& m : mobileye_obstacle)
 	{
 		for(double wid=-m.obstacle_width/2; wid<m.obstacle_width/2; wid+=0.1)
@@ -327,6 +328,11 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points,
 			{
 				stop_obstacle_waypoint = i;
 				*obstacle_type = EObstacleType::ON_WAYPOINTS;
+				if(count == 0 && stop_obstacle_waypoint - closest_waypoint < 23)
+				{
+					//system("/home/autoware/lane_change2.sh");
+					count++;
+				}
 				break;
 			}
 		}

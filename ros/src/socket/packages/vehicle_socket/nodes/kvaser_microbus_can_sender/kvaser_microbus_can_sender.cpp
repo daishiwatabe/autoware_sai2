@@ -16,87 +16,120 @@ private:
 	const double VELOCITY_MAX = 160;
 
 	//steer params
-	const int HANDLE_RIGHT_MAX = 2000;
-	const int HANDLE_LEFT_MAX  = 2000;
-	const double WHEEL_RIGHT_MAX  = 40;
-	const double WHEEL_LEFT_MAX   = 40;
+	const double HANDLE_MAX = 675;
+	const double WHEEL_MAX = 36;
+	const unsigned int STEER_VALUE_MARGIN = 20;
+
+	//mode params
+	const unsigned char MODE_TORQUE   = 0x0A;
+	const unsigned char MODE_VRLOCITY = 0x0B;
 
 	//other params
 	const unsigned int SEND_DATA_SIZE = 8;
 
 	ros::NodeHandle nh_, private_nh_;
 	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_, sub_microbus_can_;
-	ros::Subscriber sub_emergency_reset_;
+	ros::Subscriber sub_emergency_reset_, sub_torque_mode_, sub_velocity_mode;
 
 	KVASER_CAN kc;
-	bool drive_mode_, steer_mode_;
+	bool flag_drive_mode_, flag_steer_mode_;
+	unsigned char drive_control_mode_;
 	autoware_can_msgs::MicroBusCan can_receive;
 	geometry_msgs::TwistStamped twist;
 
 	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
 	{
+		std::cout << "sub Emergency" << std::endl;
 		char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
-		buf[7] = 0x55;
+		buf[0] = 0x55;
 		kc.write(0x100, buf, SEND_DATA_SIZE);
 		ros::Rate rate(1);
 		rate.sleep();
-		buf[7] = 0x00;
+		buf[0] = 0x00;
 		kc.write(0x100, buf, SEND_DATA_SIZE);
+	}
+
+	void callbackTorqueMode(const std_msgs::Empty::ConstPtr &msg)
+	{
+		std::cout << "sub TorqueMode" << std::endl;
+		drive_control_mode_ = MODE_TORQUE;
+	}
+
+	void callbackVelocityMode(const std_msgs::Empty::ConstPtr &msg)
+	{
+		std::cout << "sub VelocityMode" << std::endl;
+		drive_control_mode_ = MODE_VRLOCITY;
 	}
 
 	void callbackDModeSend(const std_msgs::Bool::ConstPtr &msg)
 	{
-		drive_mode_ = msg->data;
+		std::cout << "sub DMode" << std::endl;
+		flag_drive_mode_ = msg->data;
 	}
 
 	void callbackSModeSend(const std_msgs::Bool::ConstPtr &msg)
 	{
-		steer_mode_ = msg->data;
+		std::cout << "sub SMode" << std::endl;
+		flag_steer_mode_ = msg->data;
 	}
 
 	void callbackMicrobusCan(const autoware_can_msgs::MicroBusCan::ConstPtr &msg)
 	{
+		std::cout << "sub can" << std::endl;
 		can_receive = *msg;
 	}
 
 	void callbackTwistCmd(const geometry_msgs::TwistStamped::ConstPtr &msg)
 	{
+		std::cout << "sub twist" << std::endl;
 		twist = *msg;
 	}
 
 	void bufset_mode(unsigned char *buf)
 	{
 		unsigned char mode = 0;
-		if(drive_mode_ == true) mode |= 0x0A;
-		if(steer_mode_ == true) mode |= 0xA0;
+		if(flag_drive_mode_ == true) mode |= drive_control_mode_;
+		if(flag_steer_mode_ == true) mode |= 0xA0;
 		buf[0] = mode;  buf[1] = 0;
 	}
 
 	void bufset_steer(unsigned char *buf)
 	{
-		double twist_ang = twist.twist.angular.z*180.0/M_PI;
-		short steer_val;
-		if(twist_ang >= 0)
-			steer_val = (twist_ang / WHEEL_RIGHT_MAX) * HANDLE_RIGHT_MAX;
-		else
-			steer_val = (twist_ang / WHEEL_LEFT_MAX) * HANDLE_LEFT_MAX;
+		double twist_ang = twist.twist.angular.z*180.0 / M_PI;
+		twist_ang *= HANDLE_MAX / WHEEL_MAX;
+		twist_ang *= -20 * 1.1;
+		short steer_val = twist_ang;
 		unsigned char *steer_pointer = (unsigned char*)&steer_val;
 		buf[2] = steer_pointer[1];  buf[3] = steer_pointer[0];
 	}
 
 	void bufset_drive(unsigned char *buf)
 	{
-		double twist_drv = twist.twist.linear.x;
+		/*double twist_drv = twist.twist.linear.x;
 		short drive_val = (twist_drv / PEDAL_ACCEL_MAX) * VELOCITY_MAX;
 		unsigned char *drive_point = (unsigned char*)&drive_val;
-		buf[4] = drive_point[1];  buf[5] = drive_point[0];
+		buf[4] = drive_point[1];  buf[5] = drive_point[0];*/
+
+		//std::cout << "mode : " << (int)drive_control_mode_ << "   vel : " << (int)MODE_VRLOCITY << std::endl;
+		if(drive_control_mode_ == MODE_VRLOCITY)
+		{
+			double twist_drv = twist.twist.linear.x *3.6 * 100; std::cout << twist_drv << std::endl;
+			short drive_val = twist_drv/2;
+			unsigned char *drive_point = (unsigned char*)&drive_val;
+			buf[4] = drive_point[1];  buf[5] = drive_point[0];
+		}
+		else
+		{
+
+		}
 	}
 public:
 	kvaser_can_sender(ros::NodeHandle nh, ros::NodeHandle p_nh, int kvaser_channel)
 	    : nh_(nh)
 	    , private_nh_(p_nh)
-	    , drive_mode_(false)
-	    , steer_mode_(false)
+	    , flag_drive_mode_(false)
+	    , flag_steer_mode_(false)
+	    , drive_control_mode_(MODE_TORQUE)
 	{
 		can_receive.emergency = true;
 		kc.init(kvaser_channel);
@@ -106,9 +139,22 @@ public:
 		sub_twist_cmd_ = nh_.subscribe("/twist_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
 		sub_microbus_can_ = nh_.subscribe("/microbus/can_receive", 10, &kvaser_can_sender::callbackMicrobusCan, this);
 		sub_emergency_reset_ = nh_.subscribe("/microbus/emergency_reset", 10, &kvaser_can_sender::callbackEmergencyReset, this);
+		sub_torque_mode_ = nh_.subscribe("/microbus/set_torque_mode", 10, &kvaser_can_sender::callbackTorqueMode, this);
+		sub_velocity_mode = nh_.subscribe("/microbus/set_velocity_mode", 10, &kvaser_can_sender::callbackVelocityMode, this);
 	}
 
 	bool isOpen() {return kc.isOpen();}
+
+	/*void emergency_reset()
+	{
+		char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
+		buf[0] = 0x55;
+		kc.write(0x100, buf, SEND_DATA_SIZE);
+		ros::Rate rate(10);
+		rate.sleep();
+		buf[0] = 0x00;
+		kc.write(0x100, buf, SEND_DATA_SIZE);
+	}*/
 
 	void can_send()
 	{
@@ -135,10 +181,12 @@ int main(int argc, char** argv)
 		std::cerr << "error : open" << std::endl;
 	}
 
+	//kcs.emergency_reset();
 	ros::Rate loop_rate(100);
 	while(ros::ok())
 	{
 		kcs.can_send();
+		ros::spinOnce();
 		loop_rate.sleep();
 	}
 	return 0;

@@ -101,5 +101,6 @@ install(FILES
 		scripts/kvaser_can_sender.launch
         scripts/kvaser_microbus_can_sender.launch
         scripts/kvaser_microbus_can_receiver.launch
+        scripts/kvaser_microbus.launch
 		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 		)

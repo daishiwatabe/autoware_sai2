@@ -1,0 +1,35 @@
+<launch>
+
+  <arg name="x" default="1.08"/>
+  <arg name="y" default="0.011"/>
+  <arg name="z" default="1.81"/>
+  <arg name="yaw" default="-0.025"/>
+  <arg name="pitch" default="0.0"/>
+  <arg name="roll" default="0.0"/>
+  <arg name="frame_id" default="base_link"/>
+  <arg name="child_frame_id" default="velodyne"/>
+  <arg name="period_in_ms" default="10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_hi" args="1.08 0.011 1.48 -0.025 0.0 0.0 base_link velodyne1 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_ro" args="1.08 0.011 1.57 0.01 0.0 0.0 base_link velodyne2 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_32" args="1.08 0.011 1.72 -1.578 0.0 0.0 base_link velodyne3 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer" args="$(arg x) $(arg y) $(arg z) $(arg yaw) $(arg pitch) $(arg roll) $(arg frame_id) $(arg child_frame_id) $(arg period_in_ms)"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_me" args="1.9 0.0 1.2 0.0 0.0 0.0 base_link me_viz 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_esr" args="3.54 0.0 0.455 0.0 0.0 0.0 base_link esr_1 10"/>
+
+  <param name="/gx" value="0.0"/>
+  <param name="/gy" value="0.0"/>
+  <param name="/gz" value="2.85"/>
+  <param name="/ax" value="0.0"/>
+  <param name="/ay" value="0.0"/>
+  <param name="/az" value="0.0"/>
+
+  <param name="/imu_pose_x" value="0.305"/>
+  <param name="/imu_pose_y" value="0.0"/>
+  <param name="/imu_pose_z" value="0.59"/>
+</launch>

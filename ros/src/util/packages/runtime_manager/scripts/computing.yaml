@@ -926,6 +926,10 @@ subs :
     - name : signal creator
       desc : signal creator desc sample
       cmd  : roslaunch signal_creator signal_creator.launch
+    - name : microbus can
+      desc : microbus can desc sample
+      cmd  : roslaunch vehicle_socket kvaser_microbus.launch
+      param: microbus
 
 buttons:
   car_dpm :
@@ -6038,3 +6042,15 @@ params :
       cmd_param:
         dash     : ''
         delim    : ':='
+
+  - name  : microbus
+    vars  :
+    - name    : kvaser_channel
+      label   : 'kvaser_channel: '
+      kind    : menu
+      choices : [ '1', '2', '3', '4', '5', '6', '7', '8', '9', '10' ]
+      choices_type : str
+      v       : '0'
+      cmd_param :
+        dash        : ''
+        delim       : ':='

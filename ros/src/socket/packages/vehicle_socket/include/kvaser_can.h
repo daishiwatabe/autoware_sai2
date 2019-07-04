@@ -59,6 +59,8 @@ public:
 			return res;
 		}
 
+		if(id_ == 0x501)
+		{
 		printf("(%u) id:%lx dlc:%u data: ", msgCounter_, id_, dlc);
 		if (dlc > READ_DATA_SIZE) {
 		  dlc = READ_DATA_SIZE;
@@ -68,6 +70,7 @@ public:
 		}
 		printf(" flags:0x%x time:%lu\n", flag, time);
 		fflush(stdout);
+		}
 
 		/*if(id_ == 0x501)
 		{

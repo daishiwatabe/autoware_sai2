@@ -39,6 +39,7 @@ import syslog
 import rtmgr
 import rospy
 import std_msgs.msg
+from std_msgs.msg import Empty
 from std_msgs.msg import Bool
 from decimal import Decimal
 from autoware_config_msgs.msg import ConfigSSD
