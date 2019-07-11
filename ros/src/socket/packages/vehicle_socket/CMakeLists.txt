@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   std_msgs
   autoware_msgs
   autoware_can_msgs
+  autoware_config_msgs
   tablet_socket_msgs
 )
 

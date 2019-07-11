@@ -218,9 +218,6 @@ void WaypointLoaderNode::parseWaypointForVer3(const std::string& line, const std
   wp->waypoint_param.velocity_punchMinus = (map.find("velocity_punchMinus") != map.end()) ? std::stof(map["velocity_punchMinus"]) : -1;
   wp->waypoint_param.velocity_windowPlus = (map.find("velocity_windowPlus") != map.end()) ? std::stof(map["velocity_windowPlus"]) : -1;
   wp->waypoint_param.velocity_windowMinus = (map.find("velocity_windowMinus") != map.end()) ? std::stof(map["velocity_windowMinus"]) : -1;
-  wp->waypoint_param.drive_stroke = (map.find("drive_stroke") != map.end()) ? std::stof(map["drive_stroke"]) : -1;
-  wp->waypoint_param.brake_stroke = (map.find("brake_stroke") != map.end()) ? std::stof(map["brake_stroke"]) : -1;
-  wp->waypoint_param.brake_stroke = (map.find("mb_pedal") != map.end()) ? std::stoi(map["mb_pedal"]) : 0;
   wp->waypoint_param.pause = (map.find("pause") != map.end()) ? std::stof(map["pause"]) : 0;
   wp->waypoint_param.vgf_leafsize = (map.find("vgf_leafsize") != map.end()) ? std::stof(map["vgf_leafsize"]) : -1;
   wp->waypoint_param.vgf_measurement_range = (map.find("vgf_measurement_range") != map.end()) ? std::stof(map["vgf_measurement_range"]) : -1;

@@ -23,6 +23,9 @@ std::vector<int> velocity_punchPlusList;
 std::vector<int> velocity_punchMinusList;
 std::vector<int> velocity_windowPlusList;
 std::vector<int> velocity_windowMinusList;
+std::vector<double> drive_strokeList;
+std::vector<double> brake_strokeList;
+std::vector<short> mb_pedalList;
 std::vector<int> blinkerList;
 std::vector<int> pauseList;
 std::vector<float> vgf_leafsizeList;
@@ -50,6 +53,8 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
     int min_velocity_KPPlus, min_velocity_KPMinus;
     int min_velocity_punchPlus, min_velocity_punchMinus;
     int min_velocity_windowPlus, min_velocity_windowMinus;
+	double min_drive_stroke, min_brake_stroke;
+	short min_mb_pedal;
     int min_pause;
     float min_vgf_leafsize, min_vgf_measurement_range;
     std::vector<autoware_msgs::ExtractedPosition> min_extracted_position;
@@ -75,6 +80,9 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
             min_velocity_punchMinus = velocity_punchMinusList[cou];
             min_velocity_windowPlus = velocity_windowPlusList[cou];
             min_velocity_windowMinus = velocity_windowMinusList[cou];
+			min_drive_stroke = drive_strokeList[cou];
+			min_brake_stroke = brake_strokeList[cou];
+			min_mb_pedal = mb_pedalList[cou];
             min_pause = pauseList[cou];
             min_vgf_leafsize = vgf_leafsizeList[cou];
             min_vgf_measurement_range = vgf_measurement_rangeList[cou];
@@ -97,6 +105,9 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
         param.velocity_punchMinus = min_velocity_punchMinus;
         param.velocity_windowPlus = min_velocity_windowPlus;
         param.velocity_windowMinus = min_velocity_windowMinus;
+		param.drive_stroke = min_drive_stroke;
+		param.brake_stroke = min_brake_stroke;
+		param.mb_pedal = min_mb_pedal;
         param.curve_flag = min_curve;
         if(prev_pause == min_pause)
         {std::cout<<"0 : "<<min_pause<<","<<prev_pause<<std::endl;
@@ -178,6 +189,9 @@ void lane_waypoints_array_callback(const autoware_msgs::LaneArray::ConstPtr& msg
     velocity_punchMinusList.clear();
     velocity_windowPlusList.clear();
     velocity_windowMinusList.clear();
+	drive_strokeList.clear();
+	brake_strokeList.clear();
+	mb_pedalList.clear();
     pauseList.clear();
     vgf_leafsizeList.clear();
     vgf_measurement_rangeList.clear();
@@ -203,7 +217,10 @@ void lane_waypoints_array_callback(const autoware_msgs::LaneArray::ConstPtr& msg
             velocity_punchMinusList.push_back(waypoint.waypoint_param.velocity_punchMinus);
             velocity_windowPlusList.push_back(waypoint.waypoint_param.velocity_windowPlus);
             velocity_windowMinusList.push_back(waypoint.waypoint_param.velocity_windowMinus);
-            pauseList.push_back(waypoint.waypoint_param.pause);
+			drive_strokeList.push_back(waypoint.waypoint_param.drive_stroke);
+			brake_strokeList.push_back(waypoint.waypoint_param.brake_stroke);
+			mb_pedalList.push_back(waypoint.waypoint_param.mb_pedal);
+			pauseList.push_back(waypoint.waypoint_param.pause);
             vgf_leafsizeList.push_back(waypoint.waypoint_param.vgf_leafsize);
             vgf_measurement_rangeList.push_back(waypoint.waypoint_param.vgf_measurement_range);
             curve_flagList.push_back(waypoint.waypoint_param.curve_flag);

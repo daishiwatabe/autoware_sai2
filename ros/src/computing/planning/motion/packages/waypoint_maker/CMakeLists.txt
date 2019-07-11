@@ -64,6 +64,16 @@ target_link_libraries(waypoint_saver ${catkin_LIBRARIES})
 add_dependencies(waypoint_saver
         ${catkin_EXPORTED_TARGETS})
 
+add_executable(waypoint_saver_stroke_plus nodes/waypoint_saver/waypoint_saver_stroke_plus.cpp)
+target_link_libraries(waypoint_saver_stroke_plus ${catkin_LIBRARIES})
+add_dependencies(waypoint_saver_stroke_plus
+        ${catkin_EXPORTED_TARGETS})
+
+add_executable(waypoint_saver_microbus_stroke_plus nodes/waypoint_saver/waypoint_saver_microbus_stroke_plus.cpp)
+target_link_libraries(waypoint_saver_microbus_stroke_plus ${catkin_LIBRARIES})
+add_dependencies(waypoint_saver_microbus_stroke_plus
+        ${catkin_EXPORTED_TARGETS})
+
 add_executable(waypoint_saver_RTKplus nodes/waypoint_saver/waypoint_saver_RTKplus.cpp)
 target_link_libraries(waypoint_saver_RTKplus ${catkin_LIBRARIES})
 add_dependencies(waypoint_saver_RTKplus
@@ -110,6 +120,8 @@ install(TARGETS
         waypoint_loader_show_id
         waypoint_replanner
         waypoint_saver
+        waypoint_saver_stroke_plus
+        waypoint_saver_microbus_stroke_plus
         waypoint_saver_RTKplus
         waypoint_saver_signal_plus
         waypoint_clicker

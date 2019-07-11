@@ -6,14 +6,15 @@
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <autoware_can_msgs/MicroBusCan.h>
+#include <autoware_msgs/WaypointParam.h>
 #include "kvaser_can.h"
 
 class kvaser_can_sender
 {
 private:
 	//drive params
-	const int PEDAL_ACCEL_MAX = 2000;
-	const int PEDAL_BRAKE_MAX = 2000;
+	const int PEDAL_MAX = 2000;
+	const int PEDAL_MIN = -500;
 	const double VELOCITY_MAX = 160;
 
 	//steer params
@@ -32,6 +33,7 @@ private:
 	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_, sub_microbus_can_;
 	ros::Subscriber sub_emergency_reset_, sub_torque_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_auto_s_, sub_auto_d_, sub_auto_s_reset_, sub_auto_d_reset_;
+	ros::Subscriber sub_waypoint_param_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -40,6 +42,12 @@ private:
 	autoware_can_msgs::MicroBusCan can_receive;
 	geometry_msgs::TwistStamped twist;
 	short auto_s_, auto_d_;
+	short pedal_;
+
+	void callbackWaypointParam(const autoware_msgs::WaypointParam::ConstPtr &msg)
+	{
+		pedal_ = msg->mb_pedal;
+	}
 
 	void callbackAutoS(const std_msgs::Int16::ConstPtr &msg)
 	{
@@ -162,7 +170,8 @@ private:
 		}
 		else
 		{
-
+			unsigned char *drive_point = (unsigned char*)&pedal_;
+			buf[4] = drive_point[1];  buf[5] = drive_point[0];
 		}
 	}
 public:
@@ -174,6 +183,7 @@ public:
 	    , auto_drive_mode_(false)
 	    , auto_steer_mode_(false)
 	    , drive_control_mode_(MODE_TORQUE)
+	    , pedal_(0)
 	{
 		can_receive.emergency = true;
 		kc.init(kvaser_channel);
@@ -187,9 +197,10 @@ public:
 		sub_auto_d_ = nh_.subscribe("/microbus/auto_d", 10, &kvaser_can_sender::callbackAutoD, this);
 		sub_auto_s_reset_ = nh_.subscribe("/microbus/auto_s_reset", 10, &kvaser_can_sender::callbackAutoSReset, this);
 		sub_auto_d_reset_ = nh_.subscribe("/microbus/auto_d_reset", 10, &kvaser_can_sender::callbackAutoDReset, this);
+		sub_waypoint_param_ = nh_.subscribe("/waypoint_param", 10, &kvaser_can_sender::callbackWaypointParam, this);
 	}
 
-	bool isOpen() {return kc.isOpen();}
+	const bool isOpen() {return kc.isOpen();}
 
 	void can_send()
 	{

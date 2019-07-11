@@ -33,6 +33,7 @@
 #include <autoware_can_msgs/CANInfo.h>
 #include <autoware_msgs/PositionChecker.h>
 #include <autoware_msgs/WaypointParam.h>
+#include <autoware_config_msgs/ConfigManualDriveStroke.h>
 
 #include <iostream>
 #include <string>
@@ -73,6 +74,16 @@ void CommandData::reset()
   steering_angle = 0;
 }
 
+static bool run_manual_drive_stroke = false;
+static double manual_drive_stroke=0;
+static double manual_brake_stroke=0;
+static void manualDriveStrokeCallback(const autoware_config_msgs::ConfigManualDriveStroke& msg)
+{
+	run_manual_drive_stroke = msg.run;
+	manual_drive_stroke = msg.drive_stroke;
+	manual_brake_stroke = msg.brake_stroke;
+}
+
 static CommandData command_data;
 static int stopFlag = 1;
 
@@ -105,6 +116,8 @@ static int velocity_punchPlus=-1;
 static int velocity_punchMinus=-1;
 static int velocity_windowPlus=-1;
 static int velocity_windowMinus=-1;
+static double drive_stroke=-1;
+static double brake_stroke=-1;
 static int pause_val=-1;
 static void wayparamCallback(const autoware_msgs::WaypointParam& msg)
 {
@@ -115,6 +128,8 @@ static void wayparamCallback(const autoware_msgs::WaypointParam& msg)
     velocity_punchMinus = msg.velocity_punchMinus;
     velocity_windowPlus = msg.velocity_windowPlus;
     velocity_windowMinus = msg.velocity_windowMinus;
+	drive_stroke = msg.drive_stroke;
+	brake_stroke = msg.brake_stroke;
     pause_val = msg.pause;
 }
 
@@ -170,6 +185,8 @@ static void *sendCommand(void *arg)
   oss << velocity_punchMinus << ",";
   oss << velocity_windowPlus << ",";
   oss << velocity_windowMinus << ",";
+  oss << manual_drive_stroke << ",";
+  oss << manual_brake_stroke << ",";
 
   std::string cmd(oss.str());
   ssize_t n = write(client_sock, cmd.c_str(), cmd.size());
@@ -258,6 +275,7 @@ int main(int argc, char **argv)
   ros::Subscriber sub_position_checker = nh.subscribe("/position_checker", 1, positionCheckerCallback);
   ros::Subscriber waypoint_param_sub = nh.subscribe("/waypoint_param", 1, wayparamCallback);
   ros::Subscriber can_sub = nh.subscribe("/can_info", 1, canCallback);
+  ros::Subscriber manual_drive_stroke_sub = nh.subscribe("/manual_drive_stroke", 1, manualDriveStrokeCallback);
 
   command_data.reset();
 

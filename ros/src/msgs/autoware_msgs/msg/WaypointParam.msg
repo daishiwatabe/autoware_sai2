@@ -9,6 +9,9 @@ int32 velocity_punchPlus
 int32 velocity_punchMinus
 int32 velocity_windowPlus
 int32 velocity_windowMinus
+float64 drive_stroke
+float64 brake_stroke
+int16 mb_pedal
 int32 pause
 int32 pauseGroup
 float32 vgf_leafsize

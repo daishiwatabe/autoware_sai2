@@ -1,21 +1,38 @@
-/*
- * Copyright 2015-2019 Autoware Foundation. All rights reserved.
+﻿/*
+ *  Copyright (c) 2015, Nagoya University
+ *  All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ *  Redistribution and use in source and binary forms, with or without
+ *  modification, are permitted provided that the following conditions are met:
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *  * Redistributions of source code must retain the above copyright notice, this
+ *    list of conditions and the following disclaimer.
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ *  * Redistributions in binary form must reproduce the above copyright notice,
+ *    this list of conditions and the following disclaimer in the documentation
+ *    and/or other materials provided with the distribution.
+ *
+ *  * Neither the name of Autoware nor the names of its
+ *    contributors may be used to endorse or promote products derived from
+ *    this software without specific prior written permission.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+ *  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ *  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+ *  FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ *  DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+ *  SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+ *  CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+ *  OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ *  OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 
 #include <ros/ros.h>
 #include "autoware_msgs/VehicleCmd.h"
+#include <autoware_can_msgs/CANInfo.h>
+#include <autoware_msgs/PositionChecker.h>
+#include <autoware_msgs/WaypointParam.h>
 
 #include <iostream>
 #include <string>
@@ -57,6 +74,49 @@ void CommandData::reset()
 }
 
 static CommandData command_data;
+static int stopFlag = 1;
+
+static int steer_gain_ki = 40;
+static void canCallback(const autoware_can_msgs::CANInfo& msg)
+{
+    double speed = msg.speed;
+    if(speed < 2.0)
+    {
+        steer_gain_ki = 0;
+    }
+    else
+    {
+        steer_gain_ki = 4*(speed-20)+80;
+        if(steer_gain_ki > 120) steer_gain_ki = 120;
+        if(steer_gain_ki < 20) steer_gain_ki = 20;
+    }
+}
+
+static void positionCheckerCallback(const autoware_msgs::PositionChecker& msg)
+{
+    if(msg.stop_flag == true) {stopFlag = 1; std::cout << "aaa\n";}
+    else stopFlag = 0;
+}
+
+static int blinker=-1;
+static int velocity_KPPlus=-1;//8000;
+static int velocity_KPMinus=-1;//3500;
+static int velocity_punchPlus=-1;
+static int velocity_punchMinus=-1;
+static int velocity_windowPlus=-1;
+static int velocity_windowMinus=-1;
+static int pause_val=-1;
+static void wayparamCallback(const autoware_msgs::WaypointParam& msg)
+{
+    blinker = msg.blinker;
+    velocity_KPPlus = msg.velocity_KPPlus;
+    velocity_KPMinus = msg.velocity_KPMinus;
+    velocity_punchPlus = msg.velocity_punchPlus;
+    velocity_punchMinus = msg.velocity_punchMinus;
+    velocity_windowPlus = msg.velocity_windowPlus;
+    velocity_windowMinus = msg.velocity_windowMinus;
+    pause_val = msg.pause;
+}
 
 static void vehicleCmdCallback(const autoware_msgs::VehicleCmd& msg)
 {
@@ -95,11 +155,21 @@ static void *sendCommand(void *arg)
   oss << command_data.modeValue << ",";
   oss << command_data.gearValue << ",";
   oss << command_data.accellValue << ",";
-  oss << command_data.brakeValue << ",";
   oss << command_data.steerValue << ",";
+  oss << command_data.brakeValue << ",";
   oss << command_data.linear_velocity << ",";
   oss << command_data.steering_angle << ",";
-  oss << command_data.lampValue;
+  //oss << command_data.lampValue;
+  oss << stopFlag << ",";
+  oss << blinker << ",";
+  oss << pause_val << ",";
+  oss << steer_gain_ki << ",";
+  oss << velocity_KPPlus << ",";
+  oss << velocity_KPMinus << ",";
+  oss << velocity_punchPlus << ",";
+  oss << velocity_punchMinus << ",";
+  oss << velocity_windowPlus << ",";
+  oss << velocity_windowMinus << ",";
 
   std::string cmd(oss.str());
   ssize_t n = write(client_sock, cmd.c_str(), cmd.size());
@@ -185,6 +255,9 @@ int main(int argc, char **argv)
 
   std::cout << "vehicle sender" << std::endl;
   ros::Subscriber sub = nh.subscribe("/vehicle_cmd", 1, vehicleCmdCallback);
+  ros::Subscriber sub_position_checker = nh.subscribe("/position_checker", 1, positionCheckerCallback);
+  ros::Subscriber waypoint_param_sub = nh.subscribe("/waypoint_param", 1, wayparamCallback);
+  ros::Subscriber can_sub = nh.subscribe("/can_info", 1, canCallback);
 
   command_data.reset();
 
