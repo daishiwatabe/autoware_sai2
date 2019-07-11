@@ -8,6 +8,7 @@
 #include <autoware_can_msgs/MicroBusCan.h>
 #include <autoware_msgs/WaypointParam.h>
 #include "kvaser_can.h"
+#include <queue>
 
 class kvaser_can_sender
 {
@@ -15,7 +16,8 @@ private:
 	//drive params
 	const int PEDAL_MAX = 2000;
 	const int PEDAL_MIN = -500;
-	const double VELOCITY_MAX = 160;
+	const double SPEED_LIMIT = 20;
+	const int BRAKE_PEDAL_OFFSET = -50;
 
 	//steer params
 	const double HANDLE_MAX = 675;
@@ -140,7 +142,7 @@ private:
 		{
 			double twist_ang = twist.twist.angular.z*180.0 / M_PI;
 			twist_ang *= HANDLE_MAX / WHEEL_MAX;
-			twist_ang *= -20 * 1.1;
+			twist_ang *= 20 * 1.0;
 			steer_val = twist_ang;
 		}
 		else steer_val = auto_s_;
@@ -161,8 +163,10 @@ private:
 			short drive_val;
 			if(auto_drive_mode_ == false)
 			{
-				double twist_drv = twist.twist.linear.x *3.6 * 100; //std::cout << twist_drv << std::endl;
-				drive_val = twist_drv/2;
+				double linearx = twist.twist.linear.x;
+				//if(linearx > 0.5 && linearx < 1.0) linearx = 1.0;
+				double twist_drv = linearx *3.6 * 100; //std::cout << twist_drv << std::endl;
+				drive_val = twist_drv;
 			}
 			else drive_val = auto_d_;
 			unsigned char *drive_point = (unsigned char*)&drive_val;
@@ -174,6 +178,157 @@ private:
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];
 		}
 	}
+
+	//HEV
+
+	double estimate_accel = 0.0;
+	int target_accel_level = 0;
+	double accel_diff_sum = 0;
+	double brake_diff_sum = 0;
+	std::queue<double> accel_diff_buffer;
+	std::queue<double> brake_diff_buffer;
+	ros::Time proc_time;
+
+	void clear_diff()
+	{
+		int i;
+
+		accel_diff_sum = 0;
+		brake_diff_sum = 0;
+
+		for (i = 0; i < (int) accel_diff_buffer.size(); i++) {
+			accel_diff_buffer.pop();
+		}
+		for (i = 0; i < (int) brake_diff_buffer.size(); i++) {
+			brake_diff_buffer.pop();
+		}
+	}
+
+	double _accel_stroke_pid_control(double current_velocity, double cmd_velocity)
+	{
+		double e;
+		static double e_prev = 0;
+		double e_i;
+		double e_d;
+		double ret;
+
+		// acclerate by releasing the brake pedal if pressed.
+		if (can_receive.pedal < BRAKE_PEDAL_OFFSET) {
+			/*
+		  double target_brake_stroke = vstate.brake_stroke - _BRAKE_RELEASE_STEP;
+		  if (target_brake_stroke < 0)
+			target_brake_stroke = 0;
+		  ret = -target_brake_stroke; // if ret is negative, brake will be applied.
+		  */
+
+			// vstate has some delay until applying the current state.
+			// perhaps we can just return 0 (release brake pedal) here to avoid acceleration delay.
+			ret = 0;
+
+		  /* reset PID variables. */
+		  e_prev = 0;
+		  //clear_diff();
+		}
+		else { // PID control
+			double target_accel_stroke;
+
+		  e = cmd_velocity - current_velocity;
+
+		  e_d = e - e_prev;
+
+		  accel_diff_sum += e;
+
+      #if 0 // shouldn't we limit the cycles for I control?
+		  accel_diff_buffer.push(e);
+		  if (accel_diff_buffer.size() > _K_ACCEL_I_CYCLES) {
+			double e_old = accel_diff_buffer.front();
+			accel_diff_sum -= e_old;
+			if (accel_diff_sum < 0) {
+				accel_diff_sum = 0;
+			}
+			accel_diff_buffer.pop();
+		  }
+      #endif
+
+
+		}
+	}
+
+	void StrokeControl(double current_velocity, double cmd_velocity)
+	{
+		static std::queue<double> vel_buffer;
+		static uint vel_buffer_size = 10;
+		double old_velocity = 0.0;
+
+		// don't control if not in program mode.
+		if (can_receive.drive_mode == false) {
+			clear_diff();
+	  //#ifdef USE_BRAKE_LAMP
+	  //    sndBrkLampOff();
+	  //#endif /* USE_BRAKE_LAMP */
+		  return;
+		}
+
+		ros::Time time = ros::Time::now();
+		ros::Duration dura = time - proc_time;
+		double cycle_time = dura.sec + dura.nsec*10E-9;//secondes
+
+		if(proc_time.sec != 0 || proc_time.nsec != 0)
+		{
+			// estimate current acceleration.
+			vel_buffer.push(current_velocity);
+			if (vel_buffer.size() > vel_buffer_size) {
+				old_velocity = vel_buffer.front();
+			  vel_buffer.pop(); // remove old_velocity from the queue.
+			  estimate_accel =
+			    (current_velocity-old_velocity)/(cycle_time*vel_buffer_size);
+			}
+
+			std::cout << "estimate_accel: " << estimate_accel << std::endl;
+
+			if (fabs(cmd_velocity) > current_velocity
+			    && fabs(cmd_velocity) > 0.0
+			    && current_velocity < SPEED_LIMIT) {
+				double accel_stroke;
+			  std::cout << "accelerate: current_velocity=" << current_velocity
+			       << ", cmd_velocity=" << cmd_velocity << std::endl;
+			  accel_stroke = _accel_stroke_pid_control(current_velocity, cmd_velocity);
+			  /*if (accel_stroke > 0) {
+				cout << "ZMP_SET_DRV_STROKE(" << accel_stroke << ")" << endl;
+				ZMP_SET_DRV_STROKE(accel_stroke);
+				ZMP_SET_BRAKE_STROKE(0);
+			  }
+			  else {
+				cout << "ZMP_SET_DRV_STROKE(0)" << endl;
+				ZMP_SET_DRV_STROKE(0);
+				cout << "ZMP_SET_BRAKE_STROKE(" << -accel_stroke << ")" << endl;
+				ZMP_SET_BRAKE_STROKE(-accel_stroke);
+			  }*/
+			}
+			/*else if (fabs(cmd_velocity) < current_velocity
+					 && fabs(cmd_velocity) > 0.0) {
+				double brake_stroke;
+			  cout << "decelerate: current_velocity=" << current_velocity
+				   << ", cmd_velocity=" << cmd_velocity << endl;
+			  brake_stroke = _brake_stroke_pid_control(current_velocity, cmd_velocity);
+			  if (brake_stroke > 0) {
+				cout << "ZMP_SET_BRAKE_STROKE(" << brake_stroke << ")" << endl;
+				ZMP_SET_BRAKE_STROKE(brake_stroke);
+				ZMP_SET_DRV_STROKE(0);
+			  }
+			  else {
+				cout << "ZMP_SET_BRAKE_STROKE(0)" << endl;
+				ZMP_SET_BRAKE_STROKE(0);
+				cout << "ZMP_SET_DRV_STROKE(" << -brake_stroke << ")" << endl;
+				ZMP_SET_DRV_STROKE(-brake_stroke);
+			  }
+			}*/
+		}
+
+
+
+		proc_time = time;
+	}
 public:
 	kvaser_can_sender(ros::NodeHandle nh, ros::NodeHandle p_nh, int kvaser_channel)
 	    : nh_(nh)
@@ -184,6 +339,7 @@ public:
 	    , auto_steer_mode_(false)
 	    , drive_control_mode_(MODE_TORQUE)
 	    , pedal_(0)
+	    , proc_time(0)
 	{
 		can_receive.emergency = true;
 		kc.init(kvaser_channel);
@@ -197,7 +353,12 @@ public:
 		sub_auto_d_ = nh_.subscribe("/microbus/auto_d", 10, &kvaser_can_sender::callbackAutoD, this);
 		sub_auto_s_reset_ = nh_.subscribe("/microbus/auto_s_reset", 10, &kvaser_can_sender::callbackAutoSReset, this);
 		sub_auto_d_reset_ = nh_.subscribe("/microbus/auto_d_reset", 10, &kvaser_can_sender::callbackAutoDReset, this);
+		sub_torque_mode_ = nh_.subscribe("/microbus/set_torque_mode", 10, &kvaser_can_sender::callbackTorqueMode, this);
+		sub_velocity_mode_ = nh_.subscribe("/microbus/set_velocity_mode", 10, &kvaser_can_sender::callbackVelocityMode, this);
 		sub_waypoint_param_ = nh_.subscribe("/waypoint_param", 10, &kvaser_can_sender::callbackWaypointParam, this);
+
+		proc_time.sec = 0;
+		proc_time.nsec = 0;
 	}
 
 	const bool isOpen() {return kc.isOpen();}
