@@ -12,6 +12,7 @@ add_message_files(
   DIRECTORY msg
   FILES
     MicroBusCan.msg
+	MicroBsuCanReceiver.msg
     CANInfo.msg
     CANData.msg
     CANPacket.msg

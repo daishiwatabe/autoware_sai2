@@ -1,5 +1,6 @@
 #include <ros/ros.h>
 #include "kvaser_can.h"
+#include <autoware_can_msgs/MicroBsuCanReceiver.h>
 
 class kvaser_can_receiver
 {

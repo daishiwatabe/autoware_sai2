@@ -16,6 +16,8 @@ BT_DRIVE_MANUAL = 7
 BT_DRIVE_TORQUE = 8
 BT_DRIVE_VELOCITY = 9
 
+TX_DMERGENCY = 100
+
 class Microbus_Can_Sender:
 	def click_emegency_reset(self, event):
 		msg = Empty()
@@ -84,6 +86,11 @@ class Microbus_Can_Sender:
 		bt_drive_torque.SetFont(font)
 		bt_drive_velocity = wx.Button(panel, BT_DRIVE_VELOCITY, label="VELOCITY\nモード", pos=(200,300), size=(180,80))
 		bt_drive_velocity.SetFont(font)
+
+		lb_auto_mode = wx.StaticText(panel, -1, '安全機能', pos=(670, 10))
+		lb_auto_mode.SetFont(font)
+		self.tx_auto_mode = wx.TextCtrl(panel, TX_DMERGENCY, pos=(790,14), style=wx.TE_PROCESS_ENTER)
+		self.tx_auto_mode.SetFont(font)
 
 		bt_emergency_reset.Bind(wx.EVT_BUTTON, self.click_emegency_reset)
 		bt_steer_drive_auto.Bind(wx.EVT_BUTTON, self.click_steer_drive_auto)
