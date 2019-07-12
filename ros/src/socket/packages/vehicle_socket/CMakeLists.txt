@@ -9,6 +9,7 @@ find_package(autoware_msgs REQUIRED)
 find_package(tablet_socket_msgs REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
+  rospy
   std_msgs
   autoware_msgs
   autoware_can_msgs
@@ -20,6 +21,7 @@ set(CMAKE_CXX_FLAGS "-O2 -Wall ${CMAKE_CXX_FLAGS}")
 
 catkin_package(CATKIN_DEPENDS
   roscpp
+  rospy
   std_msgs
   autoware_can_msgs
   autoware_msgs
@@ -89,6 +91,10 @@ target_link_libraries(kvaser_microbus_can_receiver
 add_dependencies(kvaser_microbus_can_receiver
   ${catkin_EXPORTED_TARGETS}
   )
+
+catkin_install_python(PROGRAMS
+        nodes/microbus_can_topic_sender/microbus_can_topic_sender.py
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION})
 
 install(TARGETS vehicle_sender vehicle_receiver bus_socket kvaser_can_receiver kvaser_can_sender
                 kvaser_microbus_can_sender kvaser_microbus_can_receiver

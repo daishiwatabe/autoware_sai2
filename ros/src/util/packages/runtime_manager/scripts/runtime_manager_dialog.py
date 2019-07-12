@@ -85,6 +85,7 @@ from autoware_msgs.msg import IndicatorCmd
 from autoware_msgs.msg import LampCmd
 from autoware_msgs.msg import TrafficLight
 from autoware_msgs.msg import AdjustXY
+from autoware_config_msgs.msg import ConfigMicroBusCan
 from types import MethodType
 
 SCHED_OTHER = 0

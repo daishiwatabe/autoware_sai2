@@ -1,0 +1,2 @@
+Header header
+bool use_position_checker

@@ -6,7 +6,9 @@
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/TwistStamped.h>
 #include <autoware_can_msgs/MicroBusCan.h>
+#include <autoware_config_msgs/ConfigMicroBusCan.h>
 #include <autoware_msgs/WaypointParam.h>
+#include <autoware_msgs/PositionChecker.h>
 #include "kvaser_can.h"
 #include <queue>
 
@@ -35,20 +37,89 @@ private:
 	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_, sub_microbus_can_;
 	ros::Subscriber sub_emergency_reset_, sub_torque_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_auto_s_, sub_auto_d_, sub_auto_s_reset_, sub_auto_d_reset_;
-	ros::Subscriber sub_waypoint_param_;
+	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
 	bool auto_drive_mode_, auto_steer_mode_;
+	autoware_config_msgs::ConfigMicroBusCan setting;
 	unsigned char drive_control_mode_;
-	autoware_can_msgs::MicroBusCan can_receive;
-	geometry_msgs::TwistStamped twist;
+	autoware_can_msgs::MicroBusCan can_receive_;
+	geometry_msgs::TwistStamped twist_;
 	short auto_s_, auto_d_;
 	short pedal_;
+
+	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
+	{
+		std::cout << "sub Emergency" << std::endl;
+		char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
+		buf[0] = 0x55;
+		kc.write(0x100, buf, SEND_DATA_SIZE);
+		ros::Rate rate(1);
+		rate.sleep();
+		buf[0] = 0x00;
+		kc.write(0x100, buf, SEND_DATA_SIZE);
+	}
+
+	void callbackDModeSend(const std_msgs::Bool::ConstPtr &msg)
+	{
+		std::string flag = (msg->data) ? "on" : "off";
+		std::cout << "sub DMode : " << flag << std::endl;
+		flag_drive_mode_ = msg->data;
+	}
+
+	void callbackSModeSend(const std_msgs::Bool::ConstPtr &msg)
+	{
+		std::string flag = (msg->data) ? "on" : "off";
+		std::cout << "sub SMode : " << flag << std::endl;
+		flag_steer_mode_ = msg->data;
+	}
+
+	void callbackMicrobusCan(const autoware_can_msgs::MicroBusCan::ConstPtr &msg)
+	{
+		std::cout << "sub can" << std::endl;
+		can_receive_ = *msg;
+	}
+
+	void callbackTorqueMode(const std_msgs::Empty::ConstPtr &msg)
+	{
+		std::cout << "sub TorqueMode" << std::endl;
+		drive_control_mode_ = MODE_TORQUE;
+	}
+
+	void callbackVelocityMode(const std_msgs::Empty::ConstPtr &msg)
+	{
+		std::cout << "sub VelocityMode" << std::endl;
+		drive_control_mode_ = MODE_VRLOCITY;
+	}
+
+	void callbackConfigMicroBusCan(const autoware_config_msgs::ConfigMicroBusCan::ConstPtr &msg)
+	{
+		setting = *msg;
+	}
+
+	void callbackTwistCmd(const geometry_msgs::TwistStamped::ConstPtr &msg)
+	{
+		std::cout << "sub twist" << std::endl;
+		twist_ = *msg;
+	}
 
 	void callbackWaypointParam(const autoware_msgs::WaypointParam::ConstPtr &msg)
 	{
 		pedal_ = msg->mb_pedal;
+	}
+
+	void callbackPositionChecker(const autoware_msgs::PositionChecker::ConstPtr &msg)
+	{
+		if(setting.use_position_checker == true)
+		{
+			if(msg->stop_flag == true)
+			{
+				flag_drive_mode_ = false;
+				flag_steer_mode_ = false;
+				can_send();
+			}
+		}
 	}
 
 	void callbackAutoS(const std_msgs::Int16::ConstPtr &msg)
@@ -77,56 +148,6 @@ private:
 		std::cout << "ddd" << std::endl;
 	}
 
-	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
-	{
-		std::cout << "sub Emergency" << std::endl;
-		char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
-		buf[0] = 0x55;
-		kc.write(0x100, buf, SEND_DATA_SIZE);
-		ros::Rate rate(1);
-		rate.sleep();
-		buf[0] = 0x00;
-		kc.write(0x100, buf, SEND_DATA_SIZE);
-	}
-
-	void callbackTorqueMode(const std_msgs::Empty::ConstPtr &msg)
-	{
-		std::cout << "sub TorqueMode" << std::endl;
-		drive_control_mode_ = MODE_TORQUE;
-	}
-
-	void callbackVelocityMode(const std_msgs::Empty::ConstPtr &msg)
-	{
-		std::cout << "sub VelocityMode" << std::endl;
-		drive_control_mode_ = MODE_VRLOCITY;
-	}
-
-	void callbackDModeSend(const std_msgs::Bool::ConstPtr &msg)
-	{
-		std::string flag = (msg->data) ? "on" : "off";
-		std::cout << "sub DMode : " << flag << std::endl;
-		flag_drive_mode_ = msg->data;
-	}
-
-	void callbackSModeSend(const std_msgs::Bool::ConstPtr &msg)
-	{
-		std::string flag = (msg->data) ? "on" : "off";
-		std::cout << "sub SMode : " << flag << std::endl;
-		flag_steer_mode_ = msg->data;
-	}
-
-	void callbackMicrobusCan(const autoware_can_msgs::MicroBusCan::ConstPtr &msg)
-	{
-		std::cout << "sub can" << std::endl;
-		can_receive = *msg;
-	}
-
-	void callbackTwistCmd(const geometry_msgs::TwistStamped::ConstPtr &msg)
-	{
-		std::cout << "sub twist" << std::endl;
-		twist = *msg;
-	}
-
 	void bufset_mode(unsigned char *buf)
 	{
 		unsigned char mode = 0;
@@ -140,7 +161,7 @@ private:
 		short steer_val;
 		if(auto_steer_mode_ == false)
 		{
-			double twist_ang = twist.twist.angular.z*180.0 / M_PI;
+			double twist_ang = twist_.twist.angular.z*180.0 / M_PI;
 			twist_ang *= HANDLE_MAX / WHEEL_MAX;
 			twist_ang *= 20 * 1.0;
 			steer_val = twist_ang;
@@ -163,7 +184,7 @@ private:
 			short drive_val;
 			if(auto_drive_mode_ == false)
 			{
-				double linearx = twist.twist.linear.x;
+				double linearx = twist_.twist.linear.x;
 				//if(linearx > 0.5 && linearx < 1.0) linearx = 1.0;
 				double twist_drv = linearx *3.6 * 100; //std::cout << twist_drv << std::endl;
 				drive_val = twist_drv;
@@ -213,7 +234,7 @@ private:
 		double ret;
 
 		// acclerate by releasing the brake pedal if pressed.
-		if (can_receive.pedal < BRAKE_PEDAL_OFFSET) {
+		if (can_receive_.pedal < BRAKE_PEDAL_OFFSET) {
 			/*
 		  double target_brake_stroke = vstate.brake_stroke - _BRAKE_RELEASE_STEP;
 		  if (target_brake_stroke < 0)
@@ -261,7 +282,7 @@ private:
 		double old_velocity = 0.0;
 
 		// don't control if not in program mode.
-		if (can_receive.drive_mode == false) {
+		if (can_receive_.drive_mode == false) {
 			clear_diff();
 	  //#ifdef USE_BRAKE_LAMP
 	  //    sndBrkLampOff();
@@ -341,13 +362,15 @@ public:
 	    , pedal_(0)
 	    , proc_time(0)
 	{
-		can_receive.emergency = true;
+		can_receive_.emergency = true;
 		kc.init(kvaser_channel);
+
+		setting.use_position_checker == true;
 
 		sub_microbus_drive_mode_ = nh_.subscribe("/microbus/drive_mode_send", 10, &kvaser_can_sender::callbackDModeSend, this);
 		sub_microbus_steer_mode_ = nh_.subscribe("/microbus/steer_mode_send", 10, &kvaser_can_sender::callbackSModeSend, this);
 		sub_twist_cmd_ = nh_.subscribe("/twist_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
-		sub_microbus_can_ = nh_.subscribe("/microbus/can_receive", 10, &kvaser_can_sender::callbackMicrobusCan, this);
+		sub_microbus_can_ = nh_.subscribe("/microbus/can_receive_", 10, &kvaser_can_sender::callbackMicrobusCan, this);
 		sub_emergency_reset_ = nh_.subscribe("/microbus/emergency_reset", 10, &kvaser_can_sender::callbackEmergencyReset, this);
 		sub_auto_s_ = nh_.subscribe("/microbus/auto_s", 10, &kvaser_can_sender::callbackAutoS, this);
 		sub_auto_d_ = nh_.subscribe("/microbus/auto_d", 10, &kvaser_can_sender::callbackAutoD, this);
@@ -356,6 +379,8 @@ public:
 		sub_torque_mode_ = nh_.subscribe("/microbus/set_torque_mode", 10, &kvaser_can_sender::callbackTorqueMode, this);
 		sub_velocity_mode_ = nh_.subscribe("/microbus/set_velocity_mode", 10, &kvaser_can_sender::callbackVelocityMode, this);
 		sub_waypoint_param_ = nh_.subscribe("/waypoint_param", 10, &kvaser_can_sender::callbackWaypointParam, this);
+		sub_position_checker_ = nh_.subscribe("/position_checker", 10, &kvaser_can_sender::callbackPositionChecker, this);
+		sub_config_microbus_can_ = nh_.subscribe("/config/microbus_can", 10, &kvaser_can_sender::callbackConfigMicroBusCan, this);
 
 		proc_time.sec = 0;
 		proc_time.nsec = 0;
@@ -381,7 +406,8 @@ int main(int argc, char** argv)
 	ros::NodeHandle private_nh("~");
 
 	int kvaser_channel;
-	private_nh.param("kvaser_channel", kvaser_channel, 0);
+	bool use_position_checker;
+	private_nh.param<int>("kvaser_channel", kvaser_channel, 0);
 	kvaser_can_sender kcs(nh, private_nh, kvaser_channel);
 	if(kcs.isOpen() == false)
 	{

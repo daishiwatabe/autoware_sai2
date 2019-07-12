@@ -4,6 +4,7 @@
     /config/X_kf, /config/X_fusion, /config/lane_rule, /config/lane_select, /config/ndt,
     /config/ndt_mapping, /config/ndt_mapping_output, /config/superimpose,
     /config/twist_filter, /config/velocity_set, /config/waypoint_follower, /config/localizer_switch_fusion_flag,
-    /microbus/drive_mode_send, /microbus/steer_mode_send, /microbus/emergency_reset, /microbus/set_torque_mode, /microbus/set_velocity_mode]
+    /microbus/drive_mode_send, /microbus/steer_mode_send, /microbus/emergency_reset, /microbus/set_torque_mode, /microbus/set_velocity_mode,
+    /config/microbus_can]
   subscribe: [/to_rtmgr, /ndt_stat, /topic1, /topic2, /route_cmd, /gnss_stat, /pmap_stat,
     /vmap_stat, /lf_stat]

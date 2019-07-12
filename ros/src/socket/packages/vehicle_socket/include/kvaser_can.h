@@ -59,7 +59,7 @@ public:
 			return res;
 		}
 
-		if(id_ == 0x501)
+		if(id_ == 0x501)// || id_ == 0x100)
 		{
 		printf("(%u) id:%lx dlc:%u data: ", msgCounter_, id_, dlc);
 		if (dlc > READ_DATA_SIZE) {

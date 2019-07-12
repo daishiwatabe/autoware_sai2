@@ -47,6 +47,7 @@ add_message_files(
   ConfigCameraROI.msg
   ConfigLocalizerSwitchFusion.msg
   ConfigManualDriveStroke.msg
+  ConfigMicroBusCan.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

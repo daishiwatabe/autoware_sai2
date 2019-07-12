@@ -969,6 +969,7 @@ subs :
     - name : microbus can
       desc : microbus can desc sample
       cmd  : roslaunch vehicle_socket kvaser_microbus.launch
+      param: microbus_can
 
 buttons:
   car_dpm :
@@ -6081,3 +6082,18 @@ params :
       cmd_param:
         dash     : ''
         delim    : ':='
+  - name  : microbus_can
+    topic : /config/microbus_can
+    msg   : ConfigMicroBusCan
+    vars  :
+    - name  : use_position_checker
+      desc  : use_position_checker desc sample
+      label : use_position_checker
+      kind  : radio_box
+      choices:
+      - not use
+      - use
+      descs :
+      - not use position_checker
+      - use position_checker
+      v     : 2
