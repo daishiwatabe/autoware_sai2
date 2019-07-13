@@ -44,9 +44,22 @@ public:
 
 					can.emergency = (data[7] == 0x55);
 					unsigned char dmode = data[7] & 0x0F;
-					can.drive_mode = (dmode == 0x0A);
+					switch(dmode)
+					{
+					case 0x0A:
+						can.drive_auto = true;
+						can.drive_mode = autoware_can_msgs::MicroBusCan::DRIVE_MODE_STROKE;
+						break;
+					case 0x0B:
+						can.drive_auto = true;
+						can.drive_mode = autoware_can_msgs::MicroBusCan::DRIVE_MODE_VELOCITY;
+						break;
+					default:
+						can.drive_auto = false;
+					}
+					//can.drive_auto = (dmode == 0x0A);
 					unsigned char smode = data[7] & 0xF0;
-					can.steer_mode = (smode == 0xA0);
+					can.steer_auto = (smode == 0xA0);
 
 					unsigned char *vel_tmp = (unsigned char*)&can.velocity;
 					vel_tmp[0] = data[3];  vel_tmp[1] = data[2];

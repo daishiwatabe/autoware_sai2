@@ -1,5 +1,4 @@
 #include <canlib.h>
-#include <autoware_can_msgs/MicroBsuCanReceiver.h>
 
 class KVASER_CAN
 {
