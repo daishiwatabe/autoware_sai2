@@ -1,12 +1,13 @@
 #include <ros/ros.h>
-#include <autoware_can_msgs/MicroBusCan.h>
+#include <autoware_can_msgs/MicroBusCan501.h>
+#include <autoware_can_msgs/MicroBusCan502.h>
 #include "kvaser_can.h"
 
 class kvaser_can_receiver
 {
 private:
 	ros::NodeHandle nh_, private_nh_;
-	ros::Publisher pub_microbus_can_;
+	ros::Publisher pub_microbus_can_501_, pub_microbus_can_502_;
 
 	KVASER_CAN kc;
 
@@ -23,7 +24,8 @@ public:
 		read_id_flag_.read501 = read_id_flag_.read502 = false;
 		kc.init(kvaser_channel);
 
-		pub_microbus_can_ = nh_.advertise<autoware_can_msgs::MicroBusCan>("/microbus/can_receive", 10);
+		pub_microbus_can_501_ = nh_.advertise<autoware_can_msgs::MicroBusCan501>("/microbus/can_receive501", 10);
+		pub_microbus_can_502_ = nh_.advertise<autoware_can_msgs::MicroBusCan502>("/microbus/can_receive502", 10);
 	}
 
 	bool isOpen() {return kc.isOpen();}
@@ -39,45 +41,67 @@ public:
 			    {
 				    unsigned char data[KVASER_CAN::READ_DATA_SIZE];
 					kc.get_read_data(data);
-					autoware_can_msgs::MicroBusCan can;
+					autoware_can_msgs::MicroBusCan501 can;
 					can.header.stamp = ros::Time::now();
 
-					can.emergency = (data[7] == 0x55);
-					unsigned char dmode = data[7] & 0x0F;
-					switch(dmode)
+					can.emergency = (data[0] == 0x55);
+					unsigned char dmode0 = data[0] & 0x0F;
+					unsigned char dmode1 = data[1] & 0x0F;
+					switch(dmode1)
 					{
 					case 0x0A:
 						can.drive_auto = true;
-						can.drive_mode = autoware_can_msgs::MicroBusCan::DRIVE_MODE_STROKE;
 						break;
 					case 0x0B:
 						can.drive_auto = true;
-						can.drive_mode = autoware_can_msgs::MicroBusCan::DRIVE_MODE_VELOCITY;
 						break;
 					default:
 						can.drive_auto = false;
 					}
+					switch(dmode0)
+					{
+					case 0x0A:
+						can.drive_mode = autoware_can_msgs::MicroBusCan501::DRIVE_MODE_STROKE;
+						break;
+					case 0x0B:
+						can.drive_mode = autoware_can_msgs::MicroBusCan501::DRIVE_MODE_VELOCITY;
+						break;
+					}
 					//can.drive_auto = (dmode == 0x0A);
-					unsigned char smode = data[7] & 0xF0;
+					unsigned char smode = data[1] & 0xF0;
 					can.steer_auto = (smode == 0xA0);
 
 					unsigned char *vel_tmp = (unsigned char*)&can.velocity;
-					vel_tmp[0] = data[3];  vel_tmp[1] = data[2];
+					vel_tmp[0] = data[5];  vel_tmp[1] = data[4];
 
 					unsigned char *str_tmp = (unsigned char*)&can.steering_angle;
-					str_tmp[0] = data[5];  str_tmp[1] = data[4];
+					str_tmp[0] = data[3];  str_tmp[1] = data[2];
 
 					unsigned char *stroke_tmp = (unsigned char*)&can.pedal;
 					//stroke_tmp[?] = data[?];  stroke_tmp[?] = data[?];
 
 					can.read_counter = kc.get_read_counter();
 
-					pub_microbus_can_.publish(can);
+					pub_microbus_can_501_.publish(can);
 					read_id_flag_.read501 = true;
 					break;
 			    }
 			case 0x502:
 			    {
+				    unsigned char data[KVASER_CAN::READ_DATA_SIZE];
+					kc.get_read_data(data);
+					autoware_can_msgs::MicroBusCan502 can;
+					can.header.stamp = ros::Time::now();
+
+					unsigned char *vel_tmp = (unsigned char*)&can.velocity_actual;
+					vel_tmp[0] = data[7];  vel_tmp[1] = data[6];
+
+					unsigned char *str_tmp = (unsigned char*)&can.angle_actual;
+					str_tmp[0] = data[5];  str_tmp[1] = data[4];
+
+					can.read_counter = kc.get_read_counter();
+
+					pub_microbus_can_502_.publish(can);
 				    read_id_flag_.read502 = true;
 					break;
 			    }
@@ -93,7 +117,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "kvaser_can_receiver");
+	ros::init(argc, argv, "kvaser_microbus_can_receiver");
 	ros::NodeHandle nh;
 	ros::NodeHandle private_nh("~");
 

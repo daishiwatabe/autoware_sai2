@@ -1,11 +1,12 @@
-#include <ros/ros.h>
+﻿#include <ros/ros.h>
 #include <queue>
 #include <std_msgs/Bool.h>
 #include <std_msgs/UInt8.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/TwistStamped.h>
-#include <autoware_can_msgs/MicroBusCan.h>
+#include <autoware_can_msgs/MicroBusCan501.h>
+#include <autoware_can_msgs/MicroBusCan502.h>
 #include <autoware_can_msgs/MicroBusCanSenderStatus.h>
 #include <autoware_config_msgs/ConfigMicroBusCan.h>
 #include <autoware_msgs/WaypointParam.h>
@@ -37,9 +38,10 @@ private:
 	ros::Publisher pub_microbus_can_sender_status_;
 
 	ros::NodeHandle nh_, private_nh_;
-	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_, sub_microbus_can_;
+	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_;
+	ros::Subscriber sub_microbus_can_501_, sub_microbus_can_502_;
 	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
-	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_;
+	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
 
 	KVASER_CAN kc;
@@ -47,7 +49,8 @@ private:
 	bool input_drive_mode_, input_steer_mode_;
 	autoware_config_msgs::ConfigMicroBusCan setting_;
 	unsigned char drive_control_mode_;
-	autoware_can_msgs::MicroBusCan can_receive_;
+	autoware_can_msgs::MicroBusCan501 can_receive_501_;
+	autoware_can_msgs::MicroBusCan502 can_receive_502_;
 	geometry_msgs::TwistStamped twist_;
 	short input_steer_, input_drive_;
 	short pedal_;
@@ -78,10 +81,16 @@ private:
 		flag_steer_mode_ = msg->data;
 	}
 
-	void callbackMicrobusCan(const autoware_can_msgs::MicroBusCan::ConstPtr &msg)
+	void callbackMicrobusCan501(const autoware_can_msgs::MicroBusCan501::ConstPtr &msg)
 	{
 		std::cout << "sub can" << std::endl;
-		can_receive_ = *msg;
+		can_receive_501_ = *msg;
+	}
+
+	void callbackMicrobusCan502(const autoware_can_msgs::MicroBusCan502::ConstPtr &msg)
+	{
+		std::cout << "sub can" << std::endl;
+		can_receive_502_ = *msg;
 	}
 
 	void callbackStrokeMode(const std_msgs::Empty::ConstPtr &msg)
@@ -144,12 +153,24 @@ private:
 		publisStatus();
 	}
 
+	void callbackInputSteerValue(const std_msgs::Int16::ConstPtr &msg)
+	{
+		input_steer_ = msg->data;
+		std::cout << input_steer_ << std::endl;
+	}
+
 	void callbackInputDriveFlag(const std_msgs::Bool::ConstPtr &msg)
 	{
 		//input_drive_ = msg->data;
 		input_drive_mode_ = msg->data;
-		std::cout << "bbb" << std::endl;
+		std::cout << "ccc" << std::endl;
 		publisStatus();
+	}
+
+	void callbackInputDriveValue(const std_msgs::Int16::ConstPtr &msg)
+	{
+		input_drive_ = msg->data;
+		std::cout << input_drive_ << std::endl;
 	}
 
 	void bufset_mode(unsigned char *buf)
@@ -194,6 +215,7 @@ private:
 				drive_val = twist_drv;
 			}
 			else drive_val = input_drive_;
+
 			unsigned char *drive_point = (unsigned char*)&drive_val;
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];
 		}
@@ -238,7 +260,7 @@ private:
 		double ret;
 
 		// acclerate by releasing the brake pedal if pressed.
-		if (can_receive_.pedal < BRAKE_PEDAL_OFFSET) {
+		if (can_receive_501_.pedal < BRAKE_PEDAL_OFFSET) {
 			/*
 		  double target_brake_stroke = vstate.brake_stroke - _BRAKE_RELEASE_STEP;
 		  if (target_brake_stroke < 0)
@@ -286,7 +308,7 @@ private:
 		double old_velocity = 0.0;
 
 		// don't control if not in program mode.
-		if (can_receive_.drive_mode == false) {
+		if (can_receive_501_.drive_mode == false) {
 			clear_diff();
 	  //#ifdef USE_BRAKE_LAMP
 	  //    sndBrkLampOff();
@@ -362,11 +384,13 @@ public:
 	    , flag_steer_mode_(false)
 	    , input_drive_mode_(false)
 	    , input_steer_mode_(false)
+	    , input_steer_(0)
+	    , input_drive_(0)
 	    , drive_control_mode_(MODE_STROKE)
 	    , pedal_(0)
 	    , proc_time(0)
 	{
-		can_receive_.emergency = true;
+		can_receive_501_.emergency = true;
 		kc.init(kvaser_channel);
 
 		setting_.use_position_checker == true;
@@ -376,10 +400,13 @@ public:
 		sub_microbus_drive_mode_ = nh_.subscribe("/microbus/drive_mode_send", 10, &kvaser_can_sender::callbackDModeSend, this);
 		sub_microbus_steer_mode_ = nh_.subscribe("/microbus/steer_mode_send", 10, &kvaser_can_sender::callbackSModeSend, this);
 		sub_twist_cmd_ = nh_.subscribe("/twist_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
-		sub_microbus_can_ = nh_.subscribe("/microbus/can_receive", 10, &kvaser_can_sender::callbackMicrobusCan, this);
+		sub_microbus_can_501_ = nh_.subscribe("/microbus/can_receive501", 10, &kvaser_can_sender::callbackMicrobusCan501, this);
+		sub_microbus_can_502_ = nh_.subscribe("/microbus/can_receive502", 10, &kvaser_can_sender::callbackMicrobusCan502, this);
 		sub_emergency_reset_ = nh_.subscribe("/microbus/emergency_reset", 10, &kvaser_can_sender::callbackEmergencyReset, this);
 		sub_input_steer_flag_ = nh_.subscribe("/microbus/input_steer_flag", 10, &kvaser_can_sender::callbackInputSteerFlag, this);
+		sub_input_steer_value_ = nh_.subscribe("/microbus/input_steer_value", 10, &kvaser_can_sender::callbackInputSteerValue, this);
 		sub_input_drive_flag_ = nh_.subscribe("/microbus/input_drive_flag", 10, &kvaser_can_sender::callbackInputDriveFlag, this);
+		sub_input_drive_value_ = nh_.subscribe("/microbus/input_drive_value", 10, &kvaser_can_sender::callbackInputDriveValue, this);
 		sub_stroke_mode_ = nh_.subscribe("/microbus/set_stroke_mode", 10, &kvaser_can_sender::callbackStrokeMode, this);
 		sub_velocity_mode_ = nh_.subscribe("/microbus/set_velocity_mode", 10, &kvaser_can_sender::callbackVelocityMode, this);
 		sub_waypoint_param_ = nh_.subscribe("/waypoint_param", 10, &kvaser_can_sender::callbackWaypointParam, this);

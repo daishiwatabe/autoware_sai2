@@ -11,7 +11,8 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   DIRECTORY msg
   FILES
-    MicroBusCan.msg
+    MicroBusCan501.msg
+	MicroBusCan502.msg
 	MicroBusCanSenderStatus.msg
     CANInfo.msg
     CANData.msg

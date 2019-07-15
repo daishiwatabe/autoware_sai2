@@ -3,12 +3,10 @@
 
 import wx
 import rospy
-import threading
 from std_msgs.msg import Empty
 from std_msgs.msg import Bool
 from std_msgs.msg import Int16
-from autoware_can_msgs.msg import MicroBusCan501
-from autoware_can_msgs.msg import MicroBusCan502
+from autoware_can_msgs.msg import MicroBusCan
 from autoware_can_msgs.msg import MicroBusCanSenderStatus
 
 BT_EMERGENCY_RESET = 1
@@ -39,11 +37,8 @@ TX_DRIVE_MODE = 203
 TX_VELOCITY = 204
 TX_PEDAL = 205
 TX_ANGLE = 206
-TX_VELOCITY_ACTUAL = 207
-TX_PEDAL_ACTUAL = 208
-TX_ANGLE_ACTUAL = 209
 
-class Microbus_Can_Sender_GUI:
+class Microbus_Can_Sender:
 	def click_emegency_reset(self, event):
 		msg = Empty()
 		self.pub_emergency_reset.publish(msg)
@@ -112,7 +107,7 @@ class Microbus_Can_Sender_GUI:
 		msg = Int16(val)
 		self.pub_input_drive_value.publish(msg)
 
-	def callback_can_receive501(self, msg):
+	def callback_can_receive(self, msg):
 		if msg.emergency == True:
 			self.tx_emergency.SetValue('LOCK')
 			self.tx_steer_auto.SetValue('NONE')
@@ -128,9 +123,9 @@ class Microbus_Can_Sender_GUI:
 			if msg.drive_auto == True:
 				self.tx_drive_auto.SetValue('AUTO')
 
-				if msg.drive_mode == MicroBusCan501.DRIVE_MODE_STROKE:
+				if msg.drive_mode == MicroBusCan.DRIVE_MODE_STROKE:
 					str_dmode = 'STROKE'
-				elif msg.drive_mode == MicroBusCan501.DRIVE_MODE_VELOCITY:
+				elif msg.drive_mode == MicroBusCan.DRIVE_MODE_VELOCITY:
 					str_dmode = 'VELOCITY'
 				else:
 					str_dmode = 'UNKNOWN'
@@ -154,28 +149,20 @@ class Microbus_Can_Sender_GUI:
 		self.tx_pedal.SetValue(str(msg.pedal))
 		self.tx_angle.SetValue(str(msg.steering_angle))
 
-	def callback_can_receive502(self, msg): 
-		print("aaa")
-		self.tx_velocity_actual.SetValue(str(msg.velocity_actual))
-		self.tx_angle_actual.SetValue(str(msg.angle_actual))
-
 	def callback_micro_sub_can_sender_status(self, msg):
 		if msg.use_input_steer == True:
+			self.tx_input_steer_label.SetValue('ON')
 			self.bt_input_steer_send.Enable()
-			self.tx_input_steer_label.SetValue("ON")
 		else:
+			self.tx_input_steer_label.SetValue('OFF')
 			self.bt_input_steer_send.Disable()
-			self.tx_input_steer_label.SetValue("OFF")
 
 		if msg.use_input_drive == True:
+			self.tx_input_drive_label.SetValue('ON')
 			self.bt_input_drive_send.Enable()
-			self.tx_input_drive_label.SetValue("ON")
 		else:
-			self.tx_input_drive_label.SetValue("OFF")
+			self.tx_input_drive_label.SetValue('OFF')
 			self.bt_input_drive_send.Disable()
-
-	def worker(self):
-		self.app.MainLoop()
 
 	def __init__(self):
 		rospy.init_node('microbus_can_topic_sender', anonymous=True)
@@ -223,10 +210,10 @@ class Microbus_Can_Sender_GUI:
 		self.bt_input_steer_off.SetFont(font)
 		self.bt_input_drive_off = wx.Button(self.panel, BT_INPUT_DRIVE_OFF, label="ドライブ入力\nOFF", pos=(200, 530), size=(180,80))
 		self.bt_input_drive_off.SetFont(font)
-		self.tx_input_steer_label = wx.TextCtrl(self.panel, TX_INPUT_STEER_LABEL, pos=(10, 615), size=(180,45), style=wx.TE_READONLY)
+		self.tx_input_steer_label = wx.TextCtrl(self.panel, TX_INPUT_STEER_LABEL, pos=(10, 615), size=(180,45), style=wx.TE_PROCESS_ENTER)
 		#self.tx_input_steer_flag = wx.StaticText(self.panel, LB_INPUT_STEER, 'OFF', pos=(10, 530))
 		self.tx_input_steer_label.SetFont(font)
-		self.tx_input_drive_label = wx.TextCtrl(self.panel, TX_INPUT_DRIVE_LABEL, pos=(200, 615), size=(180,45), style=wx.TE_READONLY)
+		self.tx_input_drive_label = wx.TextCtrl(self.panel, TX_INPUT_DRIVE_LABEL, pos=(200, 615), size=(180,45), style=wx.TE_PROCESS_ENTER)
 		#self.tx_input_drive_flag = wx.StaticText(self.panel, LB_INPUT_DRIVE, 'OFF', pos=(200, 530))
 		self.tx_input_drive_label.SetFont(font)
 		self.tx_input_steer = wx.TextCtrl(self.panel, TX_INPUT_STEER, pos=(10,660), size=(180,45), style=wx.TE_PROCESS_ENTER)
@@ -267,22 +254,14 @@ class Microbus_Can_Sender_GUI:
 		self.lb_velocity.SetFont(font)
 		self.tx_velocity = wx.TextCtrl(self.panel, TX_VELOCITY, pos=(810,190), size=(200,45), style=wx.TE_PROCESS_ENTER)
 		self.tx_velocity.SetFont(font)
-		self.lb_velocity_actual = wx.StaticText(self.panel, -1, 'V_ACTUAL', pos=(670, 240))
-		self.lb_velocity_actual.SetFont(font)
-		self.tx_velocity_actual = wx.TextCtrl(self.panel, TX_VELOCITY_ACTUAL, pos=(810,235), size=(200,45), style=wx.TE_PROCESS_ENTER)
-		self.tx_velocity_actual.SetFont(font)
-		self.lb_pedal = wx.StaticText(self.panel, -1, 'PEDAL', pos=(670, 285))
+		self.lb_pedal = wx.StaticText(self.panel, -1, 'PEDAL', pos=(670, 240))
 		self.lb_pedal.SetFont(font)
-		self.tx_pedal = wx.TextCtrl(self.panel, TX_PEDAL, pos=(810,280), size=(200,45), style=wx.TE_PROCESS_ENTER)
+		self.tx_pedal = wx.TextCtrl(self.panel, TX_PEDAL, pos=(810,235), size=(200,45), style=wx.TE_PROCESS_ENTER)
 		self.tx_pedal.SetFont(font)
-		self.lb_angle = wx.StaticText(self.panel, -1, 'ANGLE', pos=(670, 330))
+		self.lb_angle = wx.StaticText(self.panel, -1, 'ANGLE', pos=(670, 285))
 		self.lb_angle.SetFont(font)
-		self.tx_angle = wx.TextCtrl(self.panel, TX_ANGLE, pos=(810,325), size=(200,45), style=wx.TE_PROCESS_ENTER)
+		self.tx_angle = wx.TextCtrl(self.panel, TX_ANGLE, pos=(810,280), size=(200,45), style=wx.TE_PROCESS_ENTER)
 		self.tx_angle.SetFont(font)
-		self.lb_angle_actual = wx.StaticText(self.panel, -1, 'A_ACTUAL', pos=(670, 375))
-		self.lb_angle_actual.SetFont(font)
-		self.tx_angle_actual = wx.TextCtrl(self.panel, TX_ANGLE_ACTUAL, pos=(810,370), size=(200,45), style=wx.TE_PROCESS_ENTER)
-		self.tx_angle_actual.SetFont(font)
 
 		self.pub_emergency_reset = rospy.Publisher('/microbus/emergency_reset', Empty, queue_size=1)
 		self.pub_steer_auto = rospy.Publisher('/microbus/steer_mode_send', Bool, queue_size=1)
@@ -294,17 +273,12 @@ class Microbus_Can_Sender_GUI:
 		self.pub_input_steer_value = rospy.Publisher('/microbus/input_steer_value', Int16, queue_size=1)
 		self.pub_input_drive_value = rospy.Publisher('/microbus/input_drive_value', Int16, queue_size=1)
 
-		self.sub_micro_bus_can501 = rospy.Subscriber('/microbus/can_receive501', MicroBusCan501, self.callback_can_receive501)
-		self.sub_micro_bus_can502 = rospy.Subscriber('/microbus/can_receive502', MicroBusCan502, self.callback_can_receive502)
-		self.sub_micro_bus_can_sender_status = rospy.Subscriber('/microbus/can_sender_status', MicroBusCanSenderStatus, self.callback_micro_sub_can_sender_status)
+		self.sub_micro_bus_can = rospy.Subscriber('/microbus/can_receive', MicroBusCan, self.callback_can_receive)
+		self.sub_micro_bub_can_sender_status = rospy.Subscriber('/microbus/can_sender_status', MicroBusCanSenderStatus, self.callback_micro_sub_can_sender_status)
 		
 		self.frame.Show()
-		#self.app.MainLoop()
-		self.threads = []
-		self.t = threading.Thread(target=self.worker)
-		self.threads.append(self.t)
-		self.t.start()
-		rospy.spin()
+		self.app.MainLoop()
 
 if __name__ == '__main__':
-	microbus_can_sender = Microbus_Can_Sender_GUI()
+	microbus_can_sender = Microbus_Can_Sender()
+	rospy.spin()

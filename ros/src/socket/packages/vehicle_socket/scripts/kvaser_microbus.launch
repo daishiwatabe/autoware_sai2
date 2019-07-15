@@ -1,7 +1,7 @@
 <launch>
 	<arg name="kvaser_channel" default="0"/>
 
-	<node pkg="vehicle_socket" type="kvaser_can_receiver" name="kvaser_can_receiver" output="screen">
+	<node pkg="vehicle_socket" type="kvaser_microbus_can_receiver" name="kvaser_microbus_can_receiver" output="screen">
 		<param name="kvaser_channel" value="$(arg kvaser_channel)"/>
 	</node>
 
