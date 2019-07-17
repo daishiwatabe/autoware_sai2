@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
         waypoint_follower
         lane_planner
         autoware_msgs
+		autoware_can_msgs
         vector_map
         )
 
@@ -33,6 +34,7 @@ catkin_package(
         vector_map
         lane_planner
         autoware_msgs
+		autoware_can_msgs
 )
 
 SET(CMAKE_CXX_FLAGS "-O2 -g -Wall ${CMAKE_CXX_FLAGS}")

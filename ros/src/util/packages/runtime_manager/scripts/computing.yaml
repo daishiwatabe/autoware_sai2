@@ -6096,4 +6096,4 @@ params :
       descs :
       - not use position_checker
       - use position_checker
-      v     : 2
+      v     : 1

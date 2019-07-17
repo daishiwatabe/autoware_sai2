@@ -23,7 +23,7 @@
 #include <message_filters/sync_policies/approximate_time.h>
 #include <std_msgs/Float32.h>
 #include <tf/transform_datatypes.h>
-#include <autoware_can_msgs/MicroBusCan.h>
+#include <autoware_can_msgs/MicroBusCan501.h>
 
 #include <fstream>
 
@@ -43,7 +43,7 @@ public:
 private:
   // functions
 
-  void canCallback(const autoware_can_msgs::MicroBusCanConstPtr &pose_msg);
+  void canCallback(const autoware_can_msgs::MicroBusCan501ConstPtr &pose_msg);
   void TwistPoseCallback(const geometry_msgs::TwistStampedConstPtr &twist_msg,
                          const geometry_msgs::PoseStampedConstPtr &pose_msg) const;
   void poseCallback(const geometry_msgs::PoseStampedConstPtr &pose_msg) const;
@@ -106,7 +106,7 @@ WaypointSaver::~WaypointSaver()
   delete sync_tp_;
 }
 
-void WaypointSaver::canCallback(const autoware_can_msgs::MicroBusCanConstPtr &can_msg)
+void WaypointSaver::canCallback(const autoware_can_msgs::MicroBusCan501ConstPtr &can_msg)
 {
 	pedal_ = can_msg->pedal;
 }

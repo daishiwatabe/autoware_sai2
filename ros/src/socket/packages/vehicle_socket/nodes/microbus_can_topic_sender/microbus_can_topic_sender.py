@@ -43,6 +43,20 @@ TX_VELOCITY_ACTUAL = 207
 TX_PEDAL_ACTUAL = 208
 TX_ANGLE_ACTUAL = 209
 
+class ReceiveValue:
+	def __init__(self):
+		self.emergency = True
+		self.steer_on = False
+		self.drive_on = False
+		self.Dmode = MicroBusCan501.DRIVE_MODE_STROKE
+		self.velocity = 0
+		self.v_actual = 0
+		self.pedal = 0
+		self.angle = 0
+		self.a_actual = 0
+		self.input_drive = False
+		self.input_steer = False
+
 class Microbus_Can_Sender_GUI:
 	def click_emegency_reset(self, event):
 		msg = Empty()
@@ -114,68 +128,131 @@ class Microbus_Can_Sender_GUI:
 
 	def callback_can_receive501(self, msg):
 		if msg.emergency == True:
-			self.tx_emergency.SetValue('LOCK')
-			self.tx_steer_auto.SetValue('NONE')
-			self.tx_drive_auto.SetValue('NONE')
-			self.tx_drive_mode.SetValue('NONE')
+			#self.tx_emergency.SetValue('LOCK')
+			#self.tx_steer_auto.SetValue('NONE')
+			#self.tx_drive_auto.SetValue('NONE')
+			#self.tx_drive_mode.SetValue('NONE')
+			self.receive.emergency = True
+			self.receive.steer_on = False
+			self.receive.drive_on = False
+			self.receive.Dmode = MicroBusCan501.DRIVE_MODE_NONE
 		else:
-			self.tx_emergency.SetValue('UNLOCK')
+			#self.tx_emergency.SetValue('UNLOCK')
+			self.receive.emergency = False
 			if msg.steer_auto == True:
+				#self.tx_steer_auto.SetValue('AUTO')
+				self.receive.steer_on = True
+			else:
+				#self.tx_steer_auto.SetValue('MANUAL')
+				self.receive.steer_on = False
+
+			if msg.drive_auto == True:
+				#self.tx_drive_auto.SetValue('AUTO')
+				self.receive.drive_on = True
+
+				if msg.drive_mode == MicroBusCan501.DRIVE_MODE_STROKE:
+					#str_dmode = 'STROKE'
+					self.receive.Dmode = MicroBusCan501.DRIVE_MODE_STROKE
+				elif msg.drive_mode == MicroBusCan501.DRIVE_MODE_VELOCITY:
+					#str_dmode = 'VELOCITY'
+					self.receive.Dmode = MicroBusCan501.DRIVE_MODE_VELOCITY
+				else:
+					#str_dmode = 'UNKNOWN'
+					self.receive.Dmode = MicroBusCan501.DRIVE_MODE_NONE
+				#self.tx_drive_mode.SetValue(str_dmode)
+			else:
+				#self.tx_drive_auto.SetValue('MANUAL')
+				self.receive.drive_on = False
+				#self.tx_drive_mode.SetValue('UNKNOWN')
+				self.receive.Dmode = MicroBusCan501.DRIVE_MODE_NONE
+
+		#self.tx_velocity.SetValue(str(msg.velocity))
+		self.receive.velocity = msg.velocity
+		#self.tx_pedal.SetValue(str(msg.pedal))
+		self.receive.pedal = msg.pedal
+		#self.tx_angle.SetValue(str(msg.steering_angle))
+		self.receive.steering_angle = msg.steering_angle
+
+	def callback_can_receive502(self, msg): 
+		#print("aaa")
+		#self.tx_velocity_actual.SetValue(str(msg.velocity_actual))
+		self.receive.v_actual = msg.velocity_actual
+		#self.tx_angle_actual.SetValue(str(msg.angle_actual))
+		self.receive.a_actual = msg.angle_actual
+
+	def callback_micro_sub_can_sender_status(self, msg):
+		self.receive.input_steer = msg.use_input_steer
+		self.receive.input_drive = msg.use_input_drive
+		#if msg.use_input_steer == True:
+			#self.bt_input_steer_send.Enable()
+			#self.tx_input_steer_label.SetValue("ON")
+		#else:
+			#self.bt_input_steer_send.Disable()
+			#self.tx_input_steer_label.SetValue("OFF")
+
+		#if msg.use_input_drive == True:
+			#self.bt_input_drive_send.Enable()
+			#self.tx_input_drive_label.SetValue("ON")
+		#else:
+			#self.tx_input_drive_label.SetValue("OFF")
+			#self.bt_input_drive_send.Disable()
+
+	#def worker(self):
+	#	self.app.MainLoop()
+
+	def original_MainLoop(self):
+		evtloop = wx.GUIEventLoop()
+		evtloop = wx.EventLoop()
+		wx.EventLoop.SetActive( evtloop)
+
+		#"""Drives the main wx event loop."""
+
+		while 1:
+		    while evtloop.Pending(): # if there is at least one event to be processed
+		        evtloop.Dispatch() # process one event
+		    #~ time.sleep(0.10)  
+		    
+			evtloop.ProcessIdle()
+
+			if self.receive.emergency == True:
+				self.tx_emergency.SetValue('LOCK')
+			else:
+				self.tx_emergency.SetValue('UNLOCK')
+			if self.receive.steer_on == True:
 				self.tx_steer_auto.SetValue('AUTO')
 			else:
 				self.tx_steer_auto.SetValue('MANUAL')
-
-			if msg.drive_auto == True:
+			if self.receive.drive_on == True:
 				self.tx_drive_auto.SetValue('AUTO')
-
-				if msg.drive_mode == MicroBusCan501.DRIVE_MODE_STROKE:
-					str_dmode = 'STROKE'
-				elif msg.drive_mode == MicroBusCan501.DRIVE_MODE_VELOCITY:
-					str_dmode = 'VELOCITY'
-				else:
-					str_dmode = 'UNKNOWN'
-				self.tx_drive_mode.SetValue(str_dmode)
-
-				#if str_dmode != 'UNKNOWN':
-					#self.tx_velocity.SetValue(str(msg.velocity))
-					#self.tx_pedal.SetValue(str(msg.pedal))
-					#self.tx_angle.SetValue(str(msg.steering_angle))
-				#else:
-					#self.tx_velocity.SetValue('NONE')
-					#self.tx_pedal.SetValue('NONE')
-					#self.tx_angle.SetValue('NONE')
 			else:
 				self.tx_drive_auto.SetValue('MANUAL')
-				self.tx_drive_mode.SetValue('UNKNOWN')
-				#self.tx_velocity.SetValue('NONE')
-				#self.tx_pedal.SetValue('NONE')
-				#self.tx_angle.SetValue('NONE')
-		self.tx_velocity.SetValue(str(msg.velocity))
-		self.tx_pedal.SetValue(str(msg.pedal))
-		self.tx_angle.SetValue(str(msg.steering_angle))
+ 			if self.receive.Dmode == MicroBusCan501.DRIVE_MODE_STROKE:
+				self.tx_drive_mode.SetValue('STROKE')
+			elif self.receive.Dmode == MicroBusCan501.DRIVE_MODE_VELOCITY:
+				self.tx_drive_mode.SetValue('VELOCITY')
+			else:
+				self.tx_drive_mode.SetValue('NONE')
 
-	def callback_can_receive502(self, msg): 
-		print("aaa")
-		self.tx_velocity_actual.SetValue(str(msg.velocity_actual))
-		self.tx_angle_actual.SetValue(str(msg.angle_actual))
+			self.tx_velocity.SetValue(str(self.receive.velocity))
+			self.tx_velocity_actual.SetValue(str(self.receive.v_actual))
+			self.tx_pedal.SetValue(str(self.receive.pedal))
+			self.tx_angle.SetValue(str(self.receive.angle))
+			self.tx_angle_actual.SetValue(str(self.receive.a_actual))
+			self.frame.Refresh()
 
-	def callback_micro_sub_can_sender_status(self, msg):
-		if msg.use_input_steer == True:
-			self.bt_input_steer_send.Enable()
-			self.tx_input_steer_label.SetValue("ON")
-		else:
-			self.bt_input_steer_send.Disable()
-			self.tx_input_steer_label.SetValue("OFF")
+			if self.receive.input_steer == True:
+				self.bt_input_steer_send.Enable()
+				self.tx_input_steer_label.SetValue("ON")
+			else:
+				self.bt_input_steer_send.Disable()
+				self.tx_input_steer_label.SetValue("OFF")
 
-		if msg.use_input_drive == True:
-			self.bt_input_drive_send.Enable()
-			self.tx_input_drive_label.SetValue("ON")
-		else:
-			self.tx_input_drive_label.SetValue("OFF")
-			self.bt_input_drive_send.Disable()
-
-	def worker(self):
-		self.app.MainLoop()
+			if self.receive.input_drive == True:
+				self.bt_input_drive_send.Enable()
+				self.tx_input_drive_label.SetValue("ON")
+			else:
+				self.tx_input_drive_label.SetValue("OFF")
+				self.bt_input_drive_send.Disable()
 
 	def __init__(self):
 		rospy.init_node('microbus_can_topic_sender', anonymous=True)
@@ -185,6 +262,8 @@ class Microbus_Can_Sender_GUI:
 		self.panel = wx.Panel(self.frame, wx.ID_ANY)
 		self.panel.SetBackgroundColour('#AFAFAF')
 		font = wx.Font(20, wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+
+		self.receive = ReceiveValue()
 
 		self.bt_emergency_reset = wx.Button(self.panel, BT_EMERGENCY_RESET, label="安全機能解除", pos=(10,10), size=(180,50))
 		self.bt_emergency_reset.SetFont(font)
@@ -300,11 +379,12 @@ class Microbus_Can_Sender_GUI:
 		
 		self.frame.Show()
 		#self.app.MainLoop()
-		self.threads = []
-		self.t = threading.Thread(target=self.worker)
-		self.threads.append(self.t)
-		self.t.start()
-		rospy.spin()
+		#self.threads = []
+		#self.t = threading.Thread(target=self.worker)
+		#self.threads.append(self.t)
+		#self.t.start()
+		self.original_MainLoop()
+		#rospy.spin()
 
 if __name__ == '__main__':
 	microbus_can_sender = Microbus_Can_Sender_GUI()

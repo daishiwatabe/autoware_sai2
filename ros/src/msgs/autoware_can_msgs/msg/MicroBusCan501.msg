@@ -1,5 +1,6 @@
-int8 DRIVE_MODE_STROKE = 0
-int8 DRIVE_MODE_VELOCITY = 1
+int8 DRIVE_MODE_NONE = 0
+int8 DRIVE_MODE_STROKE = 1
+int8 DRIVE_MODE_VELOCITY = 2
 
 Header header
 bool emergency
