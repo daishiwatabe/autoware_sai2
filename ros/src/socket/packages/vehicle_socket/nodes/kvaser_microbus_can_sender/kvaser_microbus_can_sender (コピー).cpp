@@ -28,27 +28,9 @@ private:
 	const double WHEEL_MAX = 36;
 	const unsigned int STEER_VALUE_MARGIN = 20;
 
-	double handle_angle_right_max = 660;
-	double handle_angle_left_max = 670;
-	double left_wheel_angle_right_max = 33;
-	double right_wheel_angle_right_max = 38;
-	double left_wheel_angle_left_max = 39.5;
-	double right_wheel_angle_left_max = 33;
-	double handle_actual_right_max = 13329;
-	double handle_actual_left_max = 14177;
-	double handle_offset = 188;
-
 	//mode params
 	const unsigned char MODE_STROKE   = 0x0A;
 	const unsigned char MODE_VRLOCITY = 0x0B;
-
-	//shift_param
-	const static unsigned char SHIFT_P = 0;
-	const static unsigned char SHIFT_R = 1;
-	const static unsigned char SHIFT_N = 2;
-	const static unsigned char SHIFT_D = 3;
-	const static unsigned char SHIFT_2 = 4;
-	const static unsigned char SHIFT_L = 5;
 
 	//other params
 	const unsigned int SEND_DATA_SIZE = 8;
@@ -61,7 +43,6 @@ private:
 	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
-	ros::Subscriber sub_shift_auto_, sub_shift_position_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -73,8 +54,6 @@ private:
 	geometry_msgs::TwistStamped twist_;
 	short input_steer_, input_drive_;
 	short pedal_;
-	bool shift_auto_;
-	unsigned char shift_position_;
 
 	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
 	{
@@ -124,19 +103,6 @@ private:
 	{
 		std::cout << "sub VelocityMode" << std::endl;
 		drive_control_mode_ = MODE_VRLOCITY;
-	}
-
-	void callbackShiftAuto(const std_msgs::Bool::ConstPtr &msg)
-	{
-		std::string str = (msg->data == true) ? "shift_auto" : "shift_manual";
-		std::cout << str << std::endl;
-		shift_auto_ = msg->data;
-	}
-
-	void callbackShiftPosition(const std_msgs::UInt8::ConstPtr &msg)
-	{
-		std::cout << "shift position : " << (int)msg->data << std::endl;
-		shift_position_ = msg->data;
 	}
 
 	void callbackConfigMicroBusCan(const autoware_config_msgs::ConfigMicroBusCan::ConstPtr &msg)
@@ -220,26 +186,10 @@ private:
 		short steer_val;
 		if(input_steer_mode_ == false)
 		{
-			/*double twist_ang = twist_.twist.angular.z*180.0 / M_PI;
+			double twist_ang = twist_.twist.angular.z*180.0 / M_PI;
 			twist_ang *= HANDLE_MAX / WHEEL_MAX;
 			twist_ang *= 20 * 1.0;
-			steer_val = twist_ang;*/
-
-			double twist_deg = twist_.twist.angular.z*180.0 / M_PI;
-			if(twist_deg < 0)
-			{
-				double actual_max = handle_actual_right_max + handle_offset;
-				double angle = (left_wheel_angle_right_max + right_wheel_angle_right_max) / 2.0;
-				steer_val = twist_deg * actual_max / angle;
-				steer_val *= 3;
-			}
-			else
-			{
-				double actual_max = handle_actual_left_max - handle_offset;
-				double angle = (left_wheel_angle_left_max + right_wheel_angle_left_max) / 2.0;
-				steer_val = twist_deg * actual_max / angle;
-				steer_val *= 3;
-			}
+			steer_val = twist_ang;
 		}
 		else steer_val = input_steer_;
 		if(can_receive_501_.steer_auto == false) steer_val = 0;
@@ -277,36 +227,6 @@ private:
 			unsigned char *drive_point = (unsigned char*)&pedal_;
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];
 		}
-	}
-
-	void bufset_shift(unsigned char *buf)
-	{
-		if (shift_auto_ == true)
-		{
-			buf[7] = 0x08;
-			switch (shift_position_)
-			{
-			case SHIFT_P:
-				buf[7] |= 0;
-				break;
-			case SHIFT_R:
-				buf[7] |= 1;
-				break;
-			case SHIFT_N:
-				buf[7] |= 2;
-				break;
-			case SHIFT_D:
-				buf[7] |= 3;
-				break;
-			case SHIFT_2:
-				buf[7] |= 4;
-				break;
-			case SHIFT_L:
-				buf[7] |= 5;
-				break;
-			}
-		}
-		else buf[7] = 0x00;
 	}
 
 	//HEV
@@ -472,12 +392,9 @@ public:
 	    , drive_control_mode_(MODE_STROKE)
 	    , pedal_(0)
 	    , proc_time(0)
-	    , shift_auto_(false)
-	    , shift_position_(0)
 	{
 		can_receive_501_.emergency = true;
-		canStatus res = kc.init(kvaser_channel, canBITRATE_500K);
-		if(res != canStatus::canOK) {std::cout << "open error" << std::endl;}
+		kc.init(kvaser_channel);
 
 		setting_.use_position_checker == true;
 
@@ -498,8 +415,6 @@ public:
 		sub_waypoint_param_ = nh_.subscribe("/waypoint_param", 10, &kvaser_can_sender::callbackWaypointParam, this);
 		sub_position_checker_ = nh_.subscribe("/position_checker", 10, &kvaser_can_sender::callbackPositionChecker, this);
 		sub_config_microbus_can_ = nh_.subscribe("/config/microbus_can", 10, &kvaser_can_sender::callbackConfigMicroBusCan, this);
-		sub_shift_auto_ = nh_.subscribe("/microbus/shift_auto", 10, &kvaser_can_sender::callbackShiftAuto, this);
-		sub_shift_position_ = nh_.subscribe("/microbus/shift_position", 10, &kvaser_can_sender::callbackShiftPosition, this);
 
 		publisStatus();
 
@@ -516,7 +431,6 @@ public:
 		bufset_mode(buf);
 		bufset_steer(buf);
 		bufset_drive(buf);
-		bufset_shift(buf);
 		kc.write(0x100, (char*)buf, SEND_DATA_SIZE);
 	}
 };

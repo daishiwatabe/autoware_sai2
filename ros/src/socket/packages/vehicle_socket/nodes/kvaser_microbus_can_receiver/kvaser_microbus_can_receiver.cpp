@@ -22,7 +22,7 @@ public:
 	    , private_nh_(p_nh)
 	{
 		read_id_flag_.read501 = read_id_flag_.read502 = false;
-		kc.init(kvaser_channel);
+		kc.init(kvaser_channel, canBITRATE_500K);
 
 		pub_microbus_can_501_ = nh_.advertise<autoware_can_msgs::MicroBusCan501>("/microbus/can_receive501", 10);
 		pub_microbus_can_502_ = nh_.advertise<autoware_can_msgs::MicroBusCan502>("/microbus/can_receive502", 10);

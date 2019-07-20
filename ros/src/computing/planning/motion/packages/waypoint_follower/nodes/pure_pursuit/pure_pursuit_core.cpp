@@ -138,7 +138,9 @@ void PurePursuitNode::publishControlCommandStamped(const bool &can_get_curvature
   ccs.cmd.linear_velocity = can_get_curvature ? computeCommandVelocity() : 0;
   ccs.cmd.linear_acceleration = can_get_curvature ? computeCommandAccel() : 0;
   ccs.cmd.steering_angle = can_get_curvature ? convertCurvatureToSteeringAngle(wheel_base_, kappa) : 0;
-
+std::cout << "steering angle," << ccs.cmd.steering_angle << std::endl;
+std::cout << "kappa," << kappa << std::endl;
+std::cout << "wheel base," << wheel_base_ << std::endl;
   pub2_.publish(ccs);
 }
 

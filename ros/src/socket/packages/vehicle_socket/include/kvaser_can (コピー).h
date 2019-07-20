@@ -19,13 +19,14 @@ public:
 	{
 	}
 
-	canStatus init(int kvaser_channel, int canBitrate)
+	canStatus init(int kvaser_channel)
 	{
 		canInitializeLibrary();
 		can_handle_ = canOpenChannel(kvaser_channel, canOPEN_CAN_FD);
 		if(can_handle_ != canStatus::canOK) return (canStatus)can_handle_;
 
-		canStatus res = canSetBusParams(can_handle_, canBitrate, 0, 0, 0, 0, 0);
+		//canStatus res = canSetBusParams(can_handle_, canBITRATE_500K, 0, 0, 0, 0, 0);
+		canStatus res = canSetBusParams(can_handle_, canBITRATE_1M, 0, 0, 0, 0, 0);
 		if(canStatus::canOK != res) return res;
 
 		res = canBusOn(can_handle_);
@@ -44,16 +45,13 @@ public:
 	bool isOpen() {return open_flag_;}
 
 	canStatus read_wait(unsigned long wait_time)
-	{
+	{std::cout << "aaa" << std::endl;
 		unsigned int dlc;
 		unsigned int flag;
 		unsigned long time;
 
 		canStatus res = canReadWait(can_handle_, &id_, &read_data_, &dlc, &flag, &time, wait_time);
-		if(canStatus::canOK != res) {
-			//std::cout << res << std::endl;
-			return res;
-		}
+		if(canStatus::canOK != res) return res;
 
 		msgCounter_++;
 		if (flag & canMSG_ERROR_FRAME)

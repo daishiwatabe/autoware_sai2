@@ -7,6 +7,7 @@ import threading
 from std_msgs.msg import Empty
 from std_msgs.msg import Bool
 from std_msgs.msg import Int16
+from std_msgs.msg import UInt8
 from autoware_can_msgs.msg import MicroBusCan501
 from autoware_can_msgs.msg import MicroBusCan502
 from autoware_can_msgs.msg import MicroBusCanSenderStatus
@@ -20,6 +21,14 @@ BT_STEER_MANUAL = 6
 BT_DRIVE_MANUAL = 7
 BT_DRIVE_STROKE = 8
 BT_DRIVE_VELOCITY = 9
+BT_SHIFT_AUTO = 10
+BT_SHIFT_MANUAL = 11
+BT_SHIFT_P = 12
+BT_SHIFT_R = 13
+BT_SHIFT_N = 14
+BT_SHIFT_D = 15
+BT_SHIFT_2 = 16
+BT_SHIFT_L = 17
 
 BT_INPUT_STEER_ON = 100
 BT_INPUT_DRIVE_ON = 101
@@ -98,6 +107,38 @@ class Microbus_Can_Sender_GUI:
 		msg = Empty()
 		self.pub_drive_velocity.publish(msg)
 
+	def click_shift_auto(self, event):
+		msg = Bool(True)
+		self.pub_shift_auto.publish(msg)
+
+	def click_shift_manual(self, event):
+		msg = Bool(False)
+		self.pub_shift_auto.publish(msg)
+
+	def click_shift_P(self, event):
+		msg = UInt8(0)
+		self.pub_shift_position.publish(msg)
+
+	def click_shift_R(self, event):
+		msg = UInt8(1)
+		self.pub_shift_position.publish(msg)
+
+	def click_shift_N(self, event):
+		msg = UInt8(2)
+		self.pub_shift_position.publish(msg)
+
+	def click_shift_D(self, event):
+		msg = UInt8(3)
+		self.pub_shift_position.publish(msg)
+
+	def click_shift_2(self, event):
+		msg = UInt8(4)
+		self.pub_shift_position.publish(msg)
+
+	def click_shift_L(self, event):
+		msg = UInt8(5)
+		self.pub_shift_position.publish(msg)
+
 	def click_input_steer_on(self, event):
 		msg = Bool(True)
 		self.pub_input_steer_flag.publish(msg)
@@ -171,7 +212,7 @@ class Microbus_Can_Sender_GUI:
 		#self.tx_pedal.SetValue(str(msg.pedal))
 		self.receive.pedal = msg.pedal
 		#self.tx_angle.SetValue(str(msg.steering_angle))
-		self.receive.steering_angle = msg.steering_angle
+		self.receive.angle = msg.steering_angle
 
 	def callback_can_receive502(self, msg): 
 		#print("aaa")
@@ -283,6 +324,22 @@ class Microbus_Can_Sender_GUI:
 		self.bt_drive_stroke.SetFont(font)
 		self.bt_drive_velocity = wx.Button(self.panel, BT_DRIVE_VELOCITY, label="VELOCITY\nモード", pos=(200,300), size=(180,80))
 		self.bt_drive_velocity.SetFont(font)
+		self.bt_shift_auto = wx.Button(self.panel, BT_SHIFT_AUTO, label="shift\nauto", pos=(370,390), size=(100,100))
+		self.bt_shift_auto.SetFont(font)
+		self.bt_shift_manual = wx.Button(self.panel, BT_SHIFT_MANUAL, label="shift\nmanual", pos=(480,390), size=(100,100))
+		self.bt_shift_manual.SetFont(font)
+		self.bt_shift_P = wx.Button(self.panel, BT_SHIFT_P, label="P", pos=(10,390), size=(50,50))
+		self.bt_shift_P.SetFont(font)
+		self.bt_shift_R = wx.Button(self.panel, BT_SHIFT_R, label="R", pos=(70,390), size=(50,50))
+		self.bt_shift_R.SetFont(font)
+		self.bt_shift_N = wx.Button(self.panel, BT_SHIFT_N, label="N", pos=(130,390), size=(50,50))
+		self.bt_shift_N.SetFont(font)
+		self.bt_shift_D = wx.Button(self.panel, BT_SHIFT_D, label="D", pos=(190,390), size=(50,50))
+		self.bt_shift_D.SetFont(font)
+		self.bt_shift_2 = wx.Button(self.panel, BT_SHIFT_2, label="2", pos=(250,390), size=(50,50))
+		self.bt_shift_2.SetFont(font)
+		self.bt_shift_L = wx.Button(self.panel, BT_SHIFT_L, label="L", pos=(310,390), size=(50,50))
+		self.bt_shift_L.SetFont(font)
 
 		self.bt_emergency_reset.Bind(wx.EVT_BUTTON, self.click_emegency_reset)
 		self.bt_steer_drive_auto.Bind(wx.EVT_BUTTON, self.click_steer_drive_auto)
@@ -293,29 +350,37 @@ class Microbus_Can_Sender_GUI:
 		self.bt_drive_manual.Bind(wx.EVT_BUTTON, self.click_drive_manual)
 		self.bt_drive_stroke.Bind(wx.EVT_BUTTON, self.click_drive_stroke)
 		self.bt_drive_velocity.Bind(wx.EVT_BUTTON, self.click_drive_velocity)
+		self.bt_shift_auto.Bind(wx.EVT_BUTTON, self.click_shift_auto)
+		self.bt_shift_manual.Bind(wx.EVT_BUTTON, self.click_shift_manual)
+		self.bt_shift_P.Bind(wx.EVT_BUTTON, self.click_shift_P)
+		self.bt_shift_R.Bind(wx.EVT_BUTTON, self.click_shift_R)
+		self.bt_shift_N.Bind(wx.EVT_BUTTON, self.click_shift_N)
+		self.bt_shift_D.Bind(wx.EVT_BUTTON, self.click_shift_D)
+		self.bt_shift_2.Bind(wx.EVT_BUTTON, self.click_shift_2)
+		self.bt_shift_L.Bind(wx.EVT_BUTTON, self.click_shift_L)
 
-		self.bt_input_steer_on = wx.Button(self.panel, BT_INPUT_STEER_ON, label="ステア入力\nON", pos=(10,440), size=(180,80))
+		self.bt_input_steer_on = wx.Button(self.panel, BT_INPUT_STEER_ON, label="ステア入力\nON", pos=(10,500), size=(180,80))
 		self.bt_input_steer_on.SetFont(font)
-		self.bt_input_drive_on = wx.Button(self.panel, BT_INPUT_DRIVE_ON, label="ドライブ入力\nON", pos=(200,440), size=(180,80))
+		self.bt_input_drive_on = wx.Button(self.panel, BT_INPUT_DRIVE_ON, label="ドライブ入力\nON", pos=(200,500), size=(180,80))
 		self.bt_input_drive_on.SetFont(font)
-		self.bt_input_steer_off = wx.Button(self.panel, BT_INPUT_STEER_OFF, label="ステア入力\nOFF", pos=(10, 530), size=(180,80))
+		self.bt_input_steer_off = wx.Button(self.panel, BT_INPUT_STEER_OFF, label="ステア入力\nOFF", pos=(10, 590), size=(180,80))
 		self.bt_input_steer_off.SetFont(font)
-		self.bt_input_drive_off = wx.Button(self.panel, BT_INPUT_DRIVE_OFF, label="ドライブ入力\nOFF", pos=(200, 530), size=(180,80))
+		self.bt_input_drive_off = wx.Button(self.panel, BT_INPUT_DRIVE_OFF, label="ドライブ入力\nOFF", pos=(200, 590), size=(180,80))
 		self.bt_input_drive_off.SetFont(font)
-		self.tx_input_steer_label = wx.TextCtrl(self.panel, TX_INPUT_STEER_LABEL, pos=(10, 615), size=(180,45), style=wx.TE_READONLY)
+		self.tx_input_steer_label = wx.TextCtrl(self.panel, TX_INPUT_STEER_LABEL, pos=(10, 675), size=(180,45), style=wx.TE_READONLY)
 		#self.tx_input_steer_flag = wx.StaticText(self.panel, LB_INPUT_STEER, 'OFF', pos=(10, 530))
 		self.tx_input_steer_label.SetFont(font)
-		self.tx_input_drive_label = wx.TextCtrl(self.panel, TX_INPUT_DRIVE_LABEL, pos=(200, 615), size=(180,45), style=wx.TE_READONLY)
+		self.tx_input_drive_label = wx.TextCtrl(self.panel, TX_INPUT_DRIVE_LABEL, pos=(200, 675), size=(180,45), style=wx.TE_READONLY)
 		#self.tx_input_drive_flag = wx.StaticText(self.panel, LB_INPUT_DRIVE, 'OFF', pos=(200, 530))
 		self.tx_input_drive_label.SetFont(font)
-		self.tx_input_steer = wx.TextCtrl(self.panel, TX_INPUT_STEER, pos=(10,660), size=(180,45), style=wx.TE_PROCESS_ENTER)
+		self.tx_input_steer = wx.TextCtrl(self.panel, TX_INPUT_STEER, pos=(10,720), size=(180,45), style=wx.TE_PROCESS_ENTER)
 		self.tx_input_steer.SetFont(font)
-		self.tx_input_drive = wx.TextCtrl(self.panel, TX_INPUT_DRIVE, pos=(200,660), size=(180,45), style=wx.TE_PROCESS_ENTER)
+		self.tx_input_drive = wx.TextCtrl(self.panel, TX_INPUT_DRIVE, pos=(200,720), size=(180,45), style=wx.TE_PROCESS_ENTER)
 		self.tx_input_drive.SetFont(font)
-		self.bt_input_steer_send = wx.Button(self.panel, BT_INPUT_STEER_SEND, label="ステア送信", pos=(10,705), size=(180,80))
+		self.bt_input_steer_send = wx.Button(self.panel, BT_INPUT_STEER_SEND, label="ステア送信", pos=(10,765), size=(180,80))
 		self.bt_input_steer_send.SetFont(font)
 		self.bt_input_steer_send.Disable()
-		self.bt_input_drive_send = wx.Button(self.panel, BT_INPUT_DRIVE_SEND, label="ドライブ送信", pos=(200,705), size=(180,80))
+		self.bt_input_drive_send = wx.Button(self.panel, BT_INPUT_DRIVE_SEND, label="ドライブ送信", pos=(200,765), size=(180,80))
 		self.bt_input_drive_send.SetFont(font)
 		self.bt_input_drive_send.Disable()
 
@@ -372,6 +437,8 @@ class Microbus_Can_Sender_GUI:
 		self.pub_input_drive_flag = rospy.Publisher('/microbus/input_drive_flag', Bool, queue_size=1)
 		self.pub_input_steer_value = rospy.Publisher('/microbus/input_steer_value', Int16, queue_size=1)
 		self.pub_input_drive_value = rospy.Publisher('/microbus/input_drive_value', Int16, queue_size=1)
+		self.pub_shift_auto = rospy.Publisher('/microbus/shift_auto', Bool, queue_size=1)
+		self.pub_shift_position = rospy.Publisher('/microbus/shift_position', UInt8, queue_size=1)
 
 		self.sub_micro_bus_can501 = rospy.Subscriber('/microbus/can_receive501', MicroBusCan501, self.callback_can_receive501)
 		self.sub_micro_bus_can502 = rospy.Subscriber('/microbus/can_receive502', MicroBusCan502, self.callback_can_receive502)

@@ -2,3 +2,12 @@ vehicle_info:
   maximum_steering_angle: 675.0
   minimum_turning_radius: 5.2
   wheel_base: 2.725
+  handle_angle_right_max: 660
+  handle_angle_left_max: -670
+  left_wheel_angle_right_max: 33
+  right_wheel_angle_right_max: 38
+  left_wheel_angle_left_max: -39.5
+  right_wheel_angle_left_max: -33
+  handle_actual_right_max: 13329
+  handle_actual_left_max: -14177
+  handle_offset: -188
