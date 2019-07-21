@@ -61,7 +61,9 @@ private:
 	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
-	ros::Subscriber sub_shift_auto_, sub_shift_position_;
+	ros::Subscriber sub_shift_auto_, sub_shift_position_, sub_emergency_stop_, sub_engine_start_, sub_ignition_;
+	ros::Subscriber sub_wiper_, sub_light_high_, sub_light_low_, sub_light_small_;
+	ros::Subscriber sub_horn_, sub_hazard_, sub_blinker_right_, sub_blinker_left_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -75,6 +77,9 @@ private:
 	short pedal_;
 	bool shift_auto_;
 	unsigned char shift_position_;
+	bool emergency_stop_, engine_start_, ignition_, wiper_;
+	bool light_high_, light_low_, light_small_;
+	bool horn_, hazard_, blinker_right_, blinker_left_;
 
 	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
 	{
@@ -207,6 +212,83 @@ private:
 		std::cout << input_drive_ << std::endl;
 	}
 
+	void callbackEmergencyStop(const std_msgs::Bool::ConstPtr &msg)
+	{
+		emergency_stop_ = msg->data;
+		std::string str = (emergency_stop_) ? "true" : "false";
+		std::cout << "emergency stop : " << str << std::endl;
+	}
+
+	void callbackEngineStart(const std_msgs::Bool::ConstPtr &msg)
+	{
+		engine_start_ = msg->data;
+		std::string str = (engine_start_) ? "true" : "false";
+		std::cout << "engine_start : " << str << std::endl;
+	}
+
+	void callbackIgnition(const std_msgs::Bool::ConstPtr &msg)
+	{
+		ignition_ = msg->data;
+		std::string str = (ignition_) ? "true" : "false";
+		std::cout << "Ignition : " << str << std::endl;
+	}
+
+	void callbackWiper(const std_msgs::Bool::ConstPtr &msg)
+	{
+		wiper_ = msg->data;
+		std::string str = (wiper_) ? "true" : "false";
+		std::cout << "wiper : " << str << std::endl;
+	}
+
+	void callbackLightHigh(const std_msgs::Bool::ConstPtr &msg)
+	{
+		light_high_ = msg->data;
+		std::string str = (light_high_) ? "true" : "false";
+		std::cout << "light_high : " << str << std::endl;
+	}
+
+	void callbackLightLow(const std_msgs::Bool::ConstPtr &msg)
+	{
+		light_low_ = msg->data;
+		std::string str = (light_low_) ? "true" : "false";
+		std::cout << "light_low : " << str << std::endl;
+	}
+
+	void callbackLightSmall(const std_msgs::Bool::ConstPtr &msg)
+	{
+		light_small_ = msg->data;
+		std::string str = (light_small_) ? "true" : "false";
+		std::cout << "light_small : " << str << std::endl;
+	}
+
+	void callbackHorn(const std_msgs::Bool::ConstPtr &msg)
+	{
+		horn_ = msg->data;
+		std::string str = (horn_) ? "true" : "false";
+		std::cout << "horn : " << str << std::endl;
+	}
+
+	void callbackHazard(const std_msgs::Bool::ConstPtr &msg)
+	{
+		hazard_ = msg->data;
+		std::string str = (hazard_) ? "true" : "false";
+		std::cout << "hazard : " << str << std::endl;
+	}
+
+	void callbackBlinkerRight(const std_msgs::Bool::ConstPtr &msg)
+	{
+		blinker_right_ = msg->data;
+		std::string str = (blinker_right_) ? "true" : "false";
+		std::cout << "blinker_right : " << str << std::endl;
+	}
+
+	void callbackBlinkerLeft(const std_msgs::Bool::ConstPtr &msg)
+	{
+		blinker_left_ = msg->data;
+		std::string str = (blinker_left_) ? "true" : "false";
+		std::cout << "blinker_left : " << str << std::endl;
+	}
+
 	void bufset_mode(unsigned char *buf)
 	{
 		unsigned char mode = 0;
@@ -279,34 +361,48 @@ private:
 		}
 	}
 
-	void bufset_shift(unsigned char *buf)
+	void bufset_car_control(unsigned char *buf)
 	{
+		buf[6] = buf[7] = 0;
+
+		if(emergency_stop_ == true) buf[6] |= 0x80;
+		else buf[6] |= 0x40;
+		if(engine_start_ == true) buf[6] |= 0x20;
+		if(ignition_ == true) buf[6] |= 0x10;
+		if(wiper_ == true) buf[6] |= 0x08;
+		if(light_high_ == true) buf[6] |= 0x04;
+		if(light_low_ == true) buf[6] |= 0x02;
+		if(light_small_ == true) buf[6] |= 0x01;
+		if(horn_ == true) buf[7] |= 0x80;
+		if(hazard_ == true) buf[7] |= 0x40;
+		if(blinker_right_ == true) buf[7] |= 0x20;
+		if(blinker_left_ == true) buf[7] |= 0x10;
+
 		if (shift_auto_ == true)
 		{
-			buf[7] = 0x08;
+			buf[7] |= 0x08;
 			switch (shift_position_)
 			{
 			case SHIFT_P:
-				buf[7] |= 0;
+				buf[7] |= 0x00;
 				break;
 			case SHIFT_R:
-				buf[7] |= 1;
+				buf[7] |= 0x01;
 				break;
 			case SHIFT_N:
-				buf[7] |= 2;
+				buf[7] |= 0x02;
 				break;
 			case SHIFT_D:
-				buf[7] |= 3;
+				buf[7] |= 0x03;
 				break;
 			case SHIFT_2:
-				buf[7] |= 4;
+				buf[7] |= 0x04;
 				break;
 			case SHIFT_L:
-				buf[7] |= 5;
+				buf[7] |= 0x05;
 				break;
 			}
 		}
-		else buf[7] = 0x00;
 	}
 
 	//HEV
@@ -474,6 +570,17 @@ public:
 	    , proc_time(0)
 	    , shift_auto_(false)
 	    , shift_position_(0)
+	    , emergency_stop_(false)
+	    , engine_start_(false)
+	    , ignition_(false)
+	    , wiper_(false)
+	    , light_high_(false)
+	    , light_low_(false)
+	    , light_small_(false)
+	    , horn_(false)
+	    , hazard_(false)
+	    , blinker_right_(false)
+	    , blinker_left_(false)
 	{
 		can_receive_501_.emergency = true;
 		canStatus res = kc.init(kvaser_channel, canBITRATE_500K);
@@ -500,6 +607,17 @@ public:
 		sub_config_microbus_can_ = nh_.subscribe("/config/microbus_can", 10, &kvaser_can_sender::callbackConfigMicroBusCan, this);
 		sub_shift_auto_ = nh_.subscribe("/microbus/shift_auto", 10, &kvaser_can_sender::callbackShiftAuto, this);
 		sub_shift_position_ = nh_.subscribe("/microbus/shift_position", 10, &kvaser_can_sender::callbackShiftPosition, this);
+		sub_emergency_stop_ = nh_.subscribe("/microbus/emergency_stop", 10, &kvaser_can_sender::callbackEmergencyStop, this);
+		sub_engine_start_ = nh_.subscribe("/microbus/engine_start", 10, &kvaser_can_sender::callbackEngineStart, this);
+		sub_ignition_ = nh_.subscribe("/microbus/ignition", 10, &kvaser_can_sender::callbackIgnition, this);
+		sub_wiper_ = nh_.subscribe("/microbus/wiper", 10, &kvaser_can_sender::callbackWiper, this);
+		sub_light_high_ = nh_.subscribe("/microbus/light_high", 10, &kvaser_can_sender::callbackLightHigh, this);
+		sub_light_low_ = nh_.subscribe("/microbus/light_low", 10, &kvaser_can_sender::callbackLightLow, this);
+		sub_light_small_ = nh_.subscribe("/microbus/light_small", 10, &kvaser_can_sender::callbackLightSmall, this);
+		sub_horn_ = nh_.subscribe("/microbus/horn", 10, &kvaser_can_sender::callbackHorn, this);
+		sub_hazard_ = nh_.subscribe("/microbus/hazard", 10, &kvaser_can_sender::callbackHazard, this);
+		sub_blinker_right_ = nh_.subscribe("/microbus/blinker_right", 10, &kvaser_can_sender::callbackBlinkerRight, this);
+		sub_blinker_left_ = nh_.subscribe("/microbus/blinker_left", 10, &kvaser_can_sender::callbackBlinkerLeft, this);
 
 		publisStatus();
 
@@ -511,13 +629,16 @@ public:
 
 	void can_send()
 	{
-		unsigned char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
+		//if(can_receive_501_.emergency == false)
+		{
+			unsigned char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
 
-		bufset_mode(buf);
-		bufset_steer(buf);
-		bufset_drive(buf);
-		bufset_shift(buf);
-		kc.write(0x100, (char*)buf, SEND_DATA_SIZE);
+			bufset_mode(buf);
+			bufset_steer(buf);
+			bufset_drive(buf);
+			bufset_car_control(buf);
+			kc.write(0x100, (char*)buf, SEND_DATA_SIZE);
+		}
 	}
 };
 
