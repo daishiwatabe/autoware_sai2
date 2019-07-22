@@ -82,6 +82,21 @@ public:
 
 					can.read_counter = kc.get_read_counter();
 
+					if(data[6] & 0x80 != 0) can.emergency_stop = 2;
+					else if(data[6] & 0x40 != 0) can.emergency_stop = 1;
+					else can.emergency_stop = 0;
+					can.engine_start = (data[6] & 0x20 != 0) ? true : false;
+					can.ignition = (data[6] & 0x10 != 0) ? true : false;
+					can.wiper = (data[6] & 0x08 != 0) ? true : false;
+					can.light_high = (data[6] & 0x04 != 0) ? true : false;
+					can.light_low = (data[6] & 0x02 != 0) ? true : false;
+					can.light_small = (data[6] & 0x01 != 0) ? true : false;
+					can.horn = (data[7] & 0x80 != 0) ? true : false;
+					can.hazard = (data[7] & 0x40 != 0) ? true : false;
+					can.blinker_right = (data[7] & 0x20 != 0) ? true : false;
+					can.blinker_left = (data[7] & 0x10 != 0) ? true : false;
+					can.shift = data[7] & 0x0F;
+
 					pub_microbus_can_501_.publish(can);
 					read_id_flag_.read501 = true;
 					break;

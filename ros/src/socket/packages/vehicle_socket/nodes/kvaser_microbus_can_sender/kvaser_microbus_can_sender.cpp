@@ -77,7 +77,8 @@ private:
 	short pedal_;
 	bool shift_auto_;
 	unsigned char shift_position_;
-	bool emergency_stop_, engine_start_, ignition_, wiper_;
+	unsigned char emergency_stop_;
+	bool engine_start_, ignition_, wiper_;
 	bool light_high_, light_low_, light_small_;
 	bool horn_, hazard_, blinker_right_, blinker_left_;
 
@@ -212,11 +213,10 @@ private:
 		std::cout << input_drive_ << std::endl;
 	}
 
-	void callbackEmergencyStop(const std_msgs::Bool::ConstPtr &msg)
+	void callbackEmergencyStop(const std_msgs::UInt8::ConstPtr &msg)
 	{
 		emergency_stop_ = msg->data;
-		std::string str = (emergency_stop_) ? "true" : "false";
-		std::cout << "emergency stop : " << str << std::endl;
+		std::cout << "emergency stop : " << (int)emergency_stop_ << std::endl;
 	}
 
 	void callbackEngineStart(const std_msgs::Bool::ConstPtr &msg)
@@ -365,8 +365,8 @@ private:
 	{
 		buf[6] = buf[7] = 0;
 
-		if(emergency_stop_ == true) buf[6] |= 0x80;
-		else buf[6] |= 0x40;
+		if(emergency_stop_ == 0x2) buf[6] |= 0x80;
+		else if(emergency_stop_ == 0x1) buf[6] |= 0x40;
 		if(engine_start_ == true) buf[6] |= 0x20;
 		if(ignition_ == true) buf[6] |= 0x10;
 		if(wiper_ == true) buf[6] |= 0x08;
