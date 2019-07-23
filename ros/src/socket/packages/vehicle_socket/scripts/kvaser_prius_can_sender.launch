@@ -1,0 +1,9 @@
+<launch>
+
+	<!-- declare arguments with default values -->
+	<arg name="kvaser_channel" default="0"/>
+
+	<node pkg="vehicle_socket" type="kvaser_prius_can_sender" name="kvaser_prius_can_sender" output="screen">
+		<param name="kvaser_channel" value="$(arg kvaser_channel)"/>
+	</node>
+</launch>

@@ -33,6 +33,8 @@ public:
 	void read_wait()
 	{
 		canStatus res = kc.read_wait(100);
+		kc.printReader();
+
 		if(res == canStatus::canOK)
 		{
 			switch(kc.get_id())
@@ -132,7 +134,7 @@ public:
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "kvaser_microbus_can_receiver");
+	ros::init(argc, argv, "kvaser_prius_can_receiver");
 	ros::NodeHandle nh;
 	ros::NodeHandle private_nh("~");
 

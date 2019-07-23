@@ -1,7 +1,7 @@
 ﻿#include <ros/ros.h>
 #include <queue>
 #include <std_msgs/Bool.h>
-#include <std_msgs/UInt8.h>
+#include <std_msgs/UInt8.h> 
 #include <std_msgs/Int16.h>
 #include <std_msgs/Empty.h>
 #include <geometry_msgs/TwistStamped.h>
@@ -28,6 +28,7 @@ private:
 	const double WHEEL_MAX = 36;
 	const unsigned int STEER_VALUE_MARGIN = 20;
 
+	//vanet params
 	double handle_angle_right_max = 660;
 	double handle_angle_left_max = 670;
 	double left_wheel_angle_right_max = 33;
@@ -37,6 +38,10 @@ private:
 	double handle_actual_right_max = 13329;
 	double handle_actual_left_max = 14177;
 	double handle_offset = 188;
+
+	//liesse params
+	double wheelrad_to_steering_can_value_left = 21510.7695034004;
+	double wheelrad_to_steering_can_value_right = 21989.2514163246;
 
 	//mode params
 	const unsigned char MODE_STROKE   = 0x0A;
@@ -307,7 +312,7 @@ private:
 			twist_ang *= 20 * 1.0;
 			steer_val = twist_ang;*/
 
-			double twist_deg = twist_.twist.angular.z*180.0 / M_PI;
+			/*double twist_deg = twist_.twist.angular.z*180.0 / M_PI;
 			if(twist_deg < 0)
 			{
 				double actual_max = handle_actual_right_max + handle_offset;
@@ -321,6 +326,16 @@ private:
 				double angle = (left_wheel_angle_left_max + right_wheel_angle_left_max) / 2.0;
 				steer_val = twist_deg * actual_max / angle;
 				steer_val *= 3;
+			}*/
+			
+			double ang = twist_.twist.angular.z;
+			if(ang > 0)
+			{
+				steer_val = ang * wheelrad_to_steering_can_value_left;
+			}
+			else
+			{
+				steer_val = ang * wheelrad_to_steering_can_value_right;
 			}
 		}
 		else steer_val = input_steer_;
