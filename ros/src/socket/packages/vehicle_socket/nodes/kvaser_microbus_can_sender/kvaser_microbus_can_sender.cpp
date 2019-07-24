@@ -1,4 +1,4 @@
-﻿#include <ros/ros.h>
+#include <ros/ros.h>
 #include <queue>
 #include <std_msgs/Bool.h>
 #include <std_msgs/UInt8.h> 
@@ -11,6 +11,7 @@
 #include <autoware_config_msgs/ConfigMicroBusCan.h>
 #include <autoware_msgs/WaypointParam.h>
 #include <autoware_msgs/PositionChecker.h>
+#include <autoware_msgs/WaypointParam.h>
 #include "kvaser_can.h"
 #include <queue>
 
@@ -66,9 +67,11 @@ private:
 	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
-	ros::Subscriber sub_shift_auto_, sub_shift_position_, sub_emergency_stop_, sub_engine_start_, sub_ignition_;
+	ros::Subscriber sub_shift_auto_, sub_shift_position_, sub_side_brake_;
+	ros::Subscriber sub_emergency_stop_, sub_engine_start_, sub_ignition_;
 	ros::Subscriber sub_wiper_, sub_light_high_, sub_light_low_, sub_light_small_;
 	ros::Subscriber sub_horn_, sub_hazard_, sub_blinker_right_, sub_blinker_left_;
+	ros::Subscriber sub_automatic_door_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -81,11 +84,14 @@ private:
 	short input_steer_, input_drive_;
 	short pedal_;
 	bool shift_auto_;
-	unsigned char shift_position_;
+	unsigned char shift_position_, side_brake_, automatic_door_;
 	unsigned char emergency_stop_;
 	bool engine_start_, ignition_, wiper_;
 	bool light_high_, light_low_, light_small_;
 	bool horn_, hazard_, blinker_right_, blinker_left_;
+	autoware_msgs::WaypointParam waypoint_param_;
+
+	ros::Time pause_time_;
 
 	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
 	{
@@ -150,6 +156,18 @@ private:
 		shift_position_ = msg->data;
 	}
 
+	void callbackSideBrake(const std_msgs::UInt8::ConstPtr &msg)
+	{
+		std::cout << "side brake : " << (int)msg->data << std::endl;
+		side_brake_ = msg->data;
+	}
+
+	void callbackAutomaticDoor(const std_msgs::UInt8::ConstPtr &msg)
+	{
+		std::cout << "automatic door : " << (int)msg->data << std::endl;
+		automatic_door_ = msg->data;
+	}
+
 	void callbackConfigMicroBusCan(const autoware_config_msgs::ConfigMicroBusCan::ConstPtr &msg)
 	{
 		setting_ = *msg;
@@ -164,7 +182,14 @@ private:
 
 	void callbackWaypointParam(const autoware_msgs::WaypointParam::ConstPtr &msg)
 	{
-		pedal_ = msg->mb_pedal;
+		//pedal_ = msg->mb_pedal;
+		waypoint_param_ = *msg;
+
+		if(waypoint_param_.pause > 0)
+		{
+			ros::Time nowtime = ros::Time::now();
+			pause_time_ = ros::Time(nowtime.sec + waypoint_param_.pause, nowtime.nsec);
+		}
 	}
 
 	void callbackPositionChecker(const autoware_msgs::PositionChecker::ConstPtr &msg)
@@ -358,10 +383,18 @@ private:
 			short drive_val;
 			if(input_drive_mode_ == false)
 			{
-				double linearx = twist_.twist.linear.x;
-				//if(linearx > 0.5 && linearx < 1.0) linearx = 1.0;
-				double twist_drv = linearx *3.6 * 100; //std::cout << twist_drv << std::endl;
-				drive_val = twist_drv;
+				ros::Time nowtime = ros::Time::now();
+				if(nowtime < pause_time_)
+				{
+					drive_val = 0;
+				}
+				else
+				{
+					double linearx = twist_.twist.linear.x;
+					//if(linearx > 0.5 && linearx < 1.0) linearx = 1.0;
+					double twist_drv = linearx *3.6 * 100; //std::cout << twist_drv << std::endl;
+					drive_val = twist_drv;
+				}
 			}
 			else drive_val = input_drive_;
 			if(can_receive_501_.drive_auto == false) drive_val = 0;
@@ -380,18 +413,30 @@ private:
 	{
 		buf[6] = buf[7] = 0;
 
-		if(emergency_stop_ == 0x2) buf[6] |= 0x80;
-		else if(emergency_stop_ == 0x1) buf[6] |= 0x40;
-		if(engine_start_ == true) buf[6] |= 0x20;
-		if(ignition_ == true) buf[6] |= 0x10;
-		if(wiper_ == true) buf[6] |= 0x08;
-		if(light_high_ == true) buf[6] |= 0x04;
-		if(light_low_ == true) buf[6] |= 0x02;
-		if(light_small_ == true) buf[6] |= 0x01;
-		if(horn_ == true) buf[7] |= 0x80;
-		if(hazard_ == true) buf[7] |= 0x40;
-		if(blinker_right_ == true) buf[7] |= 0x20;
-		if(blinker_left_ == true) buf[7] |= 0x10;
+		if(emergency_stop_ == 0x2) {buf[6] |= 0x80;  emergency_stop_ = 0;}
+		else if(emergency_stop_ == 0x1) {buf[6] |= 0x40;  emergency_stop_ = 0;}
+		if(side_brake_ == 0x2) {buf[6] |= 0x20;  side_brake_ = 0;}
+		else if(side_brake_ == 0x1) {buf[6] |= 0x10;  side_brake_ = 0;}
+		if(automatic_door_ == 0x2) buf[6] |= 0x08;
+		else if(automatic_door_ == 0x1) buf[6] |= 0x04;
+		if(waypoint_param_.blinker != 0)
+		{
+			if(waypoint_param_.blinker == 1) buf[6] |= 0x01;
+			else if(waypoint_param_.blinker == 2) buf[6] |= 0x02;
+		}
+		else
+		{
+			if(blinker_right_ == true) buf[6] |= 0x02;
+			if(blinker_left_ == true) buf[6] |= 0x01;
+		}
+		if(hazard_ == true) buf[7] |= 0x80;
+		if(horn_ == true) buf[7] |= 0x40;
+		if(light_high_ == true) buf[7] |= 0x20;
+		if(engine_start_ == true) buf[7] |= 0x10;
+		//if(ignition_ == true) buf[6] |= 0x10;
+		//if(wiper_ == true) buf[6] |= 0x08;
+		//if(light_low_ == true) buf[6] |= 0x02;
+		//if(light_small_ == true) buf[6] |= 0x01;
 
 		if (shift_auto_ == true)
 		{
@@ -585,6 +630,7 @@ public:
 	    , proc_time(0)
 	    , shift_auto_(false)
 	    , shift_position_(0)
+	    , side_brake_(0)
 	    , emergency_stop_(false)
 	    , engine_start_(false)
 	    , ignition_(false)
@@ -596,6 +642,7 @@ public:
 	    , hazard_(false)
 	    , blinker_right_(false)
 	    , blinker_left_(false)
+	    , automatic_door_(0)
 	{
 		can_receive_501_.emergency = true;
 		canStatus res = kc.init(kvaser_channel, canBITRATE_500K);
@@ -622,6 +669,7 @@ public:
 		sub_config_microbus_can_ = nh_.subscribe("/config/microbus_can", 10, &kvaser_can_sender::callbackConfigMicroBusCan, this);
 		sub_shift_auto_ = nh_.subscribe("/microbus/shift_auto", 10, &kvaser_can_sender::callbackShiftAuto, this);
 		sub_shift_position_ = nh_.subscribe("/microbus/shift_position", 10, &kvaser_can_sender::callbackShiftPosition, this);
+		sub_side_brake_ = nh_.subscribe("/microbus/side_brake", 10, &kvaser_can_sender::callbackSideBrake, this);
 		sub_emergency_stop_ = nh_.subscribe("/microbus/emergency_stop", 10, &kvaser_can_sender::callbackEmergencyStop, this);
 		sub_engine_start_ = nh_.subscribe("/microbus/engine_start", 10, &kvaser_can_sender::callbackEngineStart, this);
 		sub_ignition_ = nh_.subscribe("/microbus/ignition", 10, &kvaser_can_sender::callbackIgnition, this);
@@ -633,11 +681,14 @@ public:
 		sub_hazard_ = nh_.subscribe("/microbus/hazard", 10, &kvaser_can_sender::callbackHazard, this);
 		sub_blinker_right_ = nh_.subscribe("/microbus/blinker_right", 10, &kvaser_can_sender::callbackBlinkerRight, this);
 		sub_blinker_left_ = nh_.subscribe("/microbus/blinker_left", 10, &kvaser_can_sender::callbackBlinkerLeft, this);
+		sub_automatic_door_ = nh_.subscribe("/microbus/automatic_door", 10, &kvaser_can_sender::callbackAutomaticDoor, this);
 
 		publisStatus();
 
 		proc_time.sec = 0;
 		proc_time.nsec = 0;
+		waypoint_param_.blinker = 0;
+		pause_time_ = ros::Time::now();
 	}
 
 	const bool isOpen() {return kc.isOpen();}
@@ -647,7 +698,6 @@ public:
 		//if(can_receive_501_.emergency == false)
 		{
 			unsigned char buf[SEND_DATA_SIZE] = {0,0,0,0,0,0,0,0};
-
 			bufset_mode(buf);
 			bufset_steer(buf);
 			bufset_drive(buf);

@@ -31,6 +31,10 @@ BT_SHIFT_2 = 16
 BT_SHIFT_L = 17
 BT_ENGINE_START = 18
 BT_IGNITION = 19
+BT_SIDE_BRAKE_ON = 20
+BT_SIDE_BRAKE_OFF = 21
+BT_AUTOMATIC_DOOR_OPEN = 22
+BT_AUTOMATIC_DOOR_CLOSE = 23
 
 BT_INPUT_STEER_ON = 100
 BT_INPUT_DRIVE_ON = 101
@@ -124,6 +128,22 @@ class Microbus_Can_Sender_GUI:
 		else:
 			msg = Bool(False)
 		self.pub_ignition.publish(msg)
+
+	def click_side_brake_on(self, event):
+		msg = UInt8(2)
+		self.pub_side_brake.publish(msg)
+
+	def click_side_brake_off(self, event):
+		msg = UInt8(1)
+		self.pub_side_brake.publish(msg)
+
+	def click_automatic_door_open(self, event):
+		msg = UInt8(2)
+		self.pub_automatic_door.publish(msg)
+
+	def click_automatic_door_close(self, event):
+		msg = UInt8(1)
+		self.pub_automatic_door.publish(msg)
 
 	def click_wiper(self, event):
 		if self.receive.wiper == False:
@@ -503,6 +523,7 @@ class Microbus_Can_Sender_GUI:
 		self.panel = wx.Panel(self.frame, wx.ID_ANY)
 		self.panel.SetBackgroundColour('#AFAFAF')
 		font = wx.Font(20, wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
+		font_min = wx.Font(15, wx.FONTFAMILY_DEFAULT,wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL)
 
 		self.receive = ReceiveValue()
 
@@ -512,17 +533,25 @@ class Microbus_Can_Sender_GUI:
 		self.bt_engine_start.SetFont(font)
 		self.bt_ignition = wx.Button(self.panel, BT_IGNITION, label="イグニションON", pos=(390,10), size=(230,50))
 		self.bt_ignition.SetFont(font)
-		self.bt_steer_drive_auto = wx.Button(self.panel, BT_STEER_DRIVE_AUTO, label="ステア、ドライブ\nAUTO", pos=(10,100), size=(230,80))
+		self.bt_side_brake_on = wx.Button(self.panel, BT_SIDE_BRAKE_ON, label="サイドブレーキON", pos=(10,70), size=(190,50))
+		self.bt_side_brake_on.SetFont(font_min)	
+		self.bt_side_brake_off = wx.Button(self.panel, BT_SIDE_BRAKE_OFF, label="サイドブレーキOFF", pos=(210,70), size=(190,50))
+		self.bt_side_brake_off.SetFont(font_min)
+		self.bt_automatic_door_open = wx.Button(self.panel, BT_AUTOMATIC_DOOR_OPEN, label="ドアopen", pos=(410,70), size=(100,50))
+		self.bt_automatic_door_open.SetFont(font_min)
+		self.bt_automatic_door_close = wx.Button(self.panel, BT_AUTOMATIC_DOOR_CLOSE, label="ドアclose", pos=(520,70), size=(100,50))
+		self.bt_automatic_door_close.SetFont(font_min)
+		self.bt_steer_drive_auto = wx.Button(self.panel, BT_STEER_DRIVE_AUTO, label="ステア、ドライブ\nAUTO", pos=(10,130), size=(230,80))
 		self.bt_steer_drive_auto.SetFont(font)	
-		self.bt_steer_auto = wx.Button(self.panel, BT_STEER_AUTO, label="ステア\nAUTO", pos=(250,100), size=(180,80))
+		self.bt_steer_auto = wx.Button(self.panel, BT_STEER_AUTO, label="ステア\nAUTO", pos=(250,130), size=(180,80))
 		self.bt_steer_auto.SetFont(font)
-		self.bt_drive_auto = wx.Button(self.panel, BT_DRIVE_AUTO, label="ドライブ\nAUTO", pos=(440,100), size=(180,80))
+		self.bt_drive_auto = wx.Button(self.panel, BT_DRIVE_AUTO, label="ドライブ\nAUTO", pos=(440,130), size=(180,80))
 		self.bt_drive_auto.SetFont(font)
-		self.bt_steer_drive_manual = wx.Button(self.panel, BT_STEER_DRIVE_MANUAL, label="ステア、ドライブ\nMANUAL", pos=(10,200), size=(230,80))
+		self.bt_steer_drive_manual = wx.Button(self.panel, BT_STEER_DRIVE_MANUAL, label="ステア、ドライブ\nMANUAL", pos=(10,210), size=(230,80))
 		self.bt_steer_drive_manual.SetFont(font)
-		self.bt_steer_manual = wx.Button(self.panel, BT_STEER_MANUAL, label="ステア\nMANUAL", pos=(250,200), size=(180,80))
+		self.bt_steer_manual = wx.Button(self.panel, BT_STEER_MANUAL, label="ステア\nMANUAL", pos=(250,210), size=(180,80))
 		self.bt_steer_manual.SetFont(font)
-		self.bt_drive_manual = wx.Button(self.panel, BT_DRIVE_MANUAL, label="ドライブ\nMANUAL", pos=(440,200), size=(180,80))
+		self.bt_drive_manual = wx.Button(self.panel, BT_DRIVE_MANUAL, label="ドライブ\nMANUAL", pos=(440,210), size=(180,80))
 		self.bt_drive_manual.SetFont(font)
 		self.bt_drive_stroke = wx.Button(self.panel, BT_DRIVE_STROKE, label="STROKE\nモード", pos=(10,300), size=(180,80))
 		self.bt_drive_stroke.SetFont(font)
@@ -548,6 +577,10 @@ class Microbus_Can_Sender_GUI:
 		self.bt_emergency_reset.Bind(wx.EVT_BUTTON, self.click_emegency_reset)
 		self.bt_engine_start.Bind(wx.EVT_BUTTON, self.click_engine_start)
 		self.bt_ignition.Bind(wx.EVT_BUTTON, self.click_ignition)
+		self.bt_side_brake_on.Bind(wx.EVT_BUTTON, self.click_side_brake_on)
+		self.bt_side_brake_off.Bind(wx.EVT_BUTTON, self.click_side_brake_off)
+		self.bt_automatic_door_open.Bind(wx.EVT_BUTTON, self.click_automatic_door_open)
+		self.bt_automatic_door_close.Bind(wx.EVT_BUTTON, self.click_automatic_door_close)
 		self.bt_steer_drive_auto.Bind(wx.EVT_BUTTON, self.click_steer_drive_auto)
 		self.bt_steer_auto.Bind(wx.EVT_BUTTON, self.click_steer_auto)
 		self.bt_drive_auto.Bind(wx.EVT_BUTTON, self.click_drive_auto)
@@ -714,6 +747,8 @@ class Microbus_Can_Sender_GUI:
 		self.pub_emergency_reset = rospy.Publisher('/microbus/emergency_reset', Empty, queue_size=1)
 		self.pub_engine_start = rospy.Publisher('/microbus/engine_start', Bool, queue_size=1)
 		self.pub_ignition = rospy.Publisher('/microbus/ignition', Bool, queue_size=1)
+		self.pub_side_brake = rospy.Publisher('/microbus/side_brake', UInt8, queue_size=1)
+		self.pub_automatic_door = rospy.Publisher('/microbus/automatic_door', UInt8, queue_size=1)
 		self.pub_steer_auto = rospy.Publisher('/microbus/steer_mode_send', Bool, queue_size=1)
 		self.pub_drive_auto = rospy.Publisher('/microbus/drive_mode_send', Bool, queue_size=1)
 		self.pub_drive_stroke = rospy.Publisher('/microbus/set_stroke_mode', Empty, queue_size=1)
