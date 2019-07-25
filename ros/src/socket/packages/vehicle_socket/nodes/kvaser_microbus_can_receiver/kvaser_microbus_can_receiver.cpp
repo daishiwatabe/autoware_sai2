@@ -33,7 +33,7 @@ public:
 	void read_wait()
 	{
 		canStatus res = kc.read_wait(100);
-		kc.printReader();
+		if(kc.get_id() == 0x501 || kc.get_id() == 0x502 || kc.get_id() == 0x100) kc.printReader();
 
 		if(res == canStatus::canOK)
 		{

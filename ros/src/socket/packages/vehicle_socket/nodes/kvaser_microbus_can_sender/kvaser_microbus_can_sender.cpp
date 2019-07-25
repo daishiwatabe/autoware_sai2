@@ -123,6 +123,7 @@ private:
 	{
 		std::cout << "sub can" << std::endl;
 		can_receive_501_ = *msg;
+		if(can_receive_501_.drive_auto == false) drive_control_mode_ = MODE_STROKE;
 	}
 
 	void callbackMicrobusCan502(const autoware_can_msgs::MicroBusCan502::ConstPtr &msg)
@@ -404,7 +405,8 @@ private:
 		}
 		else
 		{
-			unsigned char *drive_point = (unsigned char*)&pedal_;
+			short drive_val = input_drive_;
+			unsigned char *drive_point = (unsigned char*)&drive_val;//(unsigned char*)&pedal_;
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];
 		}
 	}
@@ -621,8 +623,8 @@ public:
 	    , private_nh_(p_nh)
 	    , flag_drive_mode_(false)
 	    , flag_steer_mode_(false)
-	    , input_drive_mode_(false)
-	    , input_steer_mode_(false)
+	    , input_drive_mode_(true)
+	    , input_steer_mode_(true)
 	    , input_steer_(0)
 	    , input_drive_(0)
 	    , drive_control_mode_(MODE_STROKE)

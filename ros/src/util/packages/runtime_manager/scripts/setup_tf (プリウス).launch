@@ -22,9 +22,9 @@
 
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_esr" args="3.54 0.0 0.455 0.0 0.0 0.0 base_link esr_1 10"/>
 
-  <param name="/gx" value="0.58"/>
+  <param name="/gx" value="1.72"/>
   <param name="/gy" value="0.0"/>
-  <param name="/gz" value="1.63"/>
+  <param name="/gz" value="2.74"/>
   <param name="/ax" value="0.0"/>
   <param name="/ay" value="0.0"/>
   <param name="/az" value="0.0"/>
