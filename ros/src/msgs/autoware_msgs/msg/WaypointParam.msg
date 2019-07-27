@@ -18,3 +18,5 @@ float32 vgf_leafsize
 float32 vgf_measurement_range
 ExtractedPosition[] signals
 int32 curve_flag
+int16 microbus_pedal
+int16 microbus_angle

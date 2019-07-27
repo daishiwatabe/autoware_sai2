@@ -13,6 +13,7 @@ add_message_files(
   FILES
     MicroBusCan501.msg
 	MicroBusCan502.msg
+	MicroBusCan503.msg
 	MicroBusCanSenderStatus.msg
     CANInfo.msg
     CANData.msg

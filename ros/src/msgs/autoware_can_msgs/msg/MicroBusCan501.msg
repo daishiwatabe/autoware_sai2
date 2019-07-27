@@ -31,4 +31,6 @@ bool hazard
 bool blinker_right
 bool blinker_left
 uint8 shift
+uint8 side_brake
+uint8 automatic_door
 uint32 read_counter

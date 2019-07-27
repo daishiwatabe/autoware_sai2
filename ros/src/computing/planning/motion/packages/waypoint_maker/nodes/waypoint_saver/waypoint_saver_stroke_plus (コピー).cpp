@@ -24,8 +24,7 @@
 #include <std_msgs/Float32.h>
 #include <tf/transform_datatypes.h>
 #include <autoware_can_msgs/CANInfo.h>
-#include <autoware_can_msgs/MicroBusCan502.h>
-#include <autoware_can_msgs/MicroBusCan503.h>
+
 #include <fstream>
 
 #include "waypoint_follower/libwaypoint_follower.h"
@@ -44,8 +43,7 @@ public:
 private:
   // functions
 
-  void can502Callback(const autoware_can_msgs::MicroBusCan502ConstPtr &pose_msg);
-  void can503Callback(const autoware_can_msgs::MicroBusCan503ConstPtr &pose_msg);
+  void canCallback(const autoware_can_msgs::CANInfoConstPtr &pose_msg);
   void TwistPoseCallback(const geometry_msgs::TwistStampedConstPtr &twist_msg,
                          const geometry_msgs::PoseStampedConstPtr &pose_msg) const;
   void poseCallback(const geometry_msgs::PoseStampedConstPtr &pose_msg) const;
@@ -63,19 +61,19 @@ private:
   message_filters::Subscriber<geometry_msgs::TwistStamped> *twist_sub_;
   message_filters::Subscriber<geometry_msgs::PoseStamped> *pose_sub_;
   message_filters::Synchronizer<TwistPoseSync> *sync_tp_;
-  ros::Subscriber can502_sub_, can503_sub_;
+  ros::Subscriber can_sub_;
 
   // variables
   bool save_velocity_;
   double interval_;
-  short pedal_, angle_;
+  double drive_pedal_, brake_pedal_;
   std::string filename_, pose_topic_, velocity_topic_;
 };
 
 WaypointSaver::WaypointSaver()
     : private_nh_("~")
-    , pedal_(0)
-    , angle_(0)
+    , drive_pedal_(0)
+    , brake_pedal_(0)
 {
   // parameter settings
   private_nh_.param<std::string>("save_filename", filename_, std::string("data.txt"));
@@ -86,8 +84,7 @@ WaypointSaver::WaypointSaver()
 
   // subscriber
   pose_sub_ = new message_filters::Subscriber<geometry_msgs::PoseStamped>(nh_, pose_topic_, 50);
-  can502_sub_ = nh_.subscribe("/microbus/can_receive502", 10, &WaypointSaver::can502Callback, this);
-  can503_sub_ = nh_.subscribe("/microbus/can_receive503", 10, &WaypointSaver::can503Callback, this);
+  can_sub_ = nh_.subscribe("/can_info", 10, &WaypointSaver::canCallback, this);
   if (save_velocity_)
   {
     twist_sub_ = new message_filters::Subscriber<geometry_msgs::TwistStamped>(nh_, velocity_topic_, 50);
@@ -110,14 +107,10 @@ WaypointSaver::~WaypointSaver()
   delete sync_tp_;
 }
 
-void WaypointSaver::can502Callback(const autoware_can_msgs::MicroBusCan502ConstPtr &can_msg)
+void WaypointSaver::canCallback(const autoware_can_msgs::CANInfoConstPtr &can_msg)
 {
-	angle_ = can_msg->angle_actual;
-}
-
-void WaypointSaver::can503Callback(const autoware_can_msgs::MicroBusCan503ConstPtr &can_msg)
-{
-	pedal_ = can_msg->pedal_voltage;
+	drive_pedal_ = can_msg->drivepedal;
+	brake_pedal_ = can_msg->brakepedal;
 }
 
 void WaypointSaver::poseCallback(const geometry_msgs::PoseStampedConstPtr &pose_msg) const
@@ -139,10 +132,10 @@ void WaypointSaver::outputProcessing(geometry_msgs::Pose current_pose, double ve
   // first subscribe
   if (!receive_once)
   {
-	ofs << "x,y,z,yaw,velocity,change_flag,microbus_pedal,microbus_angle" << std::endl;
+	ofs << "x,y,z,yaw,velocity,change_flag,drive pedal,brake pedal" << std::endl;
     ofs << std::fixed << std::setprecision(4) << current_pose.position.x << "," << current_pose.position.y << ","
 	    << current_pose.position.z << "," << tf::getYaw(current_pose.orientation) << ",0,0,"
-	    << pedal_ << "," << angle_ << std::endl;
+	    << drive_pedal_ << "," << brake_pedal_ << std::endl;
     receive_once = true;
     displayMarker(current_pose, 0);
     previous_pose = current_pose;
@@ -157,7 +150,7 @@ void WaypointSaver::outputProcessing(geometry_msgs::Pose current_pose, double ve
     {
       ofs << std::fixed << std::setprecision(4) << current_pose.position.x << "," << current_pose.position.y << ","
 	      << current_pose.position.z << "," << tf::getYaw(current_pose.orientation) << "," << velocity << ",0,"
-	      << pedal_ << "," << angle_ << std::endl;
+	      << drive_pedal_ << "," << brake_pedal_ << std::endl;
 
       displayMarker(current_pose, velocity);
       previous_pose = current_pose;

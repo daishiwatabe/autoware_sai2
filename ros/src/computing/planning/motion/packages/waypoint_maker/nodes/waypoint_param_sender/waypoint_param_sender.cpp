@@ -32,6 +32,8 @@ std::vector<float> vgf_leafsizeList;
 std::vector<float> vgf_measurement_rangeList;
 std::vector<std::vector<autoware_msgs::ExtractedPosition>> extracted_positionList;
 std::vector<int> curve_flagList;
+std::vector<short> microbus_pedalList;
+std::vector<short> microbus_angleList;
 
 geometry_msgs::Pose local_point_sento;
 float gnss_weight = 0;
@@ -59,6 +61,7 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
     float min_vgf_leafsize, min_vgf_measurement_range;
     std::vector<autoware_msgs::ExtractedPosition> min_extracted_position;
     int min_curve;
+	short min_microbus_pedal, min_microbus_angle;
 
     for(int cou=0; cou<poseList.size(); cou++)
     {
@@ -88,6 +91,8 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
             min_vgf_measurement_range = vgf_measurement_rangeList[cou];
             min_extracted_position = extracted_positionList[cou];
             min_curve = curve_flagList[cou];
+			min_microbus_pedal = microbus_pedalList[cou];
+			min_microbus_angle = microbus_angleList[cou];
         }
     }
     if(gnss_weight == min_weight)
@@ -109,6 +114,8 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
 		param.brake_stroke = min_brake_stroke;
 		param.mb_pedal = min_mb_pedal;
         param.curve_flag = min_curve;
+		param.microbus_pedal = min_microbus_pedal;
+		param.microbus_angle = min_microbus_angle;
         if(prev_pause == min_pause)
         {std::cout<<"0 : "<<min_pause<<","<<prev_pause<<std::endl;
             param.pause = 0;
@@ -196,6 +203,8 @@ void lane_waypoints_array_callback(const autoware_msgs::LaneArray::ConstPtr& msg
     vgf_leafsizeList.clear();
     vgf_measurement_rangeList.clear();
     extracted_positionList.clear();
+	microbus_pedalList.clear();
+	microbus_angleList.clear();
 
     //for(int lanesCou=0; lanesCou<msg->lanes.size(); lanesCou++)
     for(autoware_msgs::Lane lane : msg->lanes)
@@ -224,6 +233,8 @@ void lane_waypoints_array_callback(const autoware_msgs::LaneArray::ConstPtr& msg
             vgf_leafsizeList.push_back(waypoint.waypoint_param.vgf_leafsize);
             vgf_measurement_rangeList.push_back(waypoint.waypoint_param.vgf_measurement_range);
             curve_flagList.push_back(waypoint.waypoint_param.curve_flag);
+			microbus_pedalList.push_back(waypoint.waypoint_param.microbus_pedal);
+			microbus_angleList.push_back(waypoint.waypoint_param.microbus_angle);
 
             std::vector<autoware_msgs::ExtractedPosition> eplist;
             for(int cou=0; cou<waypoint.waypoint_param.signals.size(); cou++)

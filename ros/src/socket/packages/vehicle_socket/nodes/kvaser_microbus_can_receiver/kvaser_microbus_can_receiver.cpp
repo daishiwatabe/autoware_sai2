@@ -1,13 +1,14 @@
 #include <ros/ros.h>
 #include <autoware_can_msgs/MicroBusCan501.h>
 #include <autoware_can_msgs/MicroBusCan502.h>
+#include <autoware_can_msgs/MicroBusCan503.h>
 #include "kvaser_can.h"
 
 class kvaser_can_receiver
 {
 private:
 	ros::NodeHandle nh_, private_nh_;
-	ros::Publisher pub_microbus_can_501_, pub_microbus_can_502_;
+	ros::Publisher pub_microbus_can_501_, pub_microbus_can_502_, pub_microbus_can_503_;
 
 	KVASER_CAN kc;
 
@@ -26,6 +27,7 @@ public:
 
 		pub_microbus_can_501_ = nh_.advertise<autoware_can_msgs::MicroBusCan501>("/microbus/can_receive501", 10);
 		pub_microbus_can_502_ = nh_.advertise<autoware_can_msgs::MicroBusCan502>("/microbus/can_receive502", 10);
+		pub_microbus_can_503_ = nh_.advertise<autoware_can_msgs::MicroBusCan503>("/microbus/can_receive503", 10);
 	}
 
 	bool isOpen() {return kc.isOpen();}
@@ -33,7 +35,7 @@ public:
 	void read_wait()
 	{
 		canStatus res = kc.read_wait(100);
-		if(kc.get_id() == 0x501 || kc.get_id() == 0x502 || kc.get_id() == 0x100) kc.printReader();
+		if(kc.get_id() == 0x501 || kc.get_id() == 0x502 || kc.get_id() == 0x503) kc.printReader();
 
 		if(res == canStatus::canOK)
 		{
@@ -87,6 +89,17 @@ public:
 					if(data[6] & 0x80 != 0) can.emergency_stop = 2;
 					else if(data[6] & 0x40 != 0) can.emergency_stop = 1;
 					else can.emergency_stop = 0;
+					if(data[6] & 0x20 != 0) can.side_brake = 2;
+					else if(data[6] & 0x10 != 0) can.side_brake = 1;
+					else can.side_brake = 0;
+					if(data[6] & 0x08 != 0) can.automatic_door = 2;
+					else if(data[6] & 0x04 != 0) can.automatic_door = 1;
+					else can.automatic_door = 0;
+					can.blinker_right = (data[6] & 0x02 != 0) ? true : false;
+					can.blinker_left = (data[6] & 0x01 != 0) ? true : false;
+					/*if(data[6] & 0x80 != 0) can.emergency_stop = 2;
+					else if(data[6] & 0x40 != 0) can.emergency_stop = 1;
+					else can.emergency_stop = 0;
 					can.engine_start = (data[6] & 0x20 != 0) ? true : false;
 					can.ignition = (data[6] & 0x10 != 0) ? true : false;
 					can.wiper = (data[6] & 0x08 != 0) ? true : false;
@@ -97,7 +110,7 @@ public:
 					can.hazard = (data[7] & 0x40 != 0) ? true : false;
 					can.blinker_right = (data[7] & 0x20 != 0) ? true : false;
 					can.blinker_left = (data[7] & 0x10 != 0) ? true : false;
-					can.shift = data[7] & 0x0F;
+					can.shift = data[7] & 0x0F;*/
 
 					pub_microbus_can_501_.publish(can);
 					read_id_flag_.read501 = true;
@@ -124,6 +137,21 @@ public:
 			    }
 			case 0x503:
 			    {
+				    unsigned char data[KVASER_CAN::READ_DATA_SIZE];
+					kc.get_read_data(data);
+					autoware_can_msgs::MicroBusCan503 can;
+					can.header.stamp = ros::Time::now();
+
+					unsigned char *voltage_tmp = (unsigned char*)&can.pedal_voltage;
+					voltage_tmp[0] = data[3];  voltage_tmp[1] = data[2];
+
+					unsigned char *displacement_tmp = (unsigned char*)&can.pedal_displacement;
+					displacement_tmp[0] = data[5];  displacement_tmp[1] = data[4];
+
+					unsigned char *engine_rotation_tmp = (unsigned char*)&can.engine_rotation;
+					engine_rotation_tmp[0] = data[7];  engine_rotation_tmp[1] = data[6];
+
+					pub_microbus_can_503_.publish(can);
 				    read_id_flag_.read501 = read_id_flag_.read502 = false;
 					break;
 			    }
