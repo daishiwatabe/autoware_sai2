@@ -77,6 +77,7 @@ install(FILES
         scripts/launch_files/velodyne_hdl64e_s2.launch
         scripts/launch_files/velodyne_hdl64e_s3.launch
         scripts/launch_files/velodyne_hdl32e.launch
+		scripts/launch_files/velodyne_hdl32e_single.launch
         scripts/launch_files/velodyne_vlp16.launch
         scripts/launch_files/velodyne_vlp16_hires.launch
         scripts/launch_files/velodyne_vlp32c.launch

@@ -15,23 +15,6 @@
 #include "kvaser_can.h"
 #include <time.h>
 
-class waypoint_param_geter
-{
-public:
-	ros::Time pause_time_;
-	short pause_speed_;
-	char automatic_door_;
-	bool automatic_door_taiki_;
-
-	waypoint_param_geter()
-	{
-		pause_time_ = ros::Time::now();
-		pause_speed_ = 0;
-		automatic_door_ = 0;
-		automatic_door_taiki_ = false;
-	}
-};
-
 class kvaser_can_sender
 {
 private:
@@ -108,10 +91,8 @@ private:
 	bool hazard_, blinker_right_, blinker_left_, blinker_stop_;
 	autoware_msgs::WaypointParam waypoint_param_;
 
-	ros::Time automatic_door_time_;
-	ros::Time blinker_right_time_, blinker_left_time_, blinker_stop_time_;
-
-	waypoint_param_geter wpg_;
+	double pause_time_, automatic_door_time_;
+	double blinker_right_time_, blinker_left_time_, blinker_stop_time_;
 
 	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
 	{
@@ -183,18 +164,13 @@ private:
 		side_brake_ = msg->data;
 	}
 
-	void automaticDoorSet(unsigned char flag)
-	{
-		automatic_door_ = flag;
-
-		ros::Time nowtime = ros::Time::now();
-		automatic_door_time_ = ros::Time(nowtime.sec + 5, nowtime.nsec);
-	}
-
 	void callbackAutomaticDoor(const std_msgs::UInt8::ConstPtr &msg)
 	{
 		std::cout << "automatic door : " << (int)msg->data << std::endl;
-		automaticDoorSet(msg->data);
+		automatic_door_ = msg->data;
+
+		ros::Time nowtime = ros::Time::now();
+		automatic_door_time_ = (double)clock()/CLOCKS_PER_SEC + 5;
 	}
 
 	void callbackConfigMicroBusCan(const autoware_config_msgs::ConfigMicroBusCan::ConstPtr &msg)
@@ -214,37 +190,11 @@ private:
 		pedal_ = msg->microbus_pedal;
 		waypoint_param_ = *msg;
 
-		if(waypoint_param_.pause != 0)
+		if(waypoint_param_.pause > 0)
 		{
-			if(waypoint_param_.pause > 0)
-			{
-				ros::Time nowtime = ros::Time::now();
-				wpg_.pause_time_ = ros::Time(nowtime.sec + waypoint_param_.pause, nowtime.nsec);
-				//wpg_.pause_time_ = (double)clock()/CLOCKS_PER_SEC + waypoint_param_.pause;
-				wpg_.pause_speed_ = can_receive_501_.velocity;
-			}
-			else if(waypoint_param_.pause < 0)
-			{
-				ros::Time nowtime = ros::Time::now();
-				wpg_.pause_time_ = ros::Time(nowtime.sec + waypoint_param_.pause, nowtime.nsec);
-				//wpg_.pause_time_ = (double)clock()/CLOCKS_PER_SEC + 1000;
-				wpg_.pause_speed_ = can_receive_501_.velocity;
-			}
-		}
-		if(waypoint_param_.automatic_door == 2)
-			wpg_.automatic_door_taiki_ = true;
-
-		if(waypoint_param_.blinker == 1)
-		{
-			blinkerLeft();
-		}
-		else if(waypoint_param_.blinker == 2)
-		{
-			blinkerRight();
-		}
-		else if(waypoint_param_.blinker == 0)
-		{
-			blinkerStop();
+			ros::Time nowtime = ros::Time::now();
+			//pause_time_ = ros::Time(nowtime.sec + waypoint_param_.pause, nowtime.nsec);
+			pause_time_ = (double)clock()/CLOCKS_PER_SEC + waypoint_param_.pause;
 		}
 	}
 
@@ -361,43 +311,45 @@ private:
 		std::cout << "hazard : " << str << std::endl;
 	}
 
-	void blinkerRight()
+	void callbackBlinkerRight(const std_msgs::Bool::ConstPtr &msg)
 	{
+		//bool flag = msg->data;
+		//if(flag == false) {blinker_right_ = blinker_left_ = true;}
+		//else {blinker_right_ = true;  blinker_left_ = false;}
+
 		blinker_right_ = true;
 		std::cout << "blinker right" << std::endl;
 		ros::Time nowtime = ros::Time::now();
-		blinker_right_time_ = ros::Time(nowtime.sec + 1, nowtime.nsec);
-	}
+		//blinker_right_time_ = ros::Time(nowtime.sec, nowtime.nsec + 0.1E9);
+		blinker_right_time_ = (double)clock()/CLOCKS_PER_SEC + 0.3;
 
-	void callbackBlinkerRight(const std_msgs::Bool::ConstPtr &msg)
-	{
-		blinkerRight();
-	}
-
-	void blinkerLeft()
-	{
-		blinker_left_ = true;
-		std::cout << "blinker left" << std::endl;
-		ros::Time nowtime = ros::Time::now();
-		blinker_left_time_ = ros::Time(nowtime.sec + 1, nowtime.nsec);
+		//blinker_right_ = msg->data;
+		//std::string str = (blinker_right_) ? "true" : "false";
+		//std::cout << "blinker_right : " << str << std::endl;
 	}
 
 	void callbackBlinkerLeft(const std_msgs::Bool::ConstPtr &msg)
 	{
-		blinkerLeft();
-	}
+		//bool flag = msg->data;
+		//if(flag == false) {blinker_right_ = blinker_left_ = true;}
+		//else {blinker_right_ = false;  blinker_left_ = true;}
 
-	void blinkerStop()
-	{
-		blinker_stop_ = true;
-		std::cout << "blinker stop" << std::endl;
-		ros::Time nowtime = ros::Time::now();
-		blinker_stop_time_ = ros::Time(nowtime.sec + 1, nowtime.nsec);
+		blinker_left_ = true;
+		std::cout << "blinker left" << std::endl;
+		//blinker_left_time_ = ros::Time::now();
+		blinker_left_time_ = (double)clock()/CLOCKS_PER_SEC + 0.3;
+
+		//blinker_left_ = msg->data;
+		//std::string str = (blinker_left_) ? "true" : "false";
+		//std::cout << "blinker_left : " << str << std::endl;
 	}
 
 	void callbackBlinkerStop(const std_msgs::Bool::ConstPtr &msg)
 	{
-		blinkerStop();
+		blinker_stop_ = true;
+		std::cout << "blinker stop" << std::endl;
+		//blinker_stop_time_ = ros::Time::now();
+		blinker_stop_time_ = (double)clock()/CLOCKS_PER_SEC + 0.3;
 	}
 
 	void bufset_mode(unsigned char *buf)
@@ -464,12 +416,10 @@ private:
 			short drive_val;
 			if(input_drive_mode_ == false)
 			{
-				ros::Time nowtime = ros::Time::now();
-				if(nowtime < wpg_.pause_time_)
+				double nowtime = (double)clock()/CLOCKS_PER_SEC;
+				if(nowtime < pause_time_)
 				{
-					wpg_.pause_speed_ -= 50;
-					if(wpg_.pause_speed_ < -300) wpg_.pause_speed_ = -300;
-					drive_val = wpg_.pause_speed_;
+					drive_val = 0;
 				}
 				else
 				{
@@ -510,28 +460,27 @@ private:
 		else if(side_brake_ == 0x1) {buf[6] |= 0x10;  side_brake_ = 0;}
 		if(automatic_door_ != 0x0)
 		{
-			std::cout << "aaaaaaaaaaaaaaaaaaaaa : " << automatic_door_time_ << std::endl;
 			if(automatic_door_ == 0x2) {buf[6] |= 0x08;}
 			else if(automatic_door_ == 0x1) {buf[6] |= 0x04;}
-			ros::Time time = ros::Time::now();
+			double time = (double)clock()/CLOCKS_PER_SEC;;
 			if(time > automatic_door_time_)  automatic_door_ = 0x0;
 		}
 		if(blinker_right_ == true)
-		{std::cout << "aaaaaaaaaaaaaaaaaaaaa" << std::endl;
+		{
 			buf[6] |= 0x02; //blinker_right_ = false;
-			ros::Time time = ros::Time::now();
+			double time = (double)clock()/CLOCKS_PER_SEC;
 			if(time > blinker_right_time_)  blinker_right_ = false;
 		}
 		else if(blinker_left_ == true)
 		{
 			buf[6] |= 0x01;
-			ros::Time time = ros::Time::now();
+			double time = (double)clock()/CLOCKS_PER_SEC;
 			if(time > blinker_left_time_)  blinker_left_ = false;
 		}
 		else if(blinker_stop_ == true)
 		{
 			buf[6] |= 0x03;
-			ros::Time time = ros::Time::now();
+			double time = (double)clock()/CLOCKS_PER_SEC;
 			if(time > blinker_stop_time_)  blinker_stop_ = false;
 		}
 		if(hazard_ == true) buf[7] |= 0x80;
@@ -796,8 +745,9 @@ public:
 		proc_time.sec = 0;
 		proc_time.nsec = 0;
 		waypoint_param_.blinker = 0;
-		automatic_door_time_ = blinker_right_time_ = blinker_left_time_ =
-		        blinker_stop_time_ = ros::Time::now();
+		pause_time_ = automatic_door_time_ = blinker_right_time_ = blinker_left_time_ =
+		        blinker_stop_time_ = (double)clock()/CLOCKS_PER_SEC;
+
 	}
 
 	const bool isOpen() {return kc.isOpen();}
@@ -810,16 +760,6 @@ public:
 			bufset_mode(buf);
 			bufset_steer(buf);
 			bufset_drive(buf);
-
-			if(wpg_.automatic_door_ == 2 || wpg_.automatic_door_taiki_ == true)
-			{
-				if(can_receive_502_.velocity_actual < 100)
-				{
-					automaticDoorSet(true);
-					wpg_.automatic_door_ = 0;
-					wpg_.automatic_door_taiki_ = false;
-				}
-			}
 			bufset_car_control(buf);
 			kc.write(0x100, (char*)buf, SEND_DATA_SIZE);
 		}

@@ -20,3 +20,4 @@ ExtractedPosition[] signals
 int32 curve_flag
 int16 microbus_pedal
 int16 microbus_angle
+int8 automatic_door

@@ -79,6 +79,7 @@ BT_HAZARD = 305
 BT_BLINKER_RIGHT = 306
 BT_BLINKER_LEFT = 307
 BT_EMERGENCY_STOP = 308
+BT_BLINKER_STOP = 309
 
 class ReceiveValue:
 	def __init__(self):
@@ -105,6 +106,7 @@ class ReceiveValue:
 		self.hazard = False
 		self.blinker_right = False
 		self.blinker_left = False
+		self.blinker_stop = False
 
 class Microbus_Can_Sender_GUI:
 	def click_emergency_stop(self, event):
@@ -200,6 +202,13 @@ class Microbus_Can_Sender_GUI:
 		else:
 			msg = Bool(False)
 		self.pub_blinker_left.publish(msg)
+
+	def click_blinker_stop(self, event):
+		if self.receive.blinker_stop == False:
+			msg = Bool(True)
+		else:
+			msg = Bool(False)
+		self.pub_blinker_stop.publish(msg)
 
 	def click_steer_drive_auto(self, event):
 		msg1 = Bool(True)
@@ -648,6 +657,8 @@ class Microbus_Can_Sender_GUI:
 		self.bt_blinker_right.SetFont(font)
 		self.bt_blinker_left = wx.Button(self.panel, BT_BLINKER_LEFT, label="←", pos=(290,870), size=(130,50))
 		self.bt_blinker_left.SetFont(font)
+		self.bt_blinker_stop = wx.Button(self.panel, BT_BLINKER_STOP, label="blink_stop", pos=(430,930), size=(130,50))
+		self.bt_blinker_stop.SetFont(font_min)
 
 		self.bt_emergency_stop.Bind(wx.EVT_BUTTON, self.click_emergency_stop)
 		self.bt_wiper.Bind(wx.EVT_BUTTON, self.click_wiper)
@@ -658,6 +669,7 @@ class Microbus_Can_Sender_GUI:
 		self.bt_hazard.Bind(wx.EVT_BUTTON, self.click_hazard)
 		self.bt_blinker_right.Bind(wx.EVT_BUTTON, self.click_blinker_right)
 		self.bt_blinker_left.Bind(wx.EVT_BUTTON, self.click_blinker_left)
+		self.bt_blinker_stop.Bind(wx.EVT_BUTTON, self.click_blinker_stop)
 
 		self.lb_emergency = wx.StaticText(self.panel, -1, '安全機能', pos=(670, 10))
 		self.lb_emergency.SetFont(font)
@@ -768,6 +780,7 @@ class Microbus_Can_Sender_GUI:
 		self.pub_hazard = rospy.Publisher('/microbus/hazard', Bool, queue_size=1)
 		self.pub_blinker_right = rospy.Publisher('/microbus/blinker_right', Bool, queue_size=1)
 		self.pub_blinker_left = rospy.Publisher('/microbus/blinker_left', Bool, queue_size=1)
+		self.pub_blinker_stop = rospy.Publisher('/microbus/blinker_stop', Bool, queue_size=1)
 
 		self.sub_micro_bus_can501 = rospy.Subscriber('/microbus/can_receive501', MicroBusCan501, self.callback_can_receive501)
 		self.sub_micro_bus_can502 = rospy.Subscriber('/microbus/can_receive502', MicroBusCan502, self.callback_can_receive502)

@@ -34,6 +34,7 @@ std::vector<std::vector<autoware_msgs::ExtractedPosition>> extracted_positionLis
 std::vector<int> curve_flagList;
 std::vector<short> microbus_pedalList;
 std::vector<short> microbus_angleList;
+std::vector<char> automatic_doorList;
 
 geometry_msgs::Pose local_point_sento;
 float gnss_weight = 0;
@@ -62,6 +63,7 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
     std::vector<autoware_msgs::ExtractedPosition> min_extracted_position;
     int min_curve;
 	short min_microbus_pedal, min_microbus_angle;
+	char min_automatic_door;
 
     for(int cou=0; cou<poseList.size(); cou++)
     {
@@ -93,6 +95,7 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
             min_curve = curve_flagList[cou];
 			min_microbus_pedal = microbus_pedalList[cou];
 			min_microbus_angle = microbus_angleList[cou];
+			min_automatic_door = automatic_doorList[cou];
         }
     }
     if(gnss_weight == min_weight)
@@ -116,6 +119,7 @@ void local_waypoints_callback(const visualization_msgs::MarkerArray::ConstPtr& m
         param.curve_flag = min_curve;
 		param.microbus_pedal = min_microbus_pedal;
 		param.microbus_angle = min_microbus_angle;
+		param.automatic_door = min_automatic_door;
         if(prev_pause == min_pause)
         {std::cout<<"0 : "<<min_pause<<","<<prev_pause<<std::endl;
             param.pause = 0;
@@ -205,6 +209,7 @@ void lane_waypoints_array_callback(const autoware_msgs::LaneArray::ConstPtr& msg
     extracted_positionList.clear();
 	microbus_pedalList.clear();
 	microbus_angleList.clear();
+	automatic_doorList.clear();
 
     //for(int lanesCou=0; lanesCou<msg->lanes.size(); lanesCou++)
     for(autoware_msgs::Lane lane : msg->lanes)
@@ -235,6 +240,7 @@ void lane_waypoints_array_callback(const autoware_msgs::LaneArray::ConstPtr& msg
             curve_flagList.push_back(waypoint.waypoint_param.curve_flag);
 			microbus_pedalList.push_back(waypoint.waypoint_param.microbus_pedal);
 			microbus_angleList.push_back(waypoint.waypoint_param.microbus_angle);
+			automatic_doorList.push_back(waypoint.waypoint_param.automatic_door);
 
             std::vector<autoware_msgs::ExtractedPosition> eplist;
             for(int cou=0; cou<waypoint.waypoint_param.signals.size(); cou++)
