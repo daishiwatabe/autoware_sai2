@@ -58,8 +58,8 @@ private:
 	double handle_offset = 188;
 
 	//liesse params
-	double wheelrad_to_steering_can_value_left = 21510.7695034004;
-	double wheelrad_to_steering_can_value_right = 21989.2514163246;
+	double wheelrad_to_steering_can_value_left = 20952.8189547718;
+	double wheelrad_to_steering_can_value_right = 20961.415734248;
 
 	//mode params
 	const unsigned char MODE_STROKE   = 0x0A;
@@ -212,40 +212,52 @@ private:
 	void callbackWaypointParam(const autoware_msgs::WaypointParam::ConstPtr &msg)
 	{
 		pedal_ = msg->microbus_pedal;
-		waypoint_param_ = *msg;
 
-		if(waypoint_param_.pause != 0)
+		if(msg->pause != 0)
 		{
-			if(waypoint_param_.pause > 0)
+			if(msg->pause > 0)
 			{
 				ros::Time nowtime = ros::Time::now();
-				wpg_.pause_time_ = ros::Time(nowtime.sec + waypoint_param_.pause, nowtime.nsec);
-				//wpg_.pause_time_ = (double)clock()/CLOCKS_PER_SEC + waypoint_param_.pause;
+				wpg_.pause_time_ = ros::Time(nowtime.sec + msg->pause, nowtime.nsec);
+				//wpg_.pause_time_ = (double)clock()/CLOCKS_PER_SEC + msg->pause;
 				wpg_.pause_speed_ = can_receive_501_.velocity;
 			}
-			else if(waypoint_param_.pause < 0)
+			else if(msg->pause < 0)
 			{
 				ros::Time nowtime = ros::Time::now();
-				wpg_.pause_time_ = ros::Time(nowtime.sec + waypoint_param_.pause, nowtime.nsec);
+				wpg_.pause_time_ = ros::Time(nowtime.sec + msg->pause, nowtime.nsec);
 				//wpg_.pause_time_ = (double)clock()/CLOCKS_PER_SEC + 1000;
 				wpg_.pause_speed_ = can_receive_501_.velocity;
 			}
 		}
-		if(waypoint_param_.automatic_door == 2)
-			wpg_.automatic_door_taiki_ = true;
 
-		if(waypoint_param_.blinker == 1)
+		if(msg->automatic_door == 2 && msg->automatic_door != waypoint_param_.automatic_door)
+		{std::cout << "automatic_door : " << msg->automatic_door << std::endl;
+			//wpg_.automatic_door_ = 2;
+			//wpg_.automatic_door_taiki_ = true;
+			automaticDoorSet(2);
+		}
+		else if(msg->automatic_door == 1 && msg->automatic_door != waypoint_param_.automatic_door)
+		{std::cout << "automatic_door : " << msg->automatic_door << std::endl;
+			//wpg_.automatic_door_ = 2;
+			//wpg_.automatic_door_taiki_ = true;
+			automaticDoorSet(1);
+		}
+
+		if(msg->blinker == 1)
 		{
 			blinkerLeft();
 		}
-		else if(waypoint_param_.blinker == 2)
+		else if(msg->blinker == 2)
 		{
 			blinkerRight();
 		}
-		else if(waypoint_param_.blinker == 0)
+		else if(msg->blinker == 0)
 		{
 			blinkerStop();
 		}
+
+		waypoint_param_ = *msg;
 	}
 
 	void callbackPositionChecker(const autoware_msgs::PositionChecker::ConstPtr &msg)
@@ -811,15 +823,15 @@ public:
 			bufset_steer(buf);
 			bufset_drive(buf);
 
-			if(wpg_.automatic_door_ == 2 || wpg_.automatic_door_taiki_ == true)
+			/*if(wpg_.automatic_door_ == 2 && wpg_.automatic_door_taiki_ == true)
 			{
-				if(can_receive_502_.velocity_actual < 100)
+				//if(can_receive_502_.velocity_actual < 150)
 				{
-					automaticDoorSet(true);
+					automaticDoorSet(2);
 					wpg_.automatic_door_ = 0;
 					wpg_.automatic_door_taiki_ = false;
 				}
-			}
+			}*/
 			bufset_car_control(buf);
 			kc.write(0x100, (char*)buf, SEND_DATA_SIZE);
 		}

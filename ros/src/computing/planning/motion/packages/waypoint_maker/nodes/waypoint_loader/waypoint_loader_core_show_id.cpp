@@ -225,7 +225,7 @@ void WaypointLoaderNode::parseWaypointForVer3(const std::string& line, const std
   wp->waypoint_param.vgf_leafsize = (map.find("vgf_leafsize") != map.end()) ? std::stof(map["vgf_leafsize"]) : -1;
   wp->waypoint_param.vgf_measurement_range = (map.find("vgf_measurement_range") != map.end()) ? std::stof(map["vgf_measurement_range"]) : -1;
   wp->waypoint_param.curve_flag = (map.find("curve") != map.end()) ? std::stoi(map["curve"]) : 0;
-  wp->waypoint_param.automatic_door = (map.find("automatic door") != map.end()) ? std::stoi(map["automatic door"]) : 0;
+  wp->waypoint_param.automatic_door = (char)((map.find("automatic_door") != map.end()) ? std::stoi(map["automatic_door"]) : 0);
 }
 
 FileFormat WaypointLoaderNode::checkFileFormat(const char* filename)
