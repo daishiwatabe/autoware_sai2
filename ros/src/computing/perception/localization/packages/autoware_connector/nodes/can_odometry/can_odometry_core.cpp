@@ -112,4 +112,32 @@ void CanOdometryNode::callbackFromVehicleStatus(const autoware_msgs::VehicleStat
   publishOdometry(msg);
 }
 
+void CanOdometryNode::callbackFromVehicleStatus_microbus(const autoware_can_msgs::MicroBusCan502ConstPtr &msg)
+{
+	double vx = kmph2mps(msg->velocity_actual / (3.6 * 100));
+	double vth = v_info_.convertSteeringAngleToAngularVelocity(vx, msg->angle_actual);
+	odom_.updateOdometry(vx, vth, msg->header.stamp);
+
+	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(odom_.th);
+
+	// next, we'll publish the odometry message over ROS
+	nav_msgs::Odometry odom;
+	odom.header.stamp = msg->header.stamp;
+	odom.header.frame_id = "odom";
+
+	// set the position
+	odom.pose.pose.position.x = odom_.x;
+	odom.pose.pose.position.y = odom_.y;
+	odom.pose.pose.position.z = 0.0;
+	odom.pose.pose.orientation = odom_quat;
+
+	// set the velocity
+	odom.child_frame_id = "base_link";
+	odom.twist.twist.linear.x = vx;
+	odom.twist.twist.angular.z = vth;
+
+	// publish the message
+	pub1_.publish(odom);
+}
+
 }  // autoware_connector

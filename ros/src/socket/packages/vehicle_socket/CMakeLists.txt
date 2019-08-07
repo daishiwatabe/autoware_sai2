@@ -93,6 +93,15 @@ add_dependencies(kvaser_microbus_can_receiver
   ${catkin_EXPORTED_TARGETS}
   )
 
+add_executable(rs232_microbus_can_receiver
+	nodes/rs232_microbus_can_receiver/rs232_microbus_can_receiver.cpp)
+target_link_libraries(rs232_microbus_can_receiver
+  ${catkin_LIBRARIES}
+  canlib)
+add_dependencies(rs232_microbus_can_receiver
+  ${catkin_EXPORTED_TARGETS}
+  )
+
 add_executable(kvaser_prius_can_receiver
 	nodes/kvaser_prius_can_receiver/kvaser_prius_can_receiver.cpp)
 target_link_libraries(kvaser_prius_can_receiver
@@ -130,6 +139,7 @@ install(TARGETS vehicle_sender vehicle_receiver bus_socket
                 #kvaser_can_receiver kvaser_can_sender
                 kvaser_microbus_can_sender kvaser_microbus_can_receiver
                 kvaser_prius_can_receiver kvaser_prius_can_sender
+                rs232_microbus_can_receiver
                 canusbz_prius_can_receiver
         ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
         LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}

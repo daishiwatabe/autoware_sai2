@@ -27,6 +27,7 @@
 // User Defined Includes
 #include "autoware_can_msgs/CANInfo.h"
 #include "autoware_msgs/VehicleStatus.h"
+#include "autoware_can_msgs/MicroBusCan502.h"
 
 namespace autoware_connector
 {
@@ -140,6 +141,7 @@ private:
 
   // callbacks
   void callbackFromVehicleStatus(const autoware_msgs::VehicleStatusConstPtr &msg);
+  void callbackFromVehicleStatus_microbus(const autoware_can_msgs::MicroBusCan502ConstPtr &msg);
 
   // initializer
   void initForROS();
