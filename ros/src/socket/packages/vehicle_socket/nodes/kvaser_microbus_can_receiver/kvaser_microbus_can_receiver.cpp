@@ -10,6 +10,10 @@ private:
 	ros::NodeHandle nh_, private_nh_;
 	ros::Publisher pub_microbus_can_501_, pub_microbus_can_502_, pub_microbus_can_503_;
 
+	//liesse params
+	double wheelrad_to_steering_can_value_left = 20952.8189547718;
+	double wheelrad_to_steering_can_value_right = 20961.415734248;
+
 	KVASER_CAN kc;
 
 	struct
@@ -125,10 +129,10 @@ public:
 
 					unsigned char *vel_tmp = (unsigned char*)&can.velocity_actual;
 					vel_tmp[0] = data[7];  vel_tmp[1] = data[6];
-
+					can.velocity_mps = (double)can.velocity_actual / (100.0);
 					unsigned char *str_tmp = (unsigned char*)&can.angle_actual;
 					str_tmp[0] = data[5];  str_tmp[1] = data[4];
-
+					can.angle_deg = can.angle_actual * 0.05;
 					can.read_counter = kc.get_read_counter();
 
 					pub_microbus_can_502_.publish(can);

@@ -54,7 +54,7 @@ void CanOdometryNode::initForROS()
 
   // setup subscriber
   sub1_ = nh_.subscribe("vehicle_status", 10, &CanOdometryNode::callbackFromVehicleStatus, this);
-
+  sub_bus_ = nh_.subscribe("/microbus/can_receive502", 10, &CanOdometryNode::callbackFromVehicleStatus_microbus, this);
   // setup publisher
   pub1_ = nh_.advertise<nav_msgs::Odometry>("/vehicle/odom", 10);
 }
@@ -114,8 +114,8 @@ void CanOdometryNode::callbackFromVehicleStatus(const autoware_msgs::VehicleStat
 
 void CanOdometryNode::callbackFromVehicleStatus_microbus(const autoware_can_msgs::MicroBusCan502ConstPtr &msg)
 {
-	double vx = kmph2mps(msg->velocity_actual / (3.6 * 100));
-	double vth = v_info_.convertSteeringAngleToAngularVelocity(vx, msg->angle_actual);
+	double vx = kmph2mps(msg->velocity_mps);
+	double vth = v_info_.convertSteeringAngleToAngularVelocity(vx, msg->angle_deg);
 	odom_.updateOdometry(vx, vth, msg->header.stamp);
 
 	geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(odom_.th);

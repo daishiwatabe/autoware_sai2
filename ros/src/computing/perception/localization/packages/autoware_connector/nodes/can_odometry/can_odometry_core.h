@@ -134,6 +134,7 @@ private:
 
   // subscriber
   ros::Subscriber sub1_;
+  ros::Subscriber sub_bus_;
 
   // variables
   VehicleInfo v_info_;
