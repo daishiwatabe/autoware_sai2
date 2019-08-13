@@ -62,7 +62,8 @@ public:
 					can.emergency = (data[0] == 0x55);
 					unsigned char dmode0 = data[0] & 0x0F;
 					unsigned char dmode1 = data[1] & 0x0F;
-					switch(dmode1)
+					can.drive_auto = dmode1;
+					/*switch(dmode1)
 					{
 					case 0x0A:
 						can.drive_auto = true;
@@ -72,7 +73,7 @@ public:
 						break;
 					default:
 						can.drive_auto = false;
-					}
+					}*/
 					switch(dmode0)
 					{
 					case 0x0A:
@@ -84,7 +85,7 @@ public:
 					}
 					//can.drive_auto = (dmode == 0x0A);
 					unsigned char smode = data[1] & 0xF0;
-					can.steer_auto = (smode == 0xA0);
+					can.steer_auto = smode >> 4;
 
 					unsigned char *vel_tmp = (unsigned char*)&can.velocity;
 					vel_tmp[0] = data[5];  vel_tmp[1] = data[4];

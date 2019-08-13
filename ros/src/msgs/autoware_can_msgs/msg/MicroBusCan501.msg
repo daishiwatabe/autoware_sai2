@@ -11,10 +11,22 @@ int8 SHIFT_D = 11
 int8 SHIFT_2 = 12
 int8 SHIFT_L = 13
 
+uint8 STEER_V0 = 0
+uint8 STEER_AUTO = 10
+uint8 STEER_NOT_V0 = 4
+uint8 STEER_NOT_JOY_CENTER = 1
+uint8 STEER_NOT_BOARD_RES = 8
+
+uint8 DRIVE_V0 = 0
+uint8 DRIVE_AUTO = 10
+uint8 DRIVE_NOT_V0 = 4
+uint8 DRIVE_NOT_JOY_CENTER = 1
+uint8 DRIVE_NOT_BOARD_RES = 8
+
 Header header
 bool emergency
-bool steer_auto
-bool drive_auto
+uint8 steer_auto
+uint8 drive_auto
 int8 drive_mode
 int16 velocity
 int16 steering_angle

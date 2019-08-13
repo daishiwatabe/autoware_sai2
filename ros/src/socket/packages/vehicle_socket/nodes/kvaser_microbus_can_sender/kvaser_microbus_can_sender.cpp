@@ -147,7 +147,8 @@ private:
 	{
 		std::cout << "sub can" << std::endl;
 		can_receive_501_ = *msg;
-		if(can_receive_501_.drive_auto == false) drive_control_mode_ = MODE_STROKE;
+		if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
+			drive_control_mode_ = MODE_STROKE;
 	}
 
 	void callbackMicrobusCan502(const autoware_can_msgs::MicroBusCan502::ConstPtr &msg)
@@ -461,7 +462,7 @@ private:
 			}
 		}
 		else steer_val = input_steer_;
-		if(can_receive_501_.steer_auto == false) steer_val = 0;
+		if(can_receive_501_.steer_auto != autoware_can_msgs::MicroBusCan501::STEER_AUTO) steer_val = 0;
 
 		unsigned char *steer_pointer = (unsigned char*)&steer_val;
 		buf[2] = steer_pointer[1];  buf[3] = steer_pointer[0];
@@ -496,7 +497,8 @@ private:
 				}
 			}
 			else drive_val = input_drive_;
-			if(can_receive_501_.drive_auto == false) drive_val = 0;
+			if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
+				drive_val = 0;
 
 			unsigned char *drive_point = (unsigned char*)&drive_val;
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];
@@ -510,7 +512,8 @@ private:
 				unsigned char pedal_val = pedal_;
 			}
 			else pedal_val = input_drive_;
-			if(can_receive_501_.drive_auto == false) pedal_val = 0;
+			if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
+				pedal_val = 0;
 			unsigned char *pedal_point = (unsigned char*)&pedal_val;
 			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
 		}

@@ -84,8 +84,8 @@ BT_BLINKER_STOP = 309
 class ReceiveValue:
 	def __init__(self):
 		self.emergency = True
-		self.steer_on = False
-		self.drive_on = False
+		self.steer_on = 0
+		self.drive_on = 0
 		self.Dmode = MicroBusCan501.DRIVE_MODE_STROKE
 		self.velocity = 0
 		self.v_actual = 0
@@ -313,22 +313,17 @@ class Microbus_Can_Sender_GUI:
 			#self.tx_drive_auto.SetValue('NONE')
 			#self.tx_drive_mode.SetValue('NONE')
 			self.receive.emergency = True
-			self.receive.steer_on = False
-			self.receive.drive_on = False
+			self.receive.steer_on = 0
+			self.receive.drive_on = 0
 			self.receive.Dmode = MicroBusCan501.DRIVE_MODE_NONE
 		else:
 			#self.tx_emergency.SetValue('UNLOCK')
 			self.receive.emergency = False
-			if msg.steer_auto == True:
-				#self.tx_steer_auto.SetValue('AUTO')
-				self.receive.steer_on = True
-			else:
-				#self.tx_steer_auto.SetValue('MANUAL')
-				self.receive.steer_on = False
+			self.receive.steer_on = msg.steer_auto
 
-			if msg.drive_auto == True:
+			self.receive.drive_on = msg.drive_auto
+			if self.receive.drive_on == MicroBusCan501.DRIVE_AUTO:
 				#self.tx_drive_auto.SetValue('AUTO')
-				self.receive.drive_on = True
 
 				if msg.drive_mode == MicroBusCan501.DRIVE_MODE_STROKE:
 					#str_dmode = 'STROKE'
@@ -342,7 +337,6 @@ class Microbus_Can_Sender_GUI:
 				#self.tx_drive_mode.SetValue(str_dmode)
 			else:
 				#self.tx_drive_auto.SetValue('MANUAL')
-				self.receive.drive_on = False
 				#self.tx_drive_mode.SetValue('UNKNOWN')
 				self.receive.Dmode = MicroBusCan501.DRIVE_MODE_NONE
 
@@ -410,14 +404,38 @@ class Microbus_Can_Sender_GUI:
 				self.tx_emergency.SetValue('LOCK')
 			else:
 				self.tx_emergency.SetValue('UNLOCK')
-			if self.receive.steer_on == True:
+			if self.receive.steer_on == MicroBusCan501.STEER_AUTO:
 				self.tx_steer_auto.SetValue('AUTO')
-			else:
+			elif self.receive.steer_on == MicroBusCan501.STEER_V0:
 				self.tx_steer_auto.SetValue('MANUAL')
-			if self.receive.drive_on == True:
+			elif self.receive.steer_on == MicroBusCan501.STEER_NOT_V0:
+				self.tx_steer_auto.SetValue('NOT V0')
+			elif self.receive.steer_on == MicroBusCan501.STEER_NOT_JOY_CENTER:
+				self.tx_steer_auto.SetValue('NOT JOY_CENTER')
+			elif self.receive.steer_on == MicroBusCan501.STEER_NOT_BOARD_RES:
+				self.tx_steer_auto.SetValue('NOT BOARD_RES')
+			elif self.receive.steer_on == MicroBusCan501.STEER_NOT_V0 + MicroBusCan501.STEER_NOT_JOY_CENTER:
+				self.tx_steer_auto.SetValue('NOT V0+CENTER')
+			elif self.receive.steer_on == MicroBusCan501.STEER_NOT_V0 + MicroBusCan501.STEER_NOT_BOARD_RES:
+				self.tx_steer_auto.SetValue('NOT V0+BoradRes')
+			elif self.receive.steer_on == MicroBusCan501.STEER_NOT_JOY_CENTER + MicroBusCan501.STEER_NOT_BOARD_RES:
+				self.tx_steer_auto.SetValue('NOT CENTER+BoardRes')
+			if self.receive.drive_on == MicroBusCan501.DRIVE_AUTO:
 				self.tx_drive_auto.SetValue('AUTO')
-			else:
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_V0:
 				self.tx_drive_auto.SetValue('MANUAL')
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_NOT_V0:
+				self.tx_drive_auto.SetValue('NOT V0')
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_NOT_JOY_CENTER:
+				self.tx_drive_auto.SetValue('NOT JOY_CENTER')
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_NOT_BOARD_RES:
+				self.tx_drive_auto.SetValue('NOT BOARD_RES')
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_NOT_V0 + MicroBusCan501.DRIVE_NOT_JOY_CENTER:
+				self.tx_drive_auto.SetValue('NOT V0+CENTER')
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_NOT_V0 + MicroBusCan501.DRIVE_NOT_BOARD_RES:
+				self.tx_drive_auto.SetValue('NOT V0+BoradRes')
+			elif self.receive.drive_on == MicroBusCan501.DRIVE_NOT_JOY_CENTER + MicroBusCan501.DRIVE_NOT_BOARD_RES:
+				self.tx_drive_auto.SetValue('NOT CENTER+BoardRes')
  			if self.receive.Dmode == MicroBusCan501.DRIVE_MODE_STROKE:
 				self.tx_drive_mode.SetValue('STROKE')
 			elif self.receive.Dmode == MicroBusCan501.DRIVE_MODE_VELOCITY:
