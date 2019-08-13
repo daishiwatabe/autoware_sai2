@@ -69,6 +69,7 @@ struct VehicleInfo
   }
   double convertSteeringAngleToAngularVelocity(const double cur_vel_mps, const double cur_angle_deg)  // rad/s
   {
+	  std::cout << "tan : " << tan(deg2rad(getCurrentTireAngle(cur_angle_deg))) << "," << cur_angle_deg << std::endl;
     return is_stored ? tan(deg2rad(getCurrentTireAngle(cur_angle_deg))) * cur_vel_mps / wheel_base : 0;
   }
   double getCurrentTireAngle(const double angle_deg)  // steering [degree] -> tire [degree]

@@ -41,15 +41,15 @@ void CanOdometryNode::initForROS()
   else
   {
     private_nh_.getParam("/vehicle_info/wheel_base", v_info_.wheel_base);
-    // ROS_INFO_STREAM("wheel_base : " << wheel_base);
+	// ROS_INFO_STREAM("wheel_base : " << wheel_base);
 
     private_nh_.getParam("/vehicle_info/minimum_turning_radius", v_info_.minimum_turning_radius);
-    // ROS_INFO_STREAM("minimum_turning_radius : " << minimum_turning_radius);
+	// ROS_INFO_STREAM("minimum_turning_radius : " << minimum_turning_radius);
 
     private_nh_.getParam("/vehicle_info/maximum_steering_angle", v_info_.maximum_steering_angle);  //[degree]:
-    // ROS_INFO_STREAM("maximum_steering_angle : " << maximum_steering_angle);
+	// ROS_INFO_STREAM("maximum_steering_angle : " << maximum_steering_angle);
 
-    v_info_.is_stored = true;
+	v_info_.is_stored = true;
   }
 
   // setup subscriber

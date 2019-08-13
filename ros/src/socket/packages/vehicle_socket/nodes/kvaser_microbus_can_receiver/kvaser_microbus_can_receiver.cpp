@@ -11,8 +11,12 @@ private:
 	ros::Publisher pub_microbus_can_501_, pub_microbus_can_502_, pub_microbus_can_503_;
 
 	//liesse params
+	double handle_angle_right_max = 730;
+	double handle_angle_left_max = 765;
 	double wheelrad_to_steering_can_value_left = 20952.8189547718;
 	double wheelrad_to_steering_can_value_right = 20961.415734248;
+	double angle_magn_right = handle_angle_right_max / 15000;
+	double angle_magn_left = handle_angle_left_max / 15000;
 
 	KVASER_CAN kc;
 
@@ -21,6 +25,9 @@ private:
 		bool read501, read502;
 	} read_id_flag_;
 
+	std::vector<short> velocity_list;
+	std::vector<short> angle_list;
+	const int list_pushback_size = 5;
 public:
 	kvaser_can_receiver(ros::NodeHandle nh, ros::NodeHandle p_nh, int kvaser_channel)
 	    : nh_(nh)
@@ -129,10 +136,17 @@ public:
 
 					unsigned char *vel_tmp = (unsigned char*)&can.velocity_actual;
 					vel_tmp[0] = data[7];  vel_tmp[1] = data[6];
+					velocity_list.push_back(can.velocity_actual);
+					if(velocity_list.size() > list_pushback_size) velocity_list.resize(list_pushback_size);
 					can.velocity_mps = (double)can.velocity_actual / (100.0);
+
 					unsigned char *str_tmp = (unsigned char*)&can.angle_actual;
 					str_tmp[0] = data[5];  str_tmp[1] = data[4];
-					can.angle_deg = can.angle_actual * 0.05;
+					angle_list.push_back(can.angle_actual);
+					if(angle_list.size() == list_pushback_size) angle_list.resize(list_pushback_size);
+					if(can.velocity_actual >= 0) can.angle_deg = can.angle_actual * angle_magn_left;
+					else can.angle_deg = can.angle_actual * angle_magn_right;
+
 					can.read_counter = kc.get_read_counter();
 
 					pub_microbus_can_502_.publish(can);

@@ -47,8 +47,8 @@ private:
 	const unsigned int STEER_VALUE_MARGIN = 20;
 
 	//vanet params
-	double handle_angle_right_max = 660;
-	double handle_angle_left_max = 670;
+	//double handle_angle_right_max = 660;
+	//double handle_angle_left_max = 670;
 	double left_wheel_angle_right_max = 33;
 	double right_wheel_angle_right_max = 38;
 	double left_wheel_angle_left_max = 39.5;
@@ -58,8 +58,12 @@ private:
 	double handle_offset = 188;
 
 	//liesse params
+	double handle_angle_right_max = 730;
+	double handle_angle_left_max = 765;
 	double wheelrad_to_steering_can_value_left = 20952.8189547718;
 	double wheelrad_to_steering_can_value_right = 20961.415734248;
+	double angle_magn_right = wheelrad_to_steering_can_value_right / handle_angle_right_max;
+	double angle_magn_left = wheelrad_to_steering_can_value_left / handle_angle_left_max;
 
 	//mode params
 	const unsigned char MODE_STROKE   = 0x0A;
