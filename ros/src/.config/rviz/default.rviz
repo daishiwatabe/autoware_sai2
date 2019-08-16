@@ -13,6 +13,7 @@ Panels:
         - /Global Path1/Namespaces1
         - /Local Rollouts1/Namespaces1
         - /GlobalPathAnimation1/Status1
+        - /Plotter2D1
       Splitter Ratio: 0.695804
     Tree Height: 856
   - Class: rviz/Selection
@@ -174,7 +175,6 @@ Visualization Manager:
       Unreliable: false
       Value: false
       Visibility:
-        "": true
         A* Sim Obstacle: true
         Behavior State: true
         Control Pose: true
@@ -197,6 +197,7 @@ Visualization Manager:
         OverlayImage: true
         OverlayText: true
         PP Trajectory Mark: true
+        Plotter2D: true
         Points Cluster: true
         Points Map: true
         Points Raw: true
@@ -217,8 +218,8 @@ Visualization Manager:
     - Alpha: 0.300000012
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 81.9839401
-        Min Value: 60.4408188
+        Max Value: 25.304266
+        Min Value: -7.50161982
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -685,7 +686,7 @@ Visualization Manager:
       Enabled: true
       Name: Plotter2D
       Show Value: true
-      Topic: /ndt_reliability
+      Topic: /time_ndt_matching
       Value: true
       auto color change: false
       auto scale: true
@@ -729,7 +730,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -1.6500001
+      Angle: 1.52999973
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
@@ -739,8 +740,8 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 11.540741
-      Target Frame: gps
+      Scale: 5.99695349
+      Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
       X: 0
       Y: 0

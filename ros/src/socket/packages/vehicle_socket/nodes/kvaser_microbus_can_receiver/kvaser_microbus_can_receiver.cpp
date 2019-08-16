@@ -62,7 +62,7 @@ public:
 					can.emergency = (data[0] == 0x55);
 					unsigned char dmode0 = data[0] & 0x0F;
 					unsigned char dmode1 = data[1] & 0x0F;
-					can.drive_auto = dmode1;
+					//can.drive_auto = (dmode1==0x10 || dmode1==0x11) ? 0xA : 0;
 					/*switch(dmode1)
 					{
 					case 0x0A:
@@ -74,13 +74,19 @@ public:
 					default:
 						can.drive_auto = false;
 					}*/
-					switch(dmode0)
+					switch(dmode1)
 					{
 					case 0x0A:
+						can.drive_auto = 0xA;
 						can.drive_mode = autoware_can_msgs::MicroBusCan501::DRIVE_MODE_STROKE;
 						break;
 					case 0x0B:
+						can.drive_auto = 0xA;
 						can.drive_mode = autoware_can_msgs::MicroBusCan501::DRIVE_MODE_VELOCITY;
+						break;
+					default:
+						can.drive_auto = 0;
+						can.drive_mode = 0;
 						break;
 					}
 					//can.drive_auto = (dmode == 0x0A);
@@ -148,6 +154,9 @@ public:
 					if(can.velocity_actual >= 0) can.angle_deg = can.angle_actual * angle_magn_left;
 					else can.angle_deg = can.angle_actual * angle_magn_right;
 
+					unsigned char status0 = data[0],  status1 = data[1];
+					can.clutch = (status1 & 0x40) ? false : true;
+
 					can.read_counter = kc.get_read_counter();
 
 					pub_microbus_can_502_.publish(can);
@@ -169,6 +178,11 @@ public:
 
 					unsigned char *engine_rotation_tmp = (unsigned char*)&can.engine_rotation;
 					engine_rotation_tmp[0] = data[7];  engine_rotation_tmp[1] = data[6];
+
+					unsigned char status0 = data[0],  status1 = data[1];
+					can.clutch = (status1 & 0x40) ? false : true;
+
+					can.read_counter = kc.get_read_counter();
 
 					pub_microbus_can_503_.publish(can);
 				    read_id_flag_.read501 = read_id_flag_.read502 = false;

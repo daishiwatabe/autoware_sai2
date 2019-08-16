@@ -7,6 +7,7 @@
 #include <geometry_msgs/TwistStamped.h>
 #include <autoware_can_msgs/MicroBusCan501.h>
 #include <autoware_can_msgs/MicroBusCan502.h>
+#include <autoware_can_msgs/MicroBusCan503.h>
 #include <autoware_can_msgs/MicroBusCanSenderStatus.h>
 #include <autoware_config_msgs/ConfigMicroBusCan.h>
 #include <autoware_msgs/WaypointParam.h>
@@ -84,7 +85,7 @@ private:
 
 	ros::NodeHandle nh_, private_nh_;
 	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_;
-	ros::Subscriber sub_microbus_can_501_, sub_microbus_can_502_;
+	ros::Subscriber sub_microbus_can_501_, sub_microbus_can_502_, sub_microbus_can_503_;
 	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
@@ -101,6 +102,7 @@ private:
 	unsigned char drive_control_mode_;
 	autoware_can_msgs::MicroBusCan501 can_receive_501_;
 	autoware_can_msgs::MicroBusCan502 can_receive_502_;
+	autoware_can_msgs::MicroBusCan503 can_receive_503_;
 	geometry_msgs::TwistStamped twist_;
 	short input_steer_, input_drive_;
 	short pedal_;
@@ -145,16 +147,42 @@ private:
 
 	void callbackMicrobusCan501(const autoware_can_msgs::MicroBusCan501::ConstPtr &msg)
 	{
-		std::cout << "sub can" << std::endl;
+		std::cout << "sub can_501" << std::endl;
 		can_receive_501_ = *msg;
-		if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
-			drive_control_mode_ = MODE_STROKE;
+		//if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
+		//	drive_control_mode_ = MODE_STROKE;
 	}
 
 	void callbackMicrobusCan502(const autoware_can_msgs::MicroBusCan502::ConstPtr &msg)
 	{
-		std::cout << "sub can" << std::endl;
+		std::cout << "sub can_502" << std::endl;
+		if(msg->clutch==true && can_receive_502_.clutch==false)
+		{
+			input_steer_mode_ = false; std::cout << "aaa" << std::endl;
+			publisStatus();
+		}
+		if(msg->clutch==false && can_receive_502_.clutch==true)
+		{
+			input_steer_mode_ = true;
+			publisStatus();
+		}
 		can_receive_502_ = *msg;
+	}
+
+	void callbackMicrobusCan503(const autoware_can_msgs::MicroBusCan503::ConstPtr &msg)
+	{
+		std::cout << "sub can_503" << std::endl;
+		if(msg->clutch==true && can_receive_503_.clutch==false)
+		{
+			input_drive_mode_ = false;
+			publisStatus();
+		}
+		if(msg->clutch==false && can_receive_503_.clutch==true)
+		{
+			input_drive_mode_ = true;
+			publisStatus();
+		}
+		can_receive_503_ = *msg;
 	}
 
 	void callbackStrokeMode(const std_msgs::Empty::ConstPtr &msg)
@@ -774,7 +802,7 @@ public:
 		canStatus res = kc.init(kvaser_channel, canBITRATE_500K);
 		if(res != canStatus::canOK) {std::cout << "open error" << std::endl;}
 
-		setting_.use_position_checker == true;
+		setting_.use_position_checker = true;
 
 		pub_microbus_can_sender_status_ = nh_.advertise<autoware_can_msgs::MicroBusCanSenderStatus>("/microbus/can_sender_status", 10, true);
 
@@ -783,6 +811,7 @@ public:
 		sub_twist_cmd_ = nh_.subscribe("/twist_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
 		sub_microbus_can_501_ = nh_.subscribe("/microbus/can_receive501", 10, &kvaser_can_sender::callbackMicrobusCan501, this);
 		sub_microbus_can_502_ = nh_.subscribe("/microbus/can_receive502", 10, &kvaser_can_sender::callbackMicrobusCan502, this);
+		sub_microbus_can_503_ = nh_.subscribe("/microbus/can_receive503", 10, &kvaser_can_sender::callbackMicrobusCan503, this);
 		sub_emergency_reset_ = nh_.subscribe("/microbus/emergency_reset", 10, &kvaser_can_sender::callbackEmergencyReset, this);
 		sub_input_steer_flag_ = nh_.subscribe("/microbus/input_steer_flag", 10, &kvaser_can_sender::callbackInputSteerFlag, this);
 		sub_input_steer_value_ = nh_.subscribe("/microbus/input_steer_value", 10, &kvaser_can_sender::callbackInputSteerValue, this);
