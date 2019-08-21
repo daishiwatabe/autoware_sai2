@@ -226,6 +226,45 @@ void WaypointLoaderNode::parseWaypointForVer3(const std::string& line, const std
   wp->waypoint_param.vgf_measurement_range = (map.find("vgf_measurement_range") != map.end()) ? std::stof(map["vgf_measurement_range"]) : -1;
   wp->waypoint_param.curve_flag = (map.find("curve") != map.end()) ? std::stoi(map["curve"]) : 0;
   wp->waypoint_param.automatic_door = (char)((map.find("automatic_door") != map.end()) ? std::stoi(map["automatic_door"]) : 0);
+
+  for(int cou=1; cou<=3; cou++)
+  {
+	  int count = 0;
+	  std::stringstream ss;
+
+
+	  autoware_msgs::ExtractedPosition ep;
+	  ss << "signal_ID" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.signalId=std::stoi(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_u" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.u=std::stoi(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_v" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.v=std::stoi(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_radius" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.radius=std::stoi(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_x" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.x=std::stof(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_y" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.y=std::stof(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_z" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.z=std::stof(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_hang" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.hang=std::stof(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_type" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.type=std::stoi(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_linkID" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.linkId=std::stoi(map[ss.str()]); count++;}
+	  ss.str(""); ss << "signal_plID" << cou;
+	  if(map.find(ss.str()) != map.end()) {ep.plId=std::stoi(map[ss.str()]); count++;}
+	  std::cout << "count : " << count << std::endl;
+	  if(count != 11)
+	  {
+		  wp->signals.clear();
+		  break;
+	  }
+
+	  wp->signals.push_back(ep);
+  }
 }
 
 FileFormat WaypointLoaderNode::checkFileFormat(const char* filename)

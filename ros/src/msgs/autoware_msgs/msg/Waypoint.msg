@@ -26,3 +26,5 @@ float32 time_cost
 uint32 direction
 
 WaypointParam waypoint_param
+
+ExtractedPosition[] signals
