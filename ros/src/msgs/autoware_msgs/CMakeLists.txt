@@ -77,6 +77,7 @@ add_message_files(
             PositionChecker.msg
             WaypointParam.msg
             Format7Info.msg
+            LinearArray.msg
 )
 
 ## Generate added messages and services with any dependencies listed here

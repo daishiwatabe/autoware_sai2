@@ -29,6 +29,7 @@
 #include <unordered_map>
 
 #include "autoware_msgs/LaneArray.h"
+#include "autoware_msgs/LinearArray.h"
 
 namespace waypoint_maker
 {
@@ -67,13 +68,15 @@ private:
   ros::NodeHandle private_nh_;
 
   // publisher & subscriber
-  ros::Publisher lane_pub_;
+  ros::Publisher lane_pub_, stop_line_pub_;
   ros::Subscriber config_sub_;
 
   // variables
   std::string multi_lane_csv_;
   std::vector<std::string> multi_file_path_;
   autoware_msgs::LaneArray output_lane_array_;
+
+  autoware_msgs::LinearArray stop_line_points_;
 
   // initializer
   void initPubSub();

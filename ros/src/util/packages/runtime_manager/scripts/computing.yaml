@@ -489,6 +489,10 @@ subs :
         desc : lane_rule desc sample
         cmd  : rosrun lane_planner lane_rule
         param: lane_rule
+      - name : lane_rule_waypoint
+        desc : lane_rule_waypoint desc sample
+        cmd  : rosrun lane_planner lane_rule_waypoint
+        param: lane_rule
       - name : lane_stop
         desc : lane_stop desc sample
         cmd  : rosrun lane_planner lane_stop

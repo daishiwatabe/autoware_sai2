@@ -34,15 +34,20 @@ void WaypointLoaderNode::initPubSub()
   private_nh_.param<std::string>("multi_lane_csv", multi_lane_csv_, "/tmp/driving_lane.csv");
   // setup publisher
   lane_pub_ = nh_.advertise<autoware_msgs::LaneArray>("/based/lane_waypoints_raw", 10, true);
+  stop_line_pub_ = nh_.advertise<autoware_msgs::LinearArray>("/stop_line_points", 10, true);
 }
 
 void WaypointLoaderNode::run()
 {
+  stop_line_points_.linears.clear();
   multi_file_path_.clear();
+  stop_line_points_.header.stamp = ros::Time::now();
+  stop_line_points_.header.frame_id = "map";
   parseColumns(multi_lane_csv_, &multi_file_path_);
   autoware_msgs::LaneArray lane_array;
   createLaneArray(multi_file_path_, &lane_array);
   lane_pub_.publish(lane_array);
+  if(stop_line_points_.linears.size() != 0) stop_line_pub_.publish(stop_line_points_);
   output_lane_array_ = lane_array;
   ros::spin();
 }
@@ -226,6 +231,15 @@ void WaypointLoaderNode::parseWaypointForVer3(const std::string& line, const std
   wp->waypoint_param.vgf_measurement_range = (map.find("vgf_measurement_range") != map.end()) ? std::stof(map["vgf_measurement_range"]) : -1;
   wp->waypoint_param.curve_flag = (map.find("curve") != map.end()) ? std::stoi(map["curve"]) : 0;
   wp->waypoint_param.automatic_door = (char)((map.find("automatic_door") != map.end()) ? std::stoi(map["automatic_door"]) : 0);
+  wp->waypoint_param.stop_line = (char)((map.find("stop_line") != map.end()) ? std::stoi(map["stop_line"]) : 0);
+  if(wp->waypoint_param.stop_line != 0)
+  {
+	geometry_msgs::Vector3 stop_line;
+	stop_line.x = wp->pose.pose.position.x;
+	stop_line.y = wp->pose.pose.position.y;
+	stop_line.z = wp->pose.pose.position.z;
+	stop_line_points_.linears.push_back(stop_line);
+  }
 
   for(int cou=1; cou<=3; cou++)
   {
