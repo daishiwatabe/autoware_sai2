@@ -419,8 +419,10 @@ int main(int argc, char *argv[])
 	/* wait until loading all vector map is completed */
 	ros::Rate wait_rate(100);
 	std::cout << "Loading Vector Map. Please wait";
-	while (vmap.points.empty() || vmap.lines.empty() || vmap.whitelines.empty() ||
-	       vmap.lanes.empty() || vmap.dtlanes.empty() || vmap.vectors.empty() || vmap.signals.empty())
+	//while (vmap.points.empty() || vmap.lines.empty() || vmap.whitelines.empty() ||
+	//       vmap.lanes.empty() || vmap.dtlanes.empty() || vmap.vectors.empty() || vmap.signals.empty())
+	while (vmap.points.empty() || vmap.lines.empty() ||
+	           vmap.vectors.empty() || vmap.signals.empty())
 	{
 		ros::spinOnce();
 		std::cout << ".";

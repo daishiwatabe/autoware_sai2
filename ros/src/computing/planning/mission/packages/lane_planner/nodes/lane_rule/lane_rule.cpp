@@ -195,20 +195,21 @@ autoware_msgs::Lane apply_stopline_acceleration(const autoware_msgs::Lane& lane,
 std::vector<vector_map::Point> create_stop_points(const lane_planner::vmap::VectorMap& vmap)
 {
   std::vector<vector_map::Point> stop_points;
+  std::cout << vmap.stoplines.size() << std::endl;
   for (const vector_map::StopLine& s : vmap.stoplines)
   {
-    for (const vector_map::Lane& l : vmap.lanes)
+	for (const vector_map::Lane& l : vmap.lanes)
     {
       if (l.lnid != s.linkid)
         continue;
       for (const vector_map::Node& n : vmap.nodes)
       {
         if (n.nid != l.bnid)
-          continue;
+			continue;
         for (const vector_map::Point& p : vmap.points)
         {
-          if (p.pid != n.pid)
-            continue;
+			if (p.pid != n.pid)
+			continue;
           bool hit = false;
           for (const vector_map::Point& sp : stop_points)
           {
@@ -221,8 +222,8 @@ std::vector<vector_map::Point> create_stop_points(const lane_planner::vmap::Vect
           if (!hit)
             stop_points.push_back(p);
         }
-      }
-    }
+	  }
+	}
   }
 
   return stop_points;
@@ -237,7 +238,7 @@ std::vector<size_t> create_stop_indexes(const lane_planner::vmap::VectorMap& vma
     size_t index = SIZE_MAX;
     double distance = DBL_MAX;
     for (size_t i = 0; i < lane.waypoints.size(); ++i)
-    {
+	{
       vector_map::Point point = lane_planner::vmap::create_vector_map_point(lane.waypoints[i].pose.pose.position);
       double d = hypot(p.bx - point.bx, p.ly - point.ly);
       if (d <= distance)
@@ -285,6 +286,7 @@ autoware_msgs::Lane apply_stopline_acceleration(const autoware_msgs::Lane& lane,
 
 bool is_fine_vmap(const lane_planner::vmap::VectorMap& fine_vmap, const autoware_msgs::Lane& lane)
 {
+
   if (fine_vmap.points.size() != lane.waypoints.size())
     return false;
 
@@ -386,8 +388,9 @@ void create_waypoint(const autoware_msgs::LaneArray& msg)
   cached_waypoint.id = msg.id;
   for (const autoware_msgs::Lane& l : msg.lanes)
     cached_waypoint.lanes.push_back(create_new_lane(l, header));
-  if (all_vmap.points.empty() || all_vmap.lanes.empty() || all_vmap.nodes.empty() || all_vmap.stoplines.empty() ||
-      all_vmap.dtlanes.empty())
+  //if (all_vmap.points.empty() || all_vmap.lanes.empty() || all_vmap.nodes.empty() || all_vmap.stoplines.empty() ||
+  //    all_vmap.dtlanes.empty())
+  if (all_vmap.points.empty() || all_vmap.stoplines.empty())
   {
     traffic_pub.publish(cached_waypoint);
     return;
@@ -415,7 +418,7 @@ void create_waypoint(const autoware_msgs::LaneArray& msg)
     lane_planner::vmap::VectorMap fine_vmap = lane_planner::vmap::create_fine_vmap(
         lane_vmap, lane_planner::vmap::LNO_ALL, coarse_vmap, search_radius, waypoint_max);
     if (fine_vmap.points.size() < 2 || !is_fine_vmap(fine_vmap, lane))
-    {
+	{
       traffic_waypoint.lanes.push_back(lane);
       green_waypoint.lanes.push_back(lane);
       lane = apply_stopline_acceleration(lane, config_acceleration, config_stopline_search_radius,
@@ -481,9 +484,10 @@ void create_waypoint(const autoware_msgs::LaneArray& msg)
 
 void update_values()
 {
-  if (all_vmap.points.empty() || all_vmap.lanes.empty() || all_vmap.nodes.empty() || all_vmap.stoplines.empty() ||
-      all_vmap.dtlanes.empty())
-    return;
+  //if (all_vmap.points.empty() || all_vmap.lanes.empty() || all_vmap.nodes.empty() || all_vmap.stoplines.empty() ||
+  //    all_vmap.dtlanes.empty())
+	if (all_vmap.points.empty() || all_vmap.lanes.empty() || all_vmap.stoplines.empty())
+	return;
 
   lane_vmap = lane_planner::vmap::create_lane_vmap(all_vmap, lane_planner::vmap::LNO_ALL);
 

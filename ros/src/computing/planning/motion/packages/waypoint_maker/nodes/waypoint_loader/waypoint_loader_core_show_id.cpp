@@ -256,7 +256,7 @@ void WaypointLoaderNode::parseWaypointForVer3(const std::string& line, const std
 	  if(map.find(ss.str()) != map.end()) {ep.linkId=std::stoi(map[ss.str()]); count++;}
 	  ss.str(""); ss << "signal_plID" << cou;
 	  if(map.find(ss.str()) != map.end()) {ep.plId=std::stoi(map[ss.str()]); count++;}
-	  std::cout << "count : " << count << std::endl;
+	  //std::cout << "count : " << count << std::endl;
 	  if(count != 11)
 	  {
 		  wp->signals.clear();

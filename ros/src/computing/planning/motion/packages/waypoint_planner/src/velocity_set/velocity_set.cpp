@@ -266,7 +266,7 @@ int detectStopObstacle(const pcl::PointCloud<pcl::PointXYZ>& points,
         lane.waypoints.at(i).gid == wpidx_detection_result_by_other_nodes)
     {
 		stop_obstacle_waypoint = i;
-      *obstacle_type = EObstacleType::STOPLINE;
+		*obstacle_type = EObstacleType::STOPLINE;
       obstacle_points->setStopPoint(lane.waypoints.at(i).pose.pose.position); // for vizuialization
       break;
     }
@@ -500,7 +500,7 @@ EControl obstacleDetection(int closest_waypoint, const autoware_msgs::Lane& lane
     displayObstacle(detection_result, obstacle_points, obstacle_pub);
     prev_detection = detection_result;
     false_count = 0;
-    prev_obstacle_waypoint = *obstacle_waypoint;
+	prev_obstacle_waypoint = *obstacle_waypoint;
     return detection_result;
   }
 
@@ -512,7 +512,7 @@ EControl obstacleDetection(int closest_waypoint, const autoware_msgs::Lane& lane
     if (false_count < LOOP_RATE / 2)
     {
       *obstacle_waypoint = prev_obstacle_waypoint;
-      displayObstacle(EControl::OTHERS, obstacle_points, obstacle_pub);
+		displayObstacle(EControl::OTHERS, obstacle_points, obstacle_pub);
       return prev_detection;
     }
   }

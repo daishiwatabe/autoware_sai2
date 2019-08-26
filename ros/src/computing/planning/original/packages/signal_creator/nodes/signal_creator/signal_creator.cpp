@@ -252,105 +252,100 @@ public:
 
     void save(std::string directory)
     {
-        std::string signal_path = directory + "/signaldata.csv";
-        std::string vector_path = directory + "/vector.csv";
-        std::string point_path  = directory + "/point.csv";
-        std::ofstream ofs_signal(signal_path), ofs_vector(vector_path),ofs_point(point_path);
+		std::string signal_path = "signaldata.csv";
+		std::string vector_path = "vector.csv";
+		std::string point_path  = "point.csv";
+		//std::ofstream ofs_signal, ofs_vector, ofs_point;
+		//ofs_signal.clear(); ofs_vector.clear(); ofs_point.clear();
 
-        ofs_signal << "ID,VID,PLID,Type,LinkID";
-        ofs_vector << "VID,PID,Hang,Vang";
-        ofs_point  << "PID,B,L,H,Bx,Ly,Ref,MCODE1,MCODE2,MCODE3";
+		try
+		{
+			/*ofs_signal.exceptions(std::ios::badbit | std::ios::eofbit | std::ios::failbit);
+			ofs_vector.exceptions(std::ios::badbit | std::ios::eofbit | std::ios::failbit);
+			ofs_point.exceptions(std::ios::badbit | std::ios::eofbit | std::ios::failbit);
+			ofs_signal.open(signal_path.c_str());
+			ofs_vector.open(vector_path.c_str());
+			ofs_point.open(point_path.c_str());*/
 
-        tf::Transform parent_tf;
-        for(int cou=0; cou<tf_coordinate_.size(); cou++)
-        {
-            TF_COORDINATE tf_coord = tf_coordinate_[cou];
+			/*ofs_signal << "ID,VID,PLID,Type,LinkID";
+			ofs_vector << "VID,PID,Hang,Vang";
+			ofs_point  << "PID,B,L,H,Bx,Ly,Ref,MCODE1,MCODE2,MCODE3";*/
+			std::cout << "ID,VID,PLID,Type,LinkID" << std::endl;
+			std::cout << "VID,PID,Hang,Vang" << std::endl;
+			std::cout << "PID,B,L,H,Bx,Ly,Ref,MCODE1,MCODE2,MCODE3" << std::endl;
 
-            //signal
-            ofs_signal << "\n" << cou+1; //ID
-            ofs_signal << "," << cou+1; //VID
-            ofs_signal << ",0"; //PLID
-            ofs_signal << "," << tf_coord.signal_type; //Type
-            ofs_signal << ",0"; //LinkID
+			tf::Transform parent_tf;
+			for(int cou=0; cou<tf_coordinate_.size(); cou++)
+			{
+				TF_COORDINATE tf_coord = tf_coordinate_[cou];
 
-            //vector
-            double yaw, roll, pitch;
-            tf::Vector3 origin;
-            if(cou == 0)
-            {
-                parent_tf = tf_coord.coord;
-                origin = tf_coord.coord.getOrigin();
-                tf::Quaternion qua = tf_coord.coord.getRotation();
-                tf::Matrix3x3 qua_mat(qua);
-                qua_mat.getRPY(roll, pitch, yaw);
-                ofs_vector << "\n" << cou+1; //VID
-                ofs_vector << "," << cou+1; //PID
-                ofs_vector << "," << (-yaw)*180/M_PI; //Hang
-                ofs_vector << "," << roll*180/M_PI+90; //Vang
-            }
-            else
-            {
-                try
-                {
-                    tf::Transform pose = parent_tf * tf_coord.coord;
-                    origin = pose.getOrigin();
-                    tf::Quaternion qua = pose.getRotation();
-                    tf::Matrix3x3 qua_mat(qua);
-                    qua_mat.getRPY(roll, pitch, yaw);
-                    ofs_vector << "\n" << cou+1; //VID
-                    ofs_vector << "," << cou+1; //PID
-                    ofs_vector << "," << std::setprecision(10) << (-yaw)*180/M_PI; //Hang
-                    ofs_vector << "," << std::setprecision(10) << roll*180/M_PI+90; //Vang
-                }
-                catch(tf::TransformException ex){
-                    std::cerr << "transform error" << std::endl;
-                }
-            }
+				//signal
+				/*ofs_signal << "\n" << cou+1; //ID
+				ofs_signal << "," << cou+1; //VID
+				ofs_signal << ",0"; //PLID
+				ofs_signal << "," << tf_coord.signal_type; //Type
+				ofs_signal << ",0"; //LinkID*/
+				std::cout << "signal output" << std::endl;
+				std::cout << cou+1 << "," << cou+1 << ",0," << tf_coord.signal_type << ",0" << std::endl;
+
+				//vector
+				double yaw, roll, pitch;
+				tf::Vector3 origin;
+				if(cou == 0)
+				{
+					parent_tf = tf_coord.coord;
+					origin = tf_coord.coord.getOrigin();
+					tf::Quaternion qua = tf_coord.coord.getRotation();
+					tf::Matrix3x3 qua_mat(qua);
+					qua_mat.getRPY(roll, pitch, yaw);
+					/*ofs_vector << "\n" << cou+1; //VID
+					ofs_vector << "," << cou+1; //PID
+					ofs_vector << "," << (-yaw)*180/M_PI; //Hang
+					ofs_vector << "," << roll*180/M_PI+90; //Vang*/
+					std::cout << "vector output" << std::endl;
+					std::cout << cou+1 << "," << cou+1 << "," << (-yaw)*180/M_PI << "," << roll*180/M_PI+90 << std::endl;
+				}
+				else
+				{
+					try
+					{
+						tf::Transform pose = parent_tf * tf_coord.coord;
+						origin = pose.getOrigin();
+						tf::Quaternion qua = pose.getRotation();
+						tf::Matrix3x3 qua_mat(qua);
+						qua_mat.getRPY(roll, pitch, yaw);
+						/*ofs_vector << "\n" << cou+1; //VID
+						ofs_vector << "," << cou+1; //PID
+						ofs_vector << "," << std::setprecision(10) << (-yaw)*180/M_PI; //Hang
+						ofs_vector << "," << std::setprecision(10) << roll*180/M_PI+90; //Vang*/
+						std::cout << "vector output" << std::endl;
+						std::cout << cou+1 << "," << cou+1 << "," << (-yaw)*180/M_PI << "," << roll*180/M_PI+90 << std::endl;
+					}
+					catch(tf::TransformException ex){
+						std::cerr << "transform error" << std::endl;
+					}
+				}
 
 
-            //point
-            ofs_point << "\n" << cou+1; //PID
-            ofs_point << ",0"; // B
-            ofs_point << ",0"; // L
-            ofs_point << "," << std::setprecision(10) << origin.getZ(); //H
-            ofs_point << "," << std::setprecision(10) << origin.getY(); //Bx
-            ofs_point << "," << std::setprecision(10) << origin.getX(); //Ly
-            ofs_point << ",0,0,0,0";
-        }
+				//point
+				/*ofs_point << "\n" << cou+1; //PID
+				ofs_point << ",0"; // B
+				ofs_point << ",0"; // L
+				ofs_point << "," << std::setprecision(10) << origin.getZ(); //H
+				ofs_point << "," << std::setprecision(10) << origin.getY(); //Bx
+				ofs_point << "," << std::setprecision(10) << origin.getX(); //Ly
+				ofs_point << ",0,0,0,0";*/
+				std::cout << "point output" << std::endl;
+				std::cout << cou+1 << ",0,0," << std::setprecision(10) << origin.getZ() << "," << std::setprecision(10) << origin.getY() << "," << std::setprecision(10) << origin.getX() << ",0,0,0,0" << std::endl;
+			}
 
-        /*int type[] = {1,3,2};
-        tf::Vector3 origin = tf_coordinate_.getOrigin();
-        tf::Quaternion qua = tf_coordinate_.getRotation();
-        tf::Matrix3x3 qua_mat(qua);
-        double yaw, roll, pitch;
-        qua_mat.getRPY(roll, pitch, yaw);
-        double interval = 0.3;
-        for(int id_cou=0; id_cou<3; id_cou++)
-        {
-            //signal
-            ofs_signal << "\n" << id_cou+1; //ID
-            ofs_signal << "," << id_cou+1; //VID
-            ofs_signal << ",0"; //PLID
-            ofs_signal << "," << type[id_cou]; //Type
-            ofs_signal << ",0"; //LinkID
+			//ofs_signal.close();  ofs_vector.close();  ofs_vector.close();
 
-            //vector
-            ofs_vector << "\n" << id_cou+1; //VID
-            ofs_vector << "," << id_cou+1; //PID
-            ofs_vector << "," << (-yaw)*180/M_PI; //Hang
-            ofs_vector << "," << roll*180/M_PI+90; //Vang
-
-            //point
-            ofs_point << "\n" << id_cou+1; //PID
-            ofs_point << ",0"; // B
-            ofs_point << ",0"; // L
-            ofs_point << "," << origin.getZ(); //H
-            ofs_point << "," << origin.getY(); //Bx
-            ofs_point << "," << origin.getX()+(id_cou-1)*0.3; //Ly
-            ofs_point << ",0,0,0,0";
-        }*/
-
-        ofs_signal.close();  ofs_vector.close();  ofs_vector.close();
+		}
+		catch(std::exception &e)
+		{
+			std::cerr << "error : " << e.what() << " : " << errno << std::endl;
+		}
     }
 };
 
@@ -394,7 +389,7 @@ int main(int argc, char** argv)
 
     std::string save_directory;
     private_nh.param<std::string>("save_directory", save_directory, ".");
-
+	std::cout << "save directory : " << save_directory << std::endl;
     print_description();
 
     SignalCreator signal_creator(nh, private_nh);

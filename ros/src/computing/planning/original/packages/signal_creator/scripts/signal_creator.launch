@@ -1,4 +1,7 @@
 <launch>
+	<arg name="save_directory" default="."/>
+
 	<node pkg="signal_creator" type="signal_creator" name="signal_creator" output="screen">
+		<param name="save_directory" value="$(arg save_directory)"/>
 	</node>
 </launch>
