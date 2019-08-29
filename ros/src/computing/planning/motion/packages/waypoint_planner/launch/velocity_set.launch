@@ -18,6 +18,7 @@
     <param name="remove_points_upto" value="$(arg remove_points_upto)" />
     <param name="enablePlannerDynamicSwitch" value="$(arg enablePlannerDynamicSwitch)" />
     <param name="enableMobileye" value="$(arg enableMobileye)" />
+    <remap from="safety_waypoints" to="temporary_stop_waypoints" />
   </node>
 
 </launch>

@@ -68,7 +68,7 @@ private:
   ros::NodeHandle private_nh_;
 
   // publisher & subscriber
-  ros::Publisher lane_pub_, stop_line_pub_;
+  ros::Publisher lane_pub_, signal_stop_line_pub_, temporary_stop_line_pub_;
   ros::Subscriber config_sub_;
 
   // variables
@@ -76,7 +76,10 @@ private:
   std::vector<std::string> multi_file_path_;
   autoware_msgs::LaneArray output_lane_array_;
 
-  autoware_msgs::LinearArray stop_line_points_;
+  autoware_msgs::LinearArray signal_stop_line_points_, temporary_stop_line_points_;
+
+  //id counter
+  uint32_t id_counter_;
 
   // initializer
   void initPubSub();

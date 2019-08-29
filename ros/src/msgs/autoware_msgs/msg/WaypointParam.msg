@@ -1,4 +1,5 @@
 Header header
+uint32 id
 float32 weight
 int32 blinker
 int32 feat_proj_x
@@ -21,4 +22,5 @@ int32 curve_flag
 int16 microbus_pedal
 int16 microbus_angle
 int8 automatic_door
-int8 stop_line
+int8 signal_stop_line
+int8 temporary_stop_line
