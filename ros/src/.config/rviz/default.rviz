@@ -13,7 +13,6 @@ Panels:
         - /Global Path1/Namespaces1
         - /Local Rollouts1/Namespaces1
         - /GlobalPathAnimation1/Status1
-        - /Plotter2D1
       Splitter Ratio: 0.695804
     Tree Height: 856
   - Class: rviz/Selection
@@ -91,6 +90,10 @@ Visualization Manager:
           Value: true
         me_viz:
           Value: true
+        ndt_base_link:
+          Value: true
+        rtk_base_link:
+          Value: true
         velodyne:
           Value: true
         velodyne1:
@@ -109,21 +112,7 @@ Visualization Manager:
       Tree:
         world:
           map:
-            base_link:
-              esr_1:
-                {}
-              me_viz:
-                {}
-              velodyne:
-                {}
-              velodyne1:
-                {}
-              velodyne2:
-                {}
-              velodyne3:
-                {}
-            gps:
-              {}
+            {}
       Update Interval: 0
       Value: true
     - Alpha: 0.0500000007
@@ -684,7 +673,7 @@ Visualization Manager:
     - Buffer length: 100
       Class: jsk_rviz_plugin/Plotter2D
       Enabled: true
-      Name: Plotter2D
+      Name: NDT_Time
       Show Value: true
       Topic: /time_ndt_matching
       Value: true
@@ -730,7 +719,7 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: 1.52999973
+      Angle: -0.0549994484
       Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
@@ -740,11 +729,11 @@ Visualization Manager:
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 5.99695349
+      Scale: 8.34371948
       Target Frame: <Fixed Frame>
       Value: TopDownOrtho (rviz)
-      X: 0
-      Y: 0
+      X: 30.1578999
+      Y: 4.49958992
     Saved: ~
 Window Geometry:
   Camera:

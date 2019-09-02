@@ -153,10 +153,10 @@ static ros::Publisher ndt_pose_pub;
 static geometry_msgs::PoseStamped ndt_pose_msg;
 
 // current_pose is published by vel_pose_mux
-/*
+
 static ros::Publisher current_pose_pub;
 static geometry_msgs::PoseStamped current_pose_msg;
- */
+
 
 static ros::Publisher localizer_pose_pub;
 static geometry_msgs::PoseStamped localizer_pose_msg;
@@ -579,7 +579,7 @@ static void map_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
 static void gnss_callback(const geometry_msgs::PoseStamped::ConstPtr& input)
 {
-  tf::Quaternion gnss_q(input->pose.orientation.x, input->pose.orientation.y, input->pose.orientation.z,
+/*  tf::Quaternion gnss_q(input->pose.orientation.x, input->pose.orientation.y, input->pose.orientation.z,
                         input->pose.orientation.w);
   tf::Matrix3x3 gnss_m(gnss_q);
 
@@ -595,7 +595,7 @@ static void gnss_callback(const geometry_msgs::PoseStamped::ConstPtr& input)
 
   if ((_use_gnss == 1 && init_pos_set == 0) || fitness_score >= 500.0)
   {
-    previous_pose.x = previous_gnss_pose.x;
+	previous_pose.x = previous_gnss_pose.x;
     previous_pose.y = previous_gnss_pose.y;
     previous_pose.z = previous_gnss_pose.z;
     previous_pose.roll = previous_gnss_pose.roll;
@@ -632,7 +632,7 @@ static void gnss_callback(const geometry_msgs::PoseStamped::ConstPtr& input)
     current_accel_y = 0.0;
     current_accel_z = 0.0;
 
-    init_pos_set = 1;
+	init_pos_set = 1;
   }
 
   previous_gnss_pose.x = current_gnss_pose.x;
@@ -641,7 +641,7 @@ static void gnss_callback(const geometry_msgs::PoseStamped::ConstPtr& input)
   previous_gnss_pose.roll = current_gnss_pose.roll;
   previous_gnss_pose.pitch = current_gnss_pose.pitch;
   previous_gnss_pose.yaw = current_gnss_pose.yaw;
-  previous_gnss_time = current_gnss_time;
+  previous_gnss_time = current_gnss_time;*/
 }
 
 static void initialpose_callback(const geometry_msgs::PoseWithCovarianceStamped::ConstPtr& input)
@@ -1356,7 +1356,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
     current_q.setRPY(current_pose.roll, current_pose.pitch, current_pose.yaw);
     // current_pose is published by vel_pose_mux
-    /*
+    
     current_pose_msg.header.frame_id = "/map";
     current_pose_msg.header.stamp = current_scan_time;
     current_pose_msg.pose.position.x = current_pose.x;
@@ -1366,7 +1366,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
     current_pose_msg.pose.orientation.y = current_q.y();
     current_pose_msg.pose.orientation.z = current_q.z();
     current_pose_msg.pose.orientation.w = current_q.w();
-    */
+    
 
     localizer_q.setRPY(localizer_pose.roll, localizer_pose.pitch, localizer_pose.yaw);
     if (_use_local_transform == true)
@@ -1400,7 +1400,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
     node_status_publisher_ptr_->CHECK_RATE("/topic/rate/ndt_pose/slow",8,5,1,"topic points_raw publish rate low.");
     ndt_pose_pub.publish(ndt_pose_msg);
     // current_pose is published by vel_pose_mux
-    //    current_pose_pub.publish(current_pose_msg);
+	//current_pose_pub.publish(current_pose_msg);
     localizer_pose_pub.publish(localizer_pose_msg);
 
     // Send TF "/base_link" to "/map"
@@ -1424,7 +1424,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
     // Set values for /estimate_twist
     estimate_twist_msg.header.stamp = current_scan_time;
-    estimate_twist_msg.header.frame_id = "/base_link";
+	estimate_twist_msg.header.frame_id = "/ndt_base_link";
     estimate_twist_msg.twist.linear.x = current_velocity;
     estimate_twist_msg.twist.linear.y = 0.0;
     estimate_twist_msg.twist.linear.z = 0.0;
@@ -1434,7 +1434,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
     estimate_twist_pub.publish(estimate_twist_msg);
 
-autoware_msgs::NdtPoseAndRTKPose ndtpose_and_rtkpose;
+	autoware_msgs::NdtPoseAndRTKPose ndtpose_and_rtkpose;
     ndtpose_and_rtkpose.header.frame_id = "/map";
     ndtpose_and_rtkpose.header.stamp = current_scan_time;
     ndtpose_and_rtkpose.ndt_pose.header.frame_id = "/map";
@@ -1745,7 +1745,7 @@ int main(int argc, char** argv)
   predict_pose_odom_pub = nh.advertise<geometry_msgs::PoseStamped>("/predict_pose_odom", 10);
   predict_pose_imu_odom_pub = nh.advertise<geometry_msgs::PoseStamped>("/predict_pose_imu_odom", 10);
   ndt_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/ndt_pose", 10);
-  // current_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/current_pose", 10);
+  //current_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/current_pose", 10);
   localizer_pose_pub = nh.advertise<geometry_msgs::PoseStamped>("/localizer_pose", 10);
   estimate_twist_pub = nh.advertise<geometry_msgs::TwistStamped>("/estimate_twist", 10);
   estimated_vel_mps_pub = nh.advertise<std_msgs::Float32>("/estimated_vel_mps", 10);

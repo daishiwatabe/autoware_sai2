@@ -1,8 +1,0 @@
-prefix=/home/autoware/Autoware_1.11.0_edit/install/waypoint_planner
-
-Name: waypoint_planner
-Description: Description of waypoint_planner
-Version: 1.10.0
-Cflags: 
-Libs: -L/home/autoware/Autoware_1.11.0_edit/install/waypoint_planner/lib 
-Requires: roscpp std_msgs tf waypoint_follower autoware_msgs vector_map astar_search
