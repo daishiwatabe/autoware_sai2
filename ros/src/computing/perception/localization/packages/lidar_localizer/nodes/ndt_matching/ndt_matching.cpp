@@ -1363,14 +1363,14 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
     // Send TF "/base_link" to "/map"
     transform.setOrigin(tf::Vector3(current_pose.x, current_pose.y, current_pose.z));
     transform.setRotation(current_q);
-    //    br.sendTransform(tf::StampedTransform(transform, current_scan_time, "/map", "/base_link"));
+    //    br.sendTransform(tf::StampedTransform(transform, current_scan_time, "/map", "/ndt_base_link"));
     if (_use_local_transform == true)
     {
-      br.sendTransform(tf::StampedTransform(local_transform * transform, current_scan_time, "/map", "/base_link"));
+      br.sendTransform(tf::StampedTransform(local_transform * transform, current_scan_time, "/map", "/ndt_base_link"));
     }
     else
     {
-      br.sendTransform(tf::StampedTransform(transform, current_scan_time, "/map", "/base_link"));
+      br.sendTransform(tf::StampedTransform(transform, current_scan_time, "/map", "/ndt_base_link"));
     }
 
     matching_end = std::chrono::system_clock::now();
@@ -1381,7 +1381,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
     // Set values for /estimate_twist
     estimate_twist_msg.header.stamp = current_scan_time;
-    estimate_twist_msg.header.frame_id = "/base_link";
+    estimate_twist_msg.header.frame_id = "/ndt_base_link";
     estimate_twist_msg.twist.linear.x = current_velocity;
     estimate_twist_msg.twist.linear.y = 0.0;
     estimate_twist_msg.twist.linear.z = 0.0;
