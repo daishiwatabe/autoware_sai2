@@ -185,6 +185,9 @@ public:
 					can.read_counter = kc.get_read_counter();
 
 					pub_microbus_can_503_.publish(can);
+					std::cout << "pedal_voltage : " << can.pedal_voltage << std::endl;
+					std::cout << "pedal_displacement : " << can.pedal_displacement << std::endl;
+					std::cout << "engine_rotation : " << can.engine_rotation;
 				    read_id_flag_.read501 = read_id_flag_.read502 = false;
 					break;
 			    }

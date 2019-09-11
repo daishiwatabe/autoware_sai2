@@ -1,0 +1,4 @@
+<launch>
+	<node pkg="microbus_interface" type="microbus_interface" name="microbus_interface" output="screen">
+	</node>
+</launch>

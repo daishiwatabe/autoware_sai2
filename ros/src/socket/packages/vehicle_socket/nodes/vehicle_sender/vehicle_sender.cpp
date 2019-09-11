@@ -175,7 +175,7 @@ static void *sendCommand(void *arg)
   oss << command_data.linear_velocity << ",";
   oss << command_data.steering_angle << ",";
   //oss << command_data.lampValue;
-  /*oss << stopFlag << ",";
+  oss << stopFlag << ",";
   oss << blinker << ",";
   oss << pause_val << ",";
   oss << steer_gain_ki << ",";
@@ -186,7 +186,7 @@ static void *sendCommand(void *arg)
   oss << velocity_windowPlus << ",";
   oss << velocity_windowMinus << ",";
   oss << manual_drive_stroke << ",";
-  oss << manual_brake_stroke << ",";*/
+  oss << manual_brake_stroke << ",";
 
   std::string cmd(oss.str());
   ssize_t n = write(client_sock, cmd.c_str(), cmd.size());
