@@ -1,2 +1,2 @@
 Header header
-bool stop_flag
+uint8 stop_flag

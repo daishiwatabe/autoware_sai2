@@ -105,8 +105,9 @@ static void canCallback(const autoware_can_msgs::CANInfo& msg)
 
 static void positionCheckerCallback(const autoware_msgs::PositionChecker& msg)
 {
-    if(msg.stop_flag == true) {stopFlag = 1; std::cout << "aaa\n";}
-    else stopFlag = 0;
+    //if(msg.stop_flag == true) {stopFlag = 1; std::cout << "aaa\n";}
+    //else stopFlag = 0;
+	stopFlag = msg.stop_flag;
 }
 
 static int blinker=-1;

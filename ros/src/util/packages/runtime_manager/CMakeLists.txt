@@ -79,8 +79,11 @@ install(FILES
         scripts/launch_files/velodyne_hdl32e.launch
 		scripts/launch_files/velodyne_hdl32e_single.launch
         scripts/launch_files/velodyne_vlp16.launch
+        scripts/launch_files/velodyne_vlp16_prius_right.launch
+        scripts/launch_files/velodyne_vlp16_prius_left.launch
         scripts/launch_files/velodyne_vlp16_hires.launch
         scripts/launch_files/velodyne_vlp32c.launch
+        scripts/launch_files/velodyne_vlp32c_prius_top.launch
 
         scripts/vscan.launch
         scripts/vehicle_socket.launch

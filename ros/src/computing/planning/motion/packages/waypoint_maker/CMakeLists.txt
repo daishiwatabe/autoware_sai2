@@ -109,7 +109,7 @@ target_link_libraries(waypoint_velocity_visualizer ${catkin_LIBRARIES} ${Boost_L
 add_dependencies(waypoint_velocity_visualizer
         ${catkin_EXPORTED_TARGETS})
 
-add_executable(waypoint_param_sender nodes/waypoint_param_sender/waypoint_param_sender.cpp)
+add_executable(waypoint_param_sender nodes/waypoint_param_sender/waypoint_param_sender2.cpp)
 target_link_libraries(waypoint_param_sender ${catkin_LIBRARIES})
 add_dependencies(waypoint_param_sender
         ${catkin_EXPORTED_TARGETS})

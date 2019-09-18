@@ -1,6 +1,6 @@
 <!-- -->
 <launch>
-	<arg name="limit_euc" default="3.0"/>
+	<arg name="limit_euc" default="6.0"/>
 	<arg name="permission_angle" default="30"/>
 
 	<node pkg="waypoint_follower" type="position_checker" name="position_checker" output="log">

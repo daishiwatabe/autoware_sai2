@@ -18,7 +18,7 @@ private:
     double limit_euc_, permission_angle_;
     geometry_msgs::Quaternion lane_Quat_;
 
-    bool lane_callback_stop_flag_ = true;
+    unsigned char lane_callback_stop_flag_ = 1;
 
     void local_waypoints_callback(const autoware_msgs::Lane::ConstPtr& msg)
     {
@@ -28,13 +28,13 @@ private:
 
         //std::cout << msg->waypoints.size() << std::endl;
         waypoint_max_count = msg->waypoints.size();
-        if(waypoint_max_count < 3)
+		/*if(waypoint_max_count < 3)
         {
-            checker.stop_flag = true;
+            checker.stop_flag = 1;
             pub_position_checker_.publish(checker);
             lane_callback_stop_flag_ = checker.stop_flag;
             return;
-        }
+		}*/
 
         way_first_.x =  msg->waypoints[0].pose.pose.position.x;
         way_first_.y =  msg->waypoints[0].pose.pose.position.y;
@@ -49,8 +49,8 @@ private:
         //std::cout << "local_waypoint_1,x," << msg->waypoints[1].pose.pose.position.x-way_first_.x << ",y," << msg->waypoints[1].pose.pose.position.y-way_first_.y << ",z, "<< msg->waypoints[1].pose.pose.position.z-way_first_.z << std::endl;
         double sx = fabs(way_first_.x-way_second_.x), sy = fabs(way_first_.y-way_second_.y), sz = fabs(way_first_.z-way_second_.z);
 
-        if(sx > limit_euc_ || sy > limit_euc_ || sz > limit_euc_) checker.stop_flag = true;
-        else checker.stop_flag = false;
+        if(sx > limit_euc_ || sy > limit_euc_ || sz > limit_euc_) checker.stop_flag = 2;
+        else checker.stop_flag = 0;
         std::cout << "sx : " << sx << "  sy : " << sy << "  sz : " << sz << std::endl;
         pub_position_checker_.publish(checker);
         lane_callback_stop_flag_ = checker.stop_flag;
@@ -72,20 +72,20 @@ private:
 
     void current_pose_callback(const geometry_msgs::PoseStamped::ConstPtr& msg)
     {
-        if(lane_callback_stop_flag_ == true) return;
+        if(lane_callback_stop_flag_ != 0) return;
 
         autoware_msgs::PositionChecker checker;
         checker.header.frame_id = "map";
         checker.header.stamp = ros::Time();
-        checker.stop_flag = false;
+        checker.stop_flag = 0;
 
-        if(waypoint_max_count < 3)
+		/*if(waypoint_max_count < 3)
         {
             std::cout << "not local waypoint" << std::endl;
-            checker.stop_flag = true;
+            checker.stop_flag = 1;
             pub_position_checker_.publish(checker);
             return;
-        }
+		}*/
         //std::cout << "current_pose    x : " << msg->pose.position.x << " y : " << msg->pose.position.y << " z : "<< msg->pose.position.z << std::endl;
         //std::cout << "x : " << x << " y : "<< y << " z : " << z << std::endl;
         //std::cout << "euc : " << euc << std::endl;
@@ -115,11 +115,11 @@ private:
         while(mlz_0 > 2*M_PI) {mlz_0 -= 2*M_PI;}
         if(mlz_0 <=M_PI)
         {
-            if(mlz > permission_angle_) checker.stop_flag = true;
+            if(mlz > permission_angle_) checker.stop_flag = 3;
         }
         if(mlz_0 > M_PI)
         {
-            if(mlz < 2*M_PI-permission_angle_) checker.stop_flag = true;
+            if(mlz < 2*M_PI-permission_angle_) checker.stop_flag = 3;
         }
         //std::cout << mlz_0 << "," << (int)lane_callback_stop_flag_ << std::endl;
 

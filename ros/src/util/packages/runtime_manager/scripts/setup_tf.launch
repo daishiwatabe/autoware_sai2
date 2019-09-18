@@ -10,7 +10,11 @@
   <arg name="child_frame_id" default="velodyne"/>
   <arg name="period_in_ms" default="10"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_32" args="1.08 0.00 2.08 0.0 0.0 0.0 base_link velodyne3 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_top" args="1.08 0.00 2.08 0.0 0.0 0.0 base_link velodyne_top 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_right" args="1.09 -0.52 1.60 0.0 0.0 0.0 base_link velodyne_right 10"/>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer_left" args="1.06 0.52 1.60 0.0 0.0 0.0 base_link velodyne_left 10"/>
 
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_localizer" args="$(arg x) $(arg y) $(arg z) $(arg yaw) $(arg pitch) $(arg roll) $(arg frame_id) $(arg child_frame_id) $(arg period_in_ms)"/>
 

@@ -51,6 +51,8 @@ private:
 
 	int stop_line_search(const autoware_msgs::Lane& way)
 	{
+		if(way.waypoints.size() == 0) return -1;
+		if(way.waypoints[0].waypoint_param.id < 5) return -1;
 		for(int i=0; i<way.waypoints.size() || i<config_.search_distance; i++)
 		{
 			if(way.waypoints[i].waypoint_param.temporary_stop_line > 0)
@@ -81,6 +83,7 @@ private:
 				{
 					stop_waypoint_id_ = lane.waypoints[stop_index].waypoint_param.id;
 					timer_ = ros::Time(now_time.sec + (int)stop_time_, now_time.nsec);
+					std::cout << "time : " << timer_.sec << "," << now_time.sec << std::endl;
 				}
 			}
 		}
@@ -117,10 +120,10 @@ public:
 	{
 		nh_ = nh;  private_nh_ = p_nh;
 
-		config_.search_distance = 30;
+		config_.search_distance = 7;
 		config_.acceleration = 1;
-		config_.number_of_zeros_ahead = 10;
-		config_.number_of_zeros_behind = 10;
+		config_.number_of_zeros_ahead = 5;
+		config_.number_of_zeros_behind = 5;
 		config_.stop_speed_threshold = 0.05;
 
 		timer_ = ros::Time::now();
