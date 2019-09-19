@@ -583,7 +583,7 @@ int main(int argc, char** argv)
   //ros::Subscriber stopline_sub = n.subscribe("/vector_map_info/stop_line", sub_vmap_queue_size, cache_stopline);
   //ros::Subscriber dtlane_sub = n.subscribe("/vector_map_info/dtlane", sub_vmap_queue_size, cache_dtlane);
   ros::Subscriber config_sub = n.subscribe("/config/lane_rule", sub_config_queue_size, config_parameter);
-  ros::Subscriber stop_line_sub = n.subscribe("/stop_line_points", 10, callback_stop_line);
+  ros::Subscriber stop_line_sub = n.subscribe("/signal_stop_line_points", 10, callback_stop_line);
 
   ros::spin();
 

@@ -174,13 +174,7 @@ Visualization Manager:
       Marker Topic: /vector_map
       Name: Vector Map
       Namespaces:
-        cross_walk: true
-        curb: true
-        road_edge: true
-        road_pole: true
         signal: true
-        stop_line: true
-        white_line: true
       Queue Size: 100
       Value: true
     - Class: rviz/Camera
@@ -237,8 +231,8 @@ Visualization Manager:
     - Alpha: 0.300000012
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 72.3370743
-        Min Value: 54.2716331
+        Max Value: 96.1514893
+        Min Value: 56.4721375
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -369,6 +363,11 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
+        base_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
       Name: Vehicle Model
       Robot Description: robot_description
       TF Prefix: ""
@@ -662,8 +661,7 @@ Visualization Manager:
       Marker Topic: /waypoint_saver_marker
       Name: MarkerArray
       Namespaces:
-        saved_waypoint_arrow: true
-        saved_waypoint_velocity: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -757,21 +755,26 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Angle: -0.295000345
-      Class: rviz/TopDownOrtho
+      Class: rviz/ThirdPersonFollower
+      Distance: 25.9855499
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 0
+      Focal Shape Fixed Size: true
+      Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Scale: 59.628788
+      Pitch: 0.595398307
       Target Frame: gps
-      Value: TopDownOrtho (rviz)
-      X: 78.4273376
-      Y: -49.2565231
+      Value: ThirdPersonFollower (rviz)
+      Yaw: 3.16039968
     Saved: ~
 Window Geometry:
   Camera:

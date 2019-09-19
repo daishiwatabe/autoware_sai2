@@ -241,6 +241,7 @@ void WaypointLoaderNode::parseWaypointForVer3(const std::string& line, const std
   wp->waypoint_param.automatic_door = (char)((map.find("automatic_door") != map.end()) ? std::stoi(map["automatic_door"]) : 0);
   wp->waypoint_param.signal_stop_line = (char)((map.find("signal_stop_line") != map.end()) ? std::stoi(map["signal_stop_line"]) : 0);
   wp->waypoint_param.temporary_stop_line = (char)((map.find("temporary_stop_line") != map.end()) ? std::stoi(map["temporary_stop_line"]) : 0);
+  wp->waypoint_param.fusion_select = (char)((map.find("fusion_select") != map.end()) ? std::stoi(map["fusion_select"]) : 0);
 
   if(wp->waypoint_param.signal_stop_line != 0)
   {

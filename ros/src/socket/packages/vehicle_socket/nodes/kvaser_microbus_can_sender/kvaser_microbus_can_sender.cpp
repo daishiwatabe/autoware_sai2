@@ -33,6 +33,44 @@ public:
 	}
 };
 
+struct LIMIT_ANGLE_FROM_VELOCITY_STRUCT
+{
+	double velocity;
+	double limit_angle_top;
+	double limit_angle_bottom;
+};
+
+class LIMIT_ANGLE_FROM_VELOCITY_CLASS
+{
+private:
+	std::vector<LIMIT_ANGLE_FROM_VELOCITY_STRUCT> lafvs;
+public:
+	LIMIT_ANGLE_FROM_VELOCITY_CLASS()
+	{
+		lafvs.clear();
+		LIMIT_ANGLE_FROM_VELOCITY_STRUCT data={0,700,-700};
+		lafvs.push_back(data);
+	}
+
+	void add(LIMIT_ANGLE_FROM_VELOCITY_STRUCT data) {lafvs.push_back(data);}
+
+	const LIMIT_ANGLE_FROM_VELOCITY_STRUCT getLimit(double vel)
+	{
+		for(int i=0;i<lafvs.size()-1;i++)
+		{
+			double bottom = lafvs[i].velocity;
+			double top = lafvs[i+1].velocity;
+			std::cout << "velocity_range : " << top << "," << vel << "," << bottom << std::endl;
+			if(vel >= bottom && vel < top)
+			{
+				return lafvs[i+1];
+			}
+		}
+//std::cout << "aaaaaaaaaaaaa\n";
+		return lafvs[lafvs.size()-1];
+	}
+};
+
 class kvaser_can_sender
 {
 private:
@@ -80,6 +118,11 @@ private:
 
 	//other params
 	const unsigned int SEND_DATA_SIZE = 8;
+
+	//safety
+	const LIMIT_ANGLE_FROM_VELOCITY_STRUCT limit10 = {10,680,-680}, limit15 = {15,360,-360}, limit20 = {20,180,-180}, limit30={30,90,-90}, limit40={40,45,-45};
+	LIMIT_ANGLE_FROM_VELOCITY_CLASS lafvc;
+	bool dengerStopFlag = false;//自動運転が失敗しそうな場に止めるフラグ
 
 	ros::Publisher pub_microbus_can_sender_status_;
 
@@ -166,6 +209,37 @@ private:
 			input_steer_mode_ = true;
 			publisStatus();
 		}
+
+		LIMIT_ANGLE_FROM_VELOCITY_STRUCT limitAngleData = lafvc.getLimit(msg->angle_deg);
+		std::cout <<"angle range : " << limitAngleData.limit_angle_bottom << "," << msg->angle_deg << "," << limitAngleData.limit_angle_top << std::endl;
+		if(dengerStopFlag == false)
+		{
+			bool flag = false;
+			if((limitAngleData.limit_angle_bottom > msg->angle_deg || limitAngleData.limit_angle_top < msg->angle_deg))// &&
+				    //strinf.mode == MODE_PROGRAM)
+			{
+				flag = true;
+				std::cout << "Denger! current angle limit over" << std::endl;
+			}
+
+			//long long time_sa = vstate.tstamp - stamp_backup;
+			ros::Duration rostime = can_receive_502_.header.stamp - msg->header.stamp;
+			double time_sa = rostime.sec + rostime.nsec * 1E-9;
+			double actualAngleTimeVal = fabs(msg->angle_deg - can_receive_502_.angle_deg)/time_sa;
+			std::cout << "time_sa," << time_sa << ",actualAngleTimeVal," << actualAngleTimeVal << std::endl;
+			if(actualAngleTimeVal > 1.0)// && strinf.mode == MODE_PROGRAM)
+			{
+				flag = true;
+				std::cout << "Denger! actual angle over" << std::endl;
+			}
+
+			if(flag == true)
+			{
+				flag_drive_mode_ = false;
+				flag_steer_mode_ = false;
+			}
+		}
+
 		can_receive_502_ = *msg;
 	}
 
@@ -239,6 +313,33 @@ private:
 	void callbackTwistCmd(const geometry_msgs::TwistStamped::ConstPtr &msg)
 	{
 		std::cout << "sub twist" << std::endl;
+
+		LIMIT_ANGLE_FROM_VELOCITY_STRUCT limitAngleData = lafvc.getLimit(can_receive_502_.angle_deg);
+		std::cout <<"angle range : " << limitAngleData.limit_angle_bottom << "," << can_receive_502_.angle_deg << "," << limitAngleData.limit_angle_top << std::endl;
+		if(dengerStopFlag == false)
+		{
+			bool flag = false;
+
+			ros::Duration rostime = can_receive_502_.header.stamp - msg->header.stamp;
+			double time_sa = rostime.sec + rostime.nsec * 1E-9;
+			double targetAngleTimeVal = fabs(msg->twist.angular.z - twist_.twist.angular.z)/time_sa;
+			std::cout << "time_sa," << time_sa << ",targetAngleTimeVal," << targetAngleTimeVal << std::endl;
+			if(targetAngleTimeVal > 7.0)// && strinf.mode == MODE_PROGRAM)
+			{
+				if(msg->twist.angular.z != 0)
+				{
+					flag = true;
+					std::cout << "Denger! target angle over" << std::endl;
+				}
+			}
+
+			if(flag == true)
+			{
+				flag_drive_mode_ = false;
+				flag_steer_mode_ = false;
+			}
+		}
+
 		twist_ = *msg;
 	}
 
@@ -297,10 +398,11 @@ private:
 	{
 		if(setting_.use_position_checker == true)
 		{
-			if(msg->stop_flag == true)
+			if(msg->stop_flag != 0)
 			{
 				flag_drive_mode_ = false;
 				flag_steer_mode_ = false;
+				std::cout << "Denger! Autoware stop flag : " << msg->stop_flag << std::endl;
 				can_send();
 			}
 		}
@@ -803,6 +905,8 @@ public:
 		if(res != canStatus::canOK) {std::cout << "open error" << std::endl;}
 
 		setting_.use_position_checker = true;
+
+		lafvc.add(limit10); lafvc.add(limit15); lafvc.add(limit20); lafvc.add(limit30); lafvc.add(limit40);
 
 		pub_microbus_can_sender_status_ = nh_.advertise<autoware_can_msgs::MicroBusCanSenderStatus>("/microbus/can_sender_status", 10, true);
 

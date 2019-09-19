@@ -3,6 +3,7 @@
 #include <autoware_msgs/AdjustXY.h>
 #include <autoware_config_msgs/ConfigVoxelGridFilter.h>
 #include <autoware_msgs/Signals.h>
+#include <autoware_config_msgs/ConfigLocalizerSwitchFusion.h>
 
 class WaypointMaker
 {
@@ -10,7 +11,7 @@ private:
 	ros::NodeHandle nh_, private_nh_;
 
 	ros::Subscriber sub_local_waypoint_;
-	ros::Publisher pub_waypoint_param_, pub_adjust_xy_, pub_voxelGridFilter_, pub_roi_signal_;
+	ros::Publisher pub_waypoint_param_, pub_adjust_xy_, pub_voxelGridFilter_, pub_roi_signal_, pub_fusion_select_;
 
 	void callback_local_waypoints(const autoware_msgs::Lane& msg)
 	{
@@ -62,6 +63,16 @@ private:
 			}
 			pub_roi_signal_.publish(sig_msg);
 		}
+
+		if(param.fusion_select >= 0)
+		{
+			autoware_config_msgs::ConfigLocalizerSwitchFusion msg;
+			msg.header.frame_id = "";
+			msg.header.stamp = ros::Time::now();
+			msg.header.seq = 0;
+			msg.fusion_select = param.fusion_select;
+			pub_fusion_select_.publish(msg);
+		}
 	}
 public:
 	WaypointMaker(ros::NodeHandle nh, ros::NodeHandle p_nh)
@@ -72,6 +83,7 @@ public:
 		pub_voxelGridFilter_ = nh.advertise<autoware_config_msgs::ConfigVoxelGridFilter>("/config/voxel_grid_filter",10);
 		pub_roi_signal_ = nh.advertise<autoware_msgs::Signals>("/loader_roi_signal",10);
 		pub_waypoint_param_ = nh_.advertise<autoware_msgs::WaypointParam>("/waypoint_param", 1);
+		pub_fusion_select_ = nh_.advertise<autoware_config_msgs::ConfigLocalizerSwitchFusion>("/config/fusion_select", 1);
 		sub_local_waypoint_ = nh_.subscribe("/final_waypoints", 10, &WaypointMaker::callback_local_waypoints, this);
 	}
 };

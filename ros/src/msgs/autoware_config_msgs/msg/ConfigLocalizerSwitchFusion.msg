@@ -1,2 +1,2 @@
 Header header
-int32 fusion_select
+uint8 fusion_select
