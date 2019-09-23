@@ -2,3 +2,4 @@ Header header
 bool use_position_checker
 bool use_input_steer
 bool use_input_drive
+string safety_error_message

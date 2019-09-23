@@ -142,9 +142,11 @@ int main(int argc, char** argv)
 	ros::NodeHandle private_nh("~");
 
 	TemporaryStoper ts(nh, private_nh);
+	ros::Rate rate(100);
 	while(ros::ok())
 	{
 		ros::spinOnce();
+		rate.sleep();
 	}
 
 	return 0;

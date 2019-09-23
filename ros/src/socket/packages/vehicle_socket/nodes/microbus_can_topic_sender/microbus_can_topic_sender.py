@@ -69,6 +69,7 @@ TX_HORN = 218
 TX_HAZARD = 219
 TX_BLINKER_RIGHT = 220
 TX_BLINKER_LEFT = 221
+TX_SAFETY_ERROR_MESSAGE = 222
 
 BT_WIPER = 300
 BT_LIGHT_HIGH = 301
@@ -80,6 +81,8 @@ BT_BLINKER_RIGHT = 306
 BT_BLINKER_LEFT = 307
 BT_EMERGENCY_STOP = 308
 BT_BLINKER_STOP = 309
+BT_STEER_GASU_ON = 310
+BT_DRIVE_GASU_ON = 311
 
 class ReceiveValue:
 	def __init__(self):
@@ -94,6 +97,7 @@ class ReceiveValue:
 		self.a_actual = 0
 		self.input_drive = False
 		self.input_steer = False
+		self.safety_error_message = "aaa"
 		self.shift = MicroBusCan501.SHIFT_MANUAL
 		self.emergency_stop = 0
 		self.engine_start = False
@@ -107,6 +111,8 @@ class ReceiveValue:
 		self.blinker_right = False
 		self.blinker_left = False
 		self.blinker_stop = False
+		self.drive_gasu_breake = False
+		self.steer_gasu_breake = False
 
 class Microbus_Can_Sender_GUI:
 	def click_emergency_stop(self, event):
@@ -306,6 +312,14 @@ class Microbus_Can_Sender_GUI:
 		msg = Int16(val)
 		self.pub_input_drive_value.publish(msg)
 
+	def click_steer_gasu_on(self, event):
+		msg = Bool(False)
+		self.pub_steer_gasu_on.publish(msg)
+
+	def click_drive_gasu_on(self, event):
+		msg = Bool(False)
+		self.pub_drive_gasu_on.publish(msg)
+
 	def callback_can_receive501(self, msg):
 		if msg.emergency == True:
 			#self.tx_emergency.SetValue('LOCK')
@@ -358,7 +372,7 @@ class Microbus_Can_Sender_GUI:
 		self.receive.hazard = msg.hazard
 		self.receive.blinker_right = msg.blinker_right
 		self.receive.blinker_left = msg.blinker_left
-
+ 
 	def callback_can_receive502(self, msg): 
 		#print("aaa")
 		#self.tx_velocity_actual.SetValue(str(msg.velocity_actual))
@@ -369,6 +383,7 @@ class Microbus_Can_Sender_GUI:
 	def callback_micro_sub_can_sender_status(self, msg):
 		self.receive.input_steer = msg.use_input_steer
 		self.receive.input_drive = msg.use_input_drive
+		self.receive.safety_error_message = msg.sefety_error_message
 		#if msg.use_input_steer == True:
 			#self.bt_input_steer_send.Enable()
 			#self.tx_input_steer_label.SetValue("ON")
@@ -463,6 +478,11 @@ class Microbus_Can_Sender_GUI:
 			else:
 				self.tx_input_drive_label.SetValue("OFF")
 				self.bt_input_drive_send.Disable()
+
+			if self.receive.safety_error_message != '':
+				self.tx_safety_error_message.SetValue(self.receive.safety_error_message)
+			else:
+				self.tx_safety_error_message.SetValue('')
 
 			if self.receive.shift == MicroBusCan501.SHIFT_MANUAL:
 				self.tx_shift.SetValue('MANUAL')
@@ -677,6 +697,10 @@ class Microbus_Can_Sender_GUI:
 		self.bt_blinker_left.SetFont(font)
 		self.bt_blinker_stop = wx.Button(self.panel, BT_BLINKER_STOP, label="blink_stop", pos=(430,930), size=(130,50))
 		self.bt_blinker_stop.SetFont(font_min)
+		self.bt_steer_gasu_on = wx.Button(self.panel, BT_STEER_GASU_ON, label="SC_ON", pos=(10,930), size=(130,50))
+		self.bt_steer_gasu_on.SetFont(font_min)
+		self.bt_drive_gasu_on = wx.Button(self.panel, BT_DRIVE_GASU_ON, label="DC_ON", pos=(150,930), size=(130,50))
+		self.bt_drive_gasu_on.SetFont(font_min)
 
 		self.bt_emergency_stop.Bind(wx.EVT_BUTTON, self.click_emergency_stop)
 		self.bt_wiper.Bind(wx.EVT_BUTTON, self.click_wiper)
@@ -688,6 +712,8 @@ class Microbus_Can_Sender_GUI:
 		self.bt_blinker_right.Bind(wx.EVT_BUTTON, self.click_blinker_right)
 		self.bt_blinker_left.Bind(wx.EVT_BUTTON, self.click_blinker_left)
 		self.bt_blinker_stop.Bind(wx.EVT_BUTTON, self.click_blinker_stop)
+		self.bt_steer_gasu_on.Bind(wx.EVT_BUTTON, self.click_steer_gasu_on)
+		self.bt_drive_gasu_on.Bind(wx.EVT_BUTTON, self.click_drive_gasu_on)
 
 		self.lb_emergency = wx.StaticText(self.panel, -1, '安全機能', pos=(670, 10))
 		self.lb_emergency.SetFont(font)
@@ -773,6 +799,8 @@ class Microbus_Can_Sender_GUI:
 		self.lb_blinker_left.SetFont(font)
 		self.tx_blinker_left = wx.TextCtrl(self.panel, TX_BLINKER_LEFT, pos=(830,910), size=(200,45), style=wx.TE_PROCESS_ENTER)
 		self.tx_blinker_left.SetFont(font)
+		self.tx_safety_error_message = wx.TextCtrl(self.panel, TX_SAFETY_ERROR_MESSAGE, pos=(750,955), size=(280,45), style=wx.TE_PROCESS_ENTER)
+		self.tx_safety_error_message.SetFont(font_min)
 
 		self.pub_emergency_reset = rospy.Publisher('/microbus/emergency_reset', Empty, queue_size=1)
 		self.pub_engine_start = rospy.Publisher('/microbus/engine_start', Bool, queue_size=1)
@@ -799,6 +827,8 @@ class Microbus_Can_Sender_GUI:
 		self.pub_blinker_right = rospy.Publisher('/microbus/blinker_right', Bool, queue_size=1)
 		self.pub_blinker_left = rospy.Publisher('/microbus/blinker_left', Bool, queue_size=1)
 		self.pub_blinker_stop = rospy.Publisher('/microbus/blinker_stop', Bool, queue_size=1)
+		self.pub_steer_gasu_on = rospy.Publisher('/microbus/steer_gasu_breake', Bool, queue_size=1)
+		self.pub_drive_gasu_on = rospy.Publisher('/microbus/drive_gasu_breake', Bool, queue_size=1)
 
 		self.sub_micro_bus_can501 = rospy.Subscriber('/microbus/can_receive501', MicroBusCan501, self.callback_can_receive501)
 		self.sub_micro_bus_can502 = rospy.Subscriber('/microbus/can_receive502', MicroBusCan502, self.callback_can_receive502)

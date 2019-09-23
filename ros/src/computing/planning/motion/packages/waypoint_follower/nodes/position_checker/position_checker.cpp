@@ -157,9 +157,11 @@ int main(int argc, char** argv)
     PositionChecker position_checker(nh, private_nh, topic_local_waypoint, topic_current_pose,
                                      limit_euc, permission_angle);
 
+	ros::Rate rate(100);
     while(ros::ok())
     {
         ros::spinOnce();
+		rate.sleep();
     }
     return 0;
 }

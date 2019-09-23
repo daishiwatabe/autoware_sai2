@@ -367,9 +367,11 @@ int main(int argc, char** argv)
 
 
     LocalizerSwitch localizer_switch(nh, private_nh, topicListArray);
+	ros::Rate rate(100);
     while(ros::ok())
     {
         ros::spinOnce();
+		rate.sleep();
     }
 
     delete tf_listener;

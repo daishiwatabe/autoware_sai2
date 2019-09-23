@@ -1,0 +1,10 @@
+<launch> 
+  <arg name="port" default="/dev/ttyUSB3"/>
+  <arg name="baud" default="115200" />
+  <arg name="nodename" default="novatel_oem7_2" />
+
+  <node pkg="novatel_oem7" type="novatel_oem7" name="$(arg nodename)">
+    <param name="port" value="$(arg port)" />
+    <param name="baud" value="$(arg baud)" />
+  </node>
+</launch>

@@ -22,10 +22,10 @@
 
   <node pkg="tf" type="static_transform_publisher" name="base_link_to_esr" args="3.54 0.0 0.455 0.0 0.0 0.0 base_link esr_1 10"/>
 
-  <node pkg="tf" type="static_transform_publisher" name="camera_to_velodyne" args="1.80 0.3 -0.59 -1.570795 0.0 -1.570795 velodyne camera 10"/>
+  <node pkg="tf" type="static_transform_publisher" name="camera_to_velodyne" args="1.80 0.0 -0.59 0.0 0.0 0.0 velodyne camera 10"/>
 
   <param name="/gx" value="1.5"/>
-  <param name="/gy" value="0.0"/>
+  <param name="/gy" value="0.2"/>
   <param name="/gz" value="2.85"/>
   <param name="/ax" value="0.0"/>
   <param name="/ay" value="0.0"/>

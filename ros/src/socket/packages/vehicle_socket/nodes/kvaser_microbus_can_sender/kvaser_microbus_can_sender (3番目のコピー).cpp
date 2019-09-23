@@ -4,7 +4,7 @@
 #include <std_msgs/UInt8.h> 
 #include <std_msgs/Int16.h>
 #include <std_msgs/Empty.h>
-#include <autoware_msgs/VehicleCmd.h>
+#include <geometry_msgs/TwistStamped.h>
 #include <autoware_can_msgs/MicroBusCan501.h>
 #include <autoware_can_msgs/MicroBusCan502.h>
 #include <autoware_can_msgs/MicroBusCan503.h>
@@ -132,11 +132,11 @@ private:
 	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
 	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
-	ros::Subscriber sub_shift_auto_, sub_shift_position_;
+	ros::Subscriber sub_shift_auto_, sub_shift_position_, sub_side_brake_;
 	ros::Subscriber sub_emergency_stop_, sub_engine_start_, sub_ignition_;
 	ros::Subscriber sub_wiper_, sub_light_high_, sub_light_low_, sub_light_small_;
 	ros::Subscriber sub_horn_, sub_hazard_, sub_blinker_right_, sub_blinker_left_, sub_blinker_stop_;
-	ros::Subscriber sub_automatic_door_, sub_drive_gasu_breake_, sub_steer_gasu_breake_;
+	ros::Subscriber sub_automatic_door_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -146,11 +146,11 @@ private:
 	autoware_can_msgs::MicroBusCan501 can_receive_501_;
 	autoware_can_msgs::MicroBusCan502 can_receive_502_;
 	autoware_can_msgs::MicroBusCan503 can_receive_503_;
-	autoware_msgs::VehicleCmd twist_;
+	geometry_msgs::TwistStamped twist_;
 	short input_steer_, input_drive_;
 	short pedal_;
 	bool shift_auto_;
-	unsigned char shift_position_, drive_gasu_breake_, steer_gasu_breake_, automatic_door_;
+	unsigned char shift_position_, side_brake_, automatic_door_;
 	unsigned char emergency_stop_;
 	bool engine_start_, ignition_, wiper_;
 	bool light_high_, light_low_, light_small_, horn_;
@@ -202,14 +202,42 @@ private:
 		if(msg->clutch==true && can_receive_502_.clutch==false)
 		{
 			input_steer_mode_ = false; std::cout << "aaa" << std::endl;
-			std::string safety_error_message = "";
-			publisStatus(safety_error_message);
+			publisStatus();
 		}
 		if(msg->clutch==false && can_receive_502_.clutch==true)
 		{
 			input_steer_mode_ = true;
-			std::string safety_error_message = "";
-			publisStatus(safety_error_message);
+			publisStatus();
+		}
+
+		LIMIT_ANGLE_FROM_VELOCITY_STRUCT limitAngleData = lafvc.getLimit(msg->angle_deg);
+		std::cout <<"angle range : " << limitAngleData.limit_angle_bottom << "," << msg->angle_deg << "," << limitAngleData.limit_angle_top << std::endl;
+		if(dengerStopFlag == false)
+		{
+			bool flag = false;
+			if((limitAngleData.limit_angle_bottom > msg->angle_deg || limitAngleData.limit_angle_top < msg->angle_deg))// &&
+				    //strinf.mode == MODE_PROGRAM)
+			{
+				flag = true;
+				std::cout << "Denger! current angle limit over" << std::endl;
+			}
+
+			//long long time_sa = vstate.tstamp - stamp_backup;
+			ros::Duration rostime = can_receive_502_.header.stamp - msg->header.stamp;
+			double time_sa = rostime.sec + rostime.nsec * 1E-9;
+			double actualAngleTimeVal = fabs(msg->angle_deg - can_receive_502_.angle_deg)/time_sa;
+			std::cout << "time_sa," << time_sa << ",actualAngleTimeVal," << actualAngleTimeVal << std::endl;
+			if(actualAngleTimeVal > 1.0)// && strinf.mode == MODE_PROGRAM)
+			{
+				flag = true;
+				std::cout << "Denger! actual angle over" << std::endl;
+			}
+
+			if(flag == true)
+			{
+				flag_drive_mode_ = false;
+				flag_steer_mode_ = false;
+			}
 		}
 
 		can_receive_502_ = *msg;
@@ -221,14 +249,12 @@ private:
 		if(msg->clutch==true && can_receive_503_.clutch==false)
 		{
 			input_drive_mode_ = false;
-			std::string safety_error_message = "";
-			publisStatus(safety_error_message);
+			publisStatus();
 		}
 		if(msg->clutch==false && can_receive_503_.clutch==true)
 		{
 			input_drive_mode_ = true;
-			std::string safety_error_message = "";
-			publisStatus(safety_error_message);
+			publisStatus();
 		}
 		can_receive_503_ = *msg;
 	}
@@ -258,6 +284,12 @@ private:
 		shift_position_ = msg->data;
 	}
 
+	void callbackSideBrake(const std_msgs::UInt8::ConstPtr &msg)
+	{
+		std::cout << "side brake : " << (int)msg->data << std::endl;
+		side_brake_ = msg->data;
+	}
+
 	void automaticDoorSet(unsigned char flag)
 	{
 		automatic_door_ = flag;
@@ -275,84 +307,38 @@ private:
 	void callbackConfigMicroBusCan(const autoware_config_msgs::ConfigMicroBusCan::ConstPtr &msg)
 	{
 		setting_ = *msg;
-		std::string safety_error_message = "";
-		publisStatus(safety_error_message);
+		publisStatus();
 	}
 
-	void callbackTwistCmd(const autoware_msgs::VehicleCmd::ConstPtr &msg)
+	void callbackTwistCmd(const geometry_msgs::TwistStamped::ConstPtr &msg)
 	{
 		std::cout << "sub twist" << std::endl;
 
-		ros::Duration rostime = msg->header.stamp - twist_.header.stamp;
-		double time_sa = rostime.sec + rostime.nsec * 1E-9;
-		double ws_ave = (wheelrad_to_steering_can_value_left + wheelrad_to_steering_can_value_right) / 2.0;
-		double deg = fabs(msg->ctrl_cmd.steering_angle - twist_.ctrl_cmd.steering_angle) * ws_ave * 720.0 / 15000.0;
-		double zisoku = msg->ctrl_cmd.linear_velocity * 3.6;
-
+		LIMIT_ANGLE_FROM_VELOCITY_STRUCT limitAngleData = lafvc.getLimit(can_receive_502_.angle_deg);
+		std::cout <<"angle range : " << limitAngleData.limit_angle_bottom << "," << can_receive_502_.angle_deg << "," << limitAngleData.limit_angle_top << std::endl;
 		if(dengerStopFlag == false)
 		{
 			bool flag = false;
 
-			LIMIT_ANGLE_FROM_VELOCITY_STRUCT limitAngleData = lafvc.getLimit(zisoku);
-			std::cout <<"angle range : " << limitAngleData.limit_angle_bottom << "," << deg << "," << limitAngleData.limit_angle_top << std::endl;
-
-			//double targetAngleTimeVal = fabs(deg - front_deg_)/time_sa;
-			std::cout << "time_sa," << time_sa << ",targetAngleTimeVal," << deg << std::endl;
-			double deg_th;
-			if(zisoku <= 15) deg_th = 80;
-			else deg_th = 40;
-			if(deg > deg_th)// && strinf.mode == MODE_PROGRAM)
+			ros::Duration rostime = can_receive_502_.header.stamp - msg->header.stamp;
+			double time_sa = rostime.sec + rostime.nsec * 1E-9;
+			double targetAngleTimeVal = fabs(msg->twist.angular.z - twist_.twist.angular.z)/time_sa;
+			std::cout << "time_sa," << time_sa << ",targetAngleTimeVal," << targetAngleTimeVal << std::endl;
+			if(targetAngleTimeVal > 7.0)// && strinf.mode == MODE_PROGRAM)
 			{
-				if(msg->ctrl_cmd.steering_angle != 0)
+				if(msg->twist.angular.z != 0)
 				{
 					flag = true;
 					std::cout << "Denger! target angle over" << std::endl;
 				}
 			}
 
-			if(flag == true && can_receive_502_.clutch == true)
-			{
-				drive_gasu_breake_ = true;
-				steer_gasu_breake_ = true;
-				std::stringstream safety_error_message;
-				safety_error_message << "target angle over , " << deg;
-				//std::cout << safety_error_message.str() << std::endl;
-				publisStatus(safety_error_message.str());
-			}
-		}
-
-		/*LIMIT_ANGLE_FROM_VELOCITY_STRUCT limitAngleData = lafvc.getLimit(zisoku);
-		std::cout <<"angle range : " << limitAngleData.limit_angle_bottom << "," << msg->angle_deg << "," << limitAngleData.limit_angle_top << std::endl;
-		if(dengerStopFlag == false)
-		{
-			bool flag = false;
-			if((limitAngleData.limit_angle_bottom > msg->angle_deg || limitAngleData.limit_angle_top < msg->angle_deg))// &&
-					//strinf.mode == MODE_PROGRAM)
-			{
-				flag = true;
-				std::cout << "Denger! current angle limit over" << std::endl;
-			}
-
-			//long long time_sa = vstate.tstamp - stamp_backup;
-			ros::Duration rostime = can_receive_502_.header.stamp - msg->header.stamp;
-			double time_sa = rostime.sec + rostime.nsec * 1E-9;
-			double actualAngleTimeVal = fabs(msg->angle_deg - can_receive_502_.angle_deg)/time_sa;
-			std::cout << "time_sa," << time_sa << ",actualAngleTimeVal," << actualAngleTimeVal << std::endl;
-			if(actualAngleTimeVal > 1.0)// && strinf.mode == MODE_PROGRAM)
-			{
-				flag = true;
-				std::cout << "Denger! actual angle over" << std::endl;
-			}
-
 			if(flag == true)
 			{
-				std::stringstream safety_error_message;
-				safety_error_message << "actual angle over : " << actualAngleTimeVal;
-				publisStatus(safety_error_message.str());
-				drive_gasu_breake_ = true;
-				steer_gasu_breake_ = true;
+				flag_drive_mode_ = false;
+				flag_steer_mode_ = false;
 			}
-		}*/
+		}
 
 		twist_ = *msg;
 	}
@@ -412,29 +398,23 @@ private:
 	{
 		if(setting_.use_position_checker == true)
 		{
-			if(msg->stop_flag != 0 && can_receive_502_.clutch == true)
+			if(msg->stop_flag != 0)
 			{
 				flag_drive_mode_ = false;
 				flag_steer_mode_ = false;
 				std::cout << "Denger! Autoware stop flag : " << msg->stop_flag << std::endl;
-				std::stringstream safety_error_message;
-				safety_error_message << "positon error : " << msg->stop_flag;
-				publisStatus(safety_error_message.str());
 				can_send();
 			}
 		}
 	}
 
-	void publisStatus(std::string safety_error_message)
+	void publisStatus()
 	{
 		autoware_can_msgs::MicroBusCanSenderStatus msg;
 		msg.header.stamp = ros::Time::now();
 		msg.use_position_checker = setting_.use_position_checker;
 		msg.use_input_steer = input_steer_mode_;
 		msg.use_input_drive = input_drive_mode_;
-		if(safety_error_message != "") msg.safety_error_message = safety_error_message;
-		else msg.safety_error_message = "";
-		std::cout << msg.safety_error_message << std::endl;
 		pub_microbus_can_sender_status_.publish(msg);
 	}
 
@@ -443,8 +423,7 @@ private:
 		//input_steer_ = msg->data;
 		input_steer_mode_ = msg->data;
 		std::cout << "aaa" << std::endl;
-		std::string safety_error_message = "";
-		publisStatus(safety_error_message);
+		publisStatus();
 	}
 
 	void callbackInputSteerValue(const std_msgs::Int16::ConstPtr &msg)
@@ -458,8 +437,7 @@ private:
 		//input_drive_ = msg->data;
 		input_drive_mode_ = msg->data;
 		std::cout << "ccc" << std::endl;
-		std::string safety_error_message = "";
-		publisStatus(safety_error_message);
+		publisStatus();
 	}
 
 	void callbackInputDriveValue(const std_msgs::Int16::ConstPtr &msg)
@@ -528,16 +506,6 @@ private:
 		hazard_ = msg->data;
 		std::string str = (hazard_) ? "true" : "false";
 		std::cout << "hazard : " << str << std::endl;
-	}
-
-	void callbackDriveGasuBreake(const std_msgs::Bool::ConstPtr &msg)
-	{
-		drive_gasu_breake_ = msg->data;
-	}
-
-	void callbackSteerGasuBreake(const std_msgs::Bool::ConstPtr &msg)
-	{
-		steer_gasu_breake_ = msg->data;
 	}
 
 	void blinkerRight()
@@ -613,14 +581,14 @@ private:
 				steer_val *= 3;
 			}*/
 			
-			double wheel_ang = twist_.ctrl_cmd.steering_angle;
-			if(wheel_ang > 0)
+			double ang = twist_.twist.angular.z;
+			if(ang > 0)
 			{
-				steer_val = wheel_ang * wheelrad_to_steering_can_value_left;// * 2;
+				steer_val = ang * wheelrad_to_steering_can_value_left * 2;
 			}
 			else
 			{
-				steer_val = wheel_ang * wheelrad_to_steering_can_value_right;// * 2;
+				steer_val = ang * wheelrad_to_steering_can_value_right * 2;
 			}
 		}
 		else steer_val = input_steer_;
@@ -652,7 +620,7 @@ private:
 				}
 				else
 				{
-					double linearx = twist_.ctrl_cmd.linear_velocity;
+					double linearx = twist_.twist.linear.x;
 					//if(linearx > 0.5 && linearx < 1.0) linearx = 1.0;
 					double twist_drv = linearx *3.6 * 100; //std::cout << twist_drv << std::endl;
 					drive_val = twist_drv;
@@ -687,8 +655,8 @@ private:
 
 		if(emergency_stop_ == 0x2) {buf[6] |= 0x80;  emergency_stop_ = 0;}
 		else if(emergency_stop_ == 0x1) {buf[6] |= 0x40;  emergency_stop_ = 0;}
-		if(drive_gasu_breake_ == true) {buf[6] |= 0x20;}// drive_gasu_breake_ = false;}
-		if(steer_gasu_breake_ == true) {buf[6] |= 0x10;}// steer_gasu_breake_ = false;}
+		if(side_brake_ == 0x2) {buf[6] |= 0x20;  side_brake_ = 0;}
+		else if(side_brake_ == 0x1) {buf[6] |= 0x10;  side_brake_ = 0;}
 		if(automatic_door_ != 0x0)
 		{
 			std::cout << "aaaaaaaaaaaaaaaaaaaaa : " << automatic_door_time_ << std::endl;
@@ -916,6 +884,7 @@ public:
 	    , proc_time(0)
 	    , shift_auto_(false)
 	    , shift_position_(0)
+	    , side_brake_(0)
 	    , emergency_stop_(false)
 	    , engine_start_(false)
 	    , ignition_(false)
@@ -929,8 +898,6 @@ public:
 	    , blinker_left_(false)
 	    , blinker_stop_(false)
 	    , automatic_door_(0)
-	    , drive_gasu_breake_(false)
-	    , steer_gasu_breake_(false)
 	{
 		can_receive_501_.emergency = true;
 		can_receive_501_.blinker_right = can_receive_501_.blinker_left = false;
@@ -945,7 +912,7 @@ public:
 
 		sub_microbus_drive_mode_ = nh_.subscribe("/microbus/drive_mode_send", 10, &kvaser_can_sender::callbackDModeSend, this);
 		sub_microbus_steer_mode_ = nh_.subscribe("/microbus/steer_mode_send", 10, &kvaser_can_sender::callbackSModeSend, this);
-		sub_twist_cmd_ = nh_.subscribe("/vehicle_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
+		sub_twist_cmd_ = nh_.subscribe("/twist_cmd", 10, &kvaser_can_sender::callbackTwistCmd, this);
 		sub_microbus_can_501_ = nh_.subscribe("/microbus/can_receive501", 10, &kvaser_can_sender::callbackMicrobusCan501, this);
 		sub_microbus_can_502_ = nh_.subscribe("/microbus/can_receive502", 10, &kvaser_can_sender::callbackMicrobusCan502, this);
 		sub_microbus_can_503_ = nh_.subscribe("/microbus/can_receive503", 10, &kvaser_can_sender::callbackMicrobusCan503, this);
@@ -961,6 +928,7 @@ public:
 		sub_config_microbus_can_ = nh_.subscribe("/config/microbus_can", 10, &kvaser_can_sender::callbackConfigMicroBusCan, this);
 		sub_shift_auto_ = nh_.subscribe("/microbus/shift_auto", 10, &kvaser_can_sender::callbackShiftAuto, this);
 		sub_shift_position_ = nh_.subscribe("/microbus/shift_position", 10, &kvaser_can_sender::callbackShiftPosition, this);
+		sub_side_brake_ = nh_.subscribe("/microbus/side_brake", 10, &kvaser_can_sender::callbackSideBrake, this);
 		sub_emergency_stop_ = nh_.subscribe("/microbus/emergency_stop", 10, &kvaser_can_sender::callbackEmergencyStop, this);
 		sub_engine_start_ = nh_.subscribe("/microbus/engine_start", 10, &kvaser_can_sender::callbackEngineStart, this);
 		sub_ignition_ = nh_.subscribe("/microbus/ignition", 10, &kvaser_can_sender::callbackIgnition, this);
@@ -974,11 +942,8 @@ public:
 		sub_blinker_left_ = nh_.subscribe("/microbus/blinker_left", 10, &kvaser_can_sender::callbackBlinkerLeft, this);
 		sub_blinker_stop_ = nh_.subscribe("/microbus/blinker_stop", 10, &kvaser_can_sender::callbackBlinkerStop, this);
 		sub_automatic_door_ = nh_.subscribe("/microbus/automatic_door", 10, &kvaser_can_sender::callbackAutomaticDoor, this);
-		sub_drive_gasu_breake_ = nh_.subscribe("/microbus/drive_gasu_breake", 10, &kvaser_can_sender::callbackDriveGasuBreake, this);
-		sub_steer_gasu_breake_ = nh_.subscribe("/microbus/steer_gasu_breake", 10, &kvaser_can_sender::callbackSteerGasuBreake, this);
 
-		std::string safety_error_message = "";
-		publisStatus(safety_error_message);
+		publisStatus();
 
 		proc_time.sec = 0;
 		proc_time.nsec = 0;
