@@ -587,6 +587,9 @@ private:
 		buf[0] = mode;  buf[1] = 0;
 	}
 
+	double handle_control_max_speed = 50; //
+	double handle_control_min_speed = 10; //
+	double handle_control_ratio = 1.0/32.0;
 	void bufset_steer(unsigned char *buf)
 	{
 		short steer_val;
@@ -614,13 +617,18 @@ private:
 			}*/
 			
 			double wheel_ang = twist_.ctrl_cmd.steering_angle;
+			double zisoku = twist_.ctrl_cmd.linear_velocity * 3.6;
+			double ratio = ((handle_control_ratio - 1.0) * (zisoku - handle_control_min_speed))
+			        / (handle_control_max_speed - handle_control_min_speed) + 1;
 			if(wheel_ang > 0)
 			{
-				steer_val = wheel_ang * wheelrad_to_steering_can_value_left;// * 2;
+			    steer_val = wheel_ang * wheelrad_to_steering_can_value_left;// * 2;
+			    if(zisoku > handle_control_min_speed) steer_val *= ratio;
 			}
 			else
 			{
 				steer_val = wheel_ang * wheelrad_to_steering_can_value_right;// * 2;
+			    if(zisoku > handle_control_min_speed) steer_val *= ratio;
 			}
 		}
 		else steer_val = input_steer_;

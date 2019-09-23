@@ -806,6 +806,9 @@ subs :
         desc : astar_avoid desc sample
         cmd  : roslaunch waypoint_planner astar_avoid.launch
         param: astar_avoid_param
+      - name : temporary_stoper
+        desc : temporary_stoper desc sample
+        cmd  : roslaunch waypoint_planner temporary_stoper.launch
       - name : velocity_set
         desc : velocity_set desc sample
         cmd  : roslaunch waypoint_planner velocity_set.launch
