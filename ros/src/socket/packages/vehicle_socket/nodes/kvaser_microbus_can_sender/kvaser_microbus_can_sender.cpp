@@ -99,8 +99,10 @@ private:
 	//liesse params
 	double handle_angle_right_max = 730;
 	double handle_angle_left_max = 765;
-	double wheelrad_to_steering_can_value_left = 20952.8189547718;
-	double wheelrad_to_steering_can_value_right = 20961.415734248;
+	double wheelrad_to_steering_can_value_left = 20691.8161699557;//20952.8189547718;
+	double wheelrad_to_steering_can_value_right = 20802.5331916036;//20961.415734248;
+	//double wheelrad_to_steering_can_value_left = 20691.8161699557;
+	//double wheelrad_to_steering_can_value_right = 20802.5331916036;
 	double angle_magn_right = wheelrad_to_steering_can_value_right / handle_angle_right_max;
 	double angle_magn_left = wheelrad_to_steering_can_value_left / handle_angle_left_max;
 
@@ -623,12 +625,12 @@ private:
 			if(wheel_ang > 0)
 			{
 			    steer_val = wheel_ang * wheelrad_to_steering_can_value_left;// * 2;
-			    if(zisoku > handle_control_min_speed) steer_val *= ratio;
+				//if(zisoku > handle_control_min_speed) steer_val *= ratio;
 			}
 			else
 			{
 				steer_val = wheel_ang * wheelrad_to_steering_can_value_right;// * 2;
-			    if(zisoku > handle_control_min_speed) steer_val *= ratio;
+				//if(zisoku > handle_control_min_speed) steer_val *= ratio;
 			}
 		}
 		else steer_val = input_steer_;

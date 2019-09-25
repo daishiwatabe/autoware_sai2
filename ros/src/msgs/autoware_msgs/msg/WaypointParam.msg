@@ -25,3 +25,4 @@ int8 automatic_door
 int8 signal_stop_line
 int8 temporary_stop_line
 int8 fusion_select
+LiesseXZB70MParam liesse

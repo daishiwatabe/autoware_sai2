@@ -8,7 +8,7 @@ int8 SHIFT_P = 8
 int8 SHIFT_R = 9
 int8 SHIFT_N = 10
 int8 SHIFT_D = 11
-int8 SHIFT_2 = 12
+int8 SHIFT_4 = 12
 int8 SHIFT_L = 13
 
 uint8 STEER_V0 = 0

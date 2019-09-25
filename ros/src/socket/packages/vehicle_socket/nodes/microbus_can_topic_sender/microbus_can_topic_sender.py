@@ -496,8 +496,8 @@ class Microbus_Can_Sender_GUI:
 				self.tx_shift.SetValue('N')
 			elif self.receive.shift == MicroBusCan501.SHIFT_D:
 				self.tx_shift.SetValue('D')
-			elif self.receive.shift == MicroBusCan501.SHIFT_2:
-				self.tx_shift.SetValue('2')
+			elif self.receive.shift == MicroBusCan501.SHIFT_4:
+				self.tx_shift.SetValue('4')
 			elif self.receive.shift == MicroBusCan501.SHIFT_L:
 				self.tx_shift.SetValue('L')
 
@@ -610,8 +610,10 @@ class Microbus_Can_Sender_GUI:
 		self.bt_shift_manual.SetFont(font)
 		self.bt_shift_P = wx.Button(self.panel, BT_SHIFT_P, label="P", pos=(10,390), size=(50,50))
 		self.bt_shift_P.SetFont(font)
+		self.bt_shift_P.Enable(False)
 		self.bt_shift_R = wx.Button(self.panel, BT_SHIFT_R, label="R", pos=(70,390), size=(50,50))
 		self.bt_shift_R.SetFont(font)
+		self.bt_shift_R.Enable(False)
 		self.bt_shift_N = wx.Button(self.panel, BT_SHIFT_N, label="N", pos=(130,390), size=(50,50))
 		self.bt_shift_N.SetFont(font)
 		self.bt_shift_D = wx.Button(self.panel, BT_SHIFT_D, label="D", pos=(190,390), size=(50,50))

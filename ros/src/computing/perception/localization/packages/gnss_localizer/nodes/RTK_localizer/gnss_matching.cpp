@@ -225,7 +225,7 @@ public:
           std::cout << "gz is not set." << std::endl;
           return;
         }
-        if (nh.getParam("ax", _tf_groll) == false)
+        if (nh.getParam("ax", _tf_gyaw) == false)
         {
           std::cout << "ax is not set." << std::endl;
           return;
@@ -235,15 +235,15 @@ public:
           std::cout << "ay is not set." << std::endl;
           return;
         }
-        if (nh.getParam("az", _tf_gyaw) == false)
+        if (nh.getParam("az", _tf_groll) == false)
         {
           std::cout << "az is not set." << std::endl;
           return;
         }
         Eigen::Translation3f tl_btog(_tf_gx, _tf_gy, _tf_gz);                 // tl: translation
-        Eigen::AngleAxisf rot_x_btog(_tf_groll, Eigen::Vector3f::UnitX());  // rot: rotation
+        Eigen::AngleAxisf rot_x_btog(_tf_gyaw, Eigen::Vector3f::UnitX());  // rot: rotation
         Eigen::AngleAxisf rot_y_btog(_tf_gpitch, Eigen::Vector3f::UnitY());
-        Eigen::AngleAxisf rot_z_btog(_tf_gyaw, Eigen::Vector3f::UnitZ());
+        Eigen::AngleAxisf rot_z_btog(_tf_groll, Eigen::Vector3f::UnitZ());
         tf_btog = (tl_btog * rot_z_btog * rot_y_btog * rot_x_btog).matrix();
 
         double _tf_vx, _tf_vy, _tf_vz, _tf_vroll, _tf_vpitch, _tf_vyaw;

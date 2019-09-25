@@ -75,6 +75,7 @@ add_message_files(
             GnssStandardDeviation.msg
             NdtPoseAndRTKPose.msg
             PositionChecker.msg
+            LiesseXZB70MParam.msg
             WaypointParam.msg
             Format7Info.msg
             LinearArray.msg
