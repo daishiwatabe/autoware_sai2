@@ -809,6 +809,9 @@ subs :
       - name : temporary_stoper
         desc : temporary_stoper desc sample
         cmd  : roslaunch waypoint_planner temporary_stoper.launch
+      - name : temporary_stoper_liesse
+        desc : temporary_stoper_liesse desc sample
+        cmd  : roslaunch waypoint_planner temporary_stoper_liesse.launch
       - name : velocity_set
         desc : velocity_set desc sample
         cmd  : roslaunch waypoint_planner velocity_set.launch

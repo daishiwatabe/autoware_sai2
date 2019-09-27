@@ -22,6 +22,7 @@
 #include "../../src/velocity_set/libvelocity_set.h"
 #include "../../src/velocity_set/velocity_set_info.h"
 #include "../../src/velocity_set/velocity_set_path.h"
+#include <std_msgs/Int8.h>
 
 namespace
 {
@@ -541,7 +542,7 @@ void changeWaypoints(const VelocitySetInfo& vs_info, const EControl& detection_r
     vs_path->avoidSuddenAcceleration(deceleration, closest_waypoint);
     vs_path->avoidSuddenDeceleration(vs_info.getVelocityChangeLimit(), deceleration, closest_waypoint);
     vs_path->setTemporalWaypoints(vs_info.getTemporalWaypointsSize(), closest_waypoint, vs_info.getControlPose());
-    final_waypoints_pub.publish(vs_path->getTemporalWaypoints());
+	final_waypoints_pub.publish(vs_path->getTemporalWaypoints());
   }
   else if (detection_result == EControl::DECELERATE)
   {  // DECELERATE for obstacles
@@ -550,7 +551,7 @@ void changeWaypoints(const VelocitySetInfo& vs_info, const EControl& detection_r
     vs_path->avoidSuddenDeceleration(vs_info.getVelocityChangeLimit(), vs_info.getDecelerationObstacle(), closest_waypoint);
     vs_path->avoidSuddenAcceleration(vs_info.getDecelerationObstacle(), closest_waypoint);
     vs_path->setTemporalWaypoints(vs_info.getTemporalWaypointsSize(), closest_waypoint, vs_info.getControlPose());
-    final_waypoints_pub.publish(vs_path->getTemporalWaypoints());
+	final_waypoints_pub.publish(vs_path->getTemporalWaypoints());
   }
   else
   {  // ACCELERATE or KEEP
@@ -558,7 +559,7 @@ void changeWaypoints(const VelocitySetInfo& vs_info, const EControl& detection_r
     vs_path->avoidSuddenAcceleration(vs_info.getDecelerationObstacle(), closest_waypoint);
     vs_path->avoidSuddenDeceleration(vs_info.getVelocityChangeLimit(), vs_info.getDecelerationObstacle(), closest_waypoint);
     vs_path->setTemporalWaypoints(vs_info.getTemporalWaypointsSize(), closest_waypoint, vs_info.getControlPose());
-    final_waypoints_pub.publish(vs_path->getTemporalWaypoints());
+	final_waypoints_pub.publish(vs_path->getTemporalWaypoints());
   }
 }
 
@@ -614,6 +615,7 @@ int main(int argc, char** argv)
   ros::Publisher detection_range_pub = nh.advertise<visualization_msgs::MarkerArray>("detection_range", 1);
   ros::Publisher obstacle_pub = nh.advertise<visualization_msgs::Marker>("obstacle", 1);
   ros::Publisher obstacle_waypoint_pub = nh.advertise<std_msgs::Int32>("obstacle_waypoint", 1, true);
+  ros::Publisher econtrol_pub = nh.advertise<std_msgs::Int8>("econtrol", 1, false);
 
   ros::Publisher final_waypoints_pub;
   if(enablePlannerDynamicSwitch){
@@ -649,9 +651,13 @@ int main(int argc, char** argv)
 	                                              detection_range_pub, obstacle_pub, &obstacle_waypoint, enableMobileye);
 
     changeWaypoints(vs_info, detection_result, closest_waypoint,
-                    obstacle_waypoint, final_waypoints_pub, &vs_path);
+	                obstacle_waypoint, final_waypoints_pub, &vs_path);
 
-    vs_info.clearPoints();
+	std_msgs::Int8 econtrol_msg;
+	econtrol_msg.data = (char)detection_result;
+	econtrol_pub.publish(econtrol_msg);
+
+	vs_info.clearPoints();
 	vs_info.clearMobileyeObstacle();
 
     // publish obstacle waypoint index

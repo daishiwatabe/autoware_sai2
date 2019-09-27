@@ -17,7 +17,6 @@ find_package(autoware_build_flags REQUIRED)
 
 find_package(autoware_msgs REQUIRED)
 
-find_package(tablet_socket_msgs REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   std_msgs

@@ -1,7 +1,8 @@
 #include <ros/ros.h>
 #include <queue>
 #include <std_msgs/Bool.h>
-#include <std_msgs/UInt8.h> 
+#include <std_msgs/UInt8.h>
+#include <std_msgs/Int8.h>
 #include <std_msgs/Int16.h>
 #include <std_msgs/Empty.h>
 #include <autoware_msgs/VehicleCmd.h>
@@ -10,11 +11,21 @@
 #include <autoware_can_msgs/MicroBusCan503.h>
 #include <autoware_can_msgs/MicroBusCanSenderStatus.h>
 #include <autoware_config_msgs/ConfigMicroBusCan.h>
+#include <autoware_config_msgs/ConfigVelocitySet.h>
 #include <autoware_msgs/WaypointParam.h>
 #include <autoware_msgs/PositionChecker.h>
 #include <autoware_msgs/WaypointParam.h>
 #include "kvaser_can.h"
 #include <time.h>
+
+enum class EControl
+{
+  KEEP = -1,
+  STOP = 1,
+  STOPLINE = 2,
+  DECELERATE = 3,
+  OTHERS = 4,
+};
 
 class waypoint_param_geter
 {
@@ -108,7 +119,7 @@ private:
 
 	//mode params
 	const unsigned char MODE_STROKE   = 0x0A;
-	const unsigned char MODE_VRLOCITY = 0x0B;
+	const unsigned char MODE_VERLOCITY = 0x0B;
 
 	//shift_param
 	const static unsigned char SHIFT_P = 0;
@@ -139,6 +150,7 @@ private:
 	ros::Subscriber sub_wiper_, sub_light_high_, sub_light_low_, sub_light_small_;
 	ros::Subscriber sub_horn_, sub_hazard_, sub_blinker_right_, sub_blinker_left_, sub_blinker_stop_;
 	ros::Subscriber sub_automatic_door_, sub_drive_gasu_breake_, sub_steer_gasu_breake_;
+	ros::Subscriber sub_econtrol_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -157,12 +169,18 @@ private:
 	bool engine_start_, ignition_, wiper_;
 	bool light_high_, light_low_, light_small_, horn_;
 	bool hazard_, blinker_right_, blinker_left_, blinker_stop_;
+	EControl econtrol;
 	autoware_msgs::WaypointParam waypoint_param_;
 
 	ros::Time automatic_door_time_;
 	ros::Time blinker_right_time_, blinker_left_time_, blinker_stop_time_;
 
 	waypoint_param_geter wpg_;
+
+	void callbackEControl(const std_msgs::Int8::ConstPtr &msg)
+	{
+		econtrol = (EControl)msg->data;
+	}
 
 	void callbackEmergencyReset(const std_msgs::Empty::ConstPtr &msg)
 	{
@@ -215,6 +233,7 @@ private:
 		}
 
 		can_receive_502_ = *msg;
+		brake_mode_changer();
 	}
 
 	void callbackMicrobusCan503(const autoware_can_msgs::MicroBusCan503::ConstPtr &msg)
@@ -222,12 +241,16 @@ private:
 		std::cout << "sub can_503" << std::endl;
 		if(msg->clutch==true && can_receive_503_.clutch==false)
 		{
+			drive_control_mode_ = MODE_VERLOCITY;
+			shift_auto_ = true;
 			input_drive_mode_ = false;
 			std::string safety_error_message = "";
 			publisStatus(safety_error_message);
 		}
 		if(msg->clutch==false && can_receive_503_.clutch==true)
 		{
+			drive_control_mode_ = MODE_STROKE;
+			shift_auto_ = false;
 			input_drive_mode_ = true;
 			std::string safety_error_message = "";
 			publisStatus(safety_error_message);
@@ -244,7 +267,7 @@ private:
 	void callbackVelocityMode(const std_msgs::Empty::ConstPtr &msg)
 	{
 		std::cout << "sub VelocityMode" << std::endl;
-		drive_control_mode_ = MODE_VRLOCITY;
+		drive_control_mode_ = MODE_VERLOCITY;
 	}
 
 	void callbackShiftAuto(const std_msgs::Bool::ConstPtr &msg)
@@ -290,6 +313,8 @@ private:
 		double ws_ave = (wheelrad_to_steering_can_value_left + wheelrad_to_steering_can_value_right) / 2.0;
 		double deg = fabs(msg->ctrl_cmd.steering_angle - twist_.ctrl_cmd.steering_angle) * ws_ave * 720.0 / 15000.0;
 		double zisoku = msg->ctrl_cmd.linear_velocity * 3.6;
+
+		brake_mode_changer();
 
 		if(dengerStopFlag == false)
 		{
@@ -405,6 +430,11 @@ private:
 		else if(msg->blinker == 0)
 		{
 			blinkerStop();
+		}
+
+		if(msg->liesse.shift >= 0)
+		{
+			shift_position_ = msg->liesse.shift;
 		}
 
 		waypoint_param_ = *msg;
@@ -581,10 +611,34 @@ private:
 		blinkerStop();
 	}
 
+	const double braking_speed_th = 5.0;//km/h
+	bool brake_flag = false;
+	void brake_mode_changer()
+	{
+		double zisoku_twist = twist_.ctrl_cmd.linear_velocity * 3.6;
+		double zisoku_can = can_receive_502_.velocity_actual / 100.0;
+		std::cout << "brake : " << zisoku_twist << "," << zisoku_can << "," << (int)brake_flag << std::endl;
+		if(zisoku_can <= 2.0) brake_flag = false;
+		else if(econtrol == EControl::STOP)
+		{
+			if(brake_flag == false)
+			{
+				if(zisoku_can - zisoku_twist >= braking_speed_th) brake_flag = true;
+			}
+			else {
+				if(zisoku_can - zisoku_twist <= 0.0) brake_flag = false;
+			}
+		}
+	}
+
 	void bufset_mode(unsigned char *buf)
 	{
 		unsigned char mode = 0;
-		if(flag_drive_mode_ == true) mode |= drive_control_mode_;
+		if(flag_drive_mode_ == true)
+		{
+			if(brake_flag == true) mode |= 0x0A;
+			else mode |= drive_control_mode_;
+		}
 		if(flag_steer_mode_ == true) mode |= 0xA0;
 		buf[0] = mode;  buf[1] = 0;
 	}
@@ -640,6 +694,7 @@ private:
 		buf[2] = steer_pointer[1];  buf[3] = steer_pointer[0];
 	}
 
+	double econtrol_stop_value=0;
 	void bufset_drive(unsigned char *buf)
 	{
 		/*double twist_drv = twist.twist.linear.x;
@@ -648,7 +703,19 @@ private:
 		buf[4] = drive_point[1];  buf[5] = drive_point[0];*/
 
 		//std::cout << "mode : " << (int)drive_control_mode_ << "   vel : " << (int)MODE_VRLOCITY << std::endl;
-		if(drive_control_mode_ == MODE_VRLOCITY)
+
+		if(brake_flag == true)
+		{
+			econtrol_stop_value -= 4;
+			if(econtrol_stop_value < -500) econtrol_stop_value = -500;
+			short pedal_val = (short)econtrol_stop_value;
+			unsigned char *pedal_point = (unsigned char*)&pedal_val;
+			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
+			return;
+		}
+
+		econtrol_stop_value = 0;
+		if(drive_control_mode_ == MODE_VERLOCITY)
 		{
 			short drive_val;
 			if(input_drive_mode_ == false)
@@ -986,6 +1053,7 @@ public:
 		sub_automatic_door_ = nh_.subscribe("/microbus/automatic_door", 10, &kvaser_can_sender::callbackAutomaticDoor, this);
 		sub_drive_gasu_breake_ = nh_.subscribe("/microbus/drive_gasu_breake", 10, &kvaser_can_sender::callbackDriveGasuBreake, this);
 		sub_steer_gasu_breake_ = nh_.subscribe("/microbus/steer_gasu_breake", 10, &kvaser_can_sender::callbackSteerGasuBreake, this);
+		sub_econtrol_ = nh_.subscribe("/econtrol", 10, &kvaser_can_sender::callbackEControl, this);
 
 		std::string safety_error_message = "";
 		publisStatus(safety_error_message);
