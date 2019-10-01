@@ -713,8 +713,8 @@ private:
 
 		if(brake_flag == true)
 		{
-			econtrol_stop_value -= 1;
-			if(obstracle_waypoint_ > 20)
+			econtrol_stop_value -= 4;
+			if(obstracle_waypoint_ < 20)
 			{
 				if(econtrol_stop_value < -100) econtrol_stop_value = -100;
 			}
@@ -726,7 +726,7 @@ private:
 			{
 				if(econtrol_stop_value < -350) econtrol_stop_value = -350;
 			}
-			if(econtrol_stop_value < -500) econtrol_stop_value = -500;
+			else if(econtrol_stop_value < -500) econtrol_stop_value = -500;
 			short pedal_val = (short)econtrol_stop_value;
 			unsigned char *pedal_point = (unsigned char*)&pedal_val;
 			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
@@ -757,8 +757,6 @@ private:
 			else drive_val = input_drive_;
 			if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
 				drive_val = 0;
-			if(can_receive_503_.clutch == false)
-				drive_val = can_receive_502_.velocity_actual;
 
 			unsigned char *drive_point = (unsigned char*)&drive_val;
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];

@@ -15,7 +15,7 @@
 #include <autoware_config_msgs/ConfigVelocitySet.h>
 #include <autoware_msgs/WaypointParam.h>
 #include <autoware_msgs/PositionChecker.h>
-#include <autoware_msgs/WaypointParam.h>
+#include <geometry_msgs/TwistStamped.h>
 #include "kvaser_can.h"
 #include <time.h>
 
@@ -109,6 +109,7 @@ private:
 	double handle_offset = 188;
 
 	//liesse params
+	double zentyo = 6.5;//m
 	double handle_angle_right_max = 730;
 	double handle_angle_left_max = 765;
 	double wheelrad_to_steering_can_value_left = 20691.8161699557;//20952.8189547718;
@@ -151,7 +152,7 @@ private:
 	ros::Subscriber sub_wiper_, sub_light_high_, sub_light_low_, sub_light_small_;
 	ros::Subscriber sub_horn_, sub_hazard_, sub_blinker_right_, sub_blinker_left_, sub_blinker_stop_;
 	ros::Subscriber sub_automatic_door_, sub_drive_gasu_breake_, sub_steer_gasu_breake_;
-	ros::Subscriber sub_econtrol_, sub_obtracle_waypoint_;
+	ros::Subscriber sub_econtrol_, sub_obtracle_waypoint_, sub_current_velocity_, sub_current_pose_;
 
 	KVASER_CAN kc;
 	bool flag_drive_mode_, flag_steer_mode_;
@@ -171,7 +172,11 @@ private:
 	bool light_high_, light_low_, light_small_, horn_;
 	bool hazard_, blinker_right_, blinker_left_, blinker_stop_;
 	EControl econtrol;
-	int obstracle_waypoint_;
+	int obstracle_waypoint_, prev_obstracle_waypoint_;
+	ros::Time obstracle_time_, prev_obstracle_time_;
+
+	geometry_msgs::TwistStamped current_velocity_, current_pose_;
+
 	autoware_msgs::WaypointParam waypoint_param_;
 
 	ros::Time automatic_door_time_;
@@ -179,9 +184,116 @@ private:
 
 	waypoint_param_geter wpg_;
 
+	void callbackCurrentPose(const geometry_msgs::TwistStamped::ConstPtr &msg)
+	{
+		current_pose_ = *msg;
+	}
+
+	void callbackCurrentVelocity(const geometry_msgs::TwistStamped::ConstPtr &msg)
+	{
+		current_velocity_ = *msg;
+	}
+
+	double rel_mps_ = 0;
+	std::vector<int> obstracle_vec;
+	std::vector<double> obstracle_time_vec;
+	double obstracle_distance = 0;
+	double time_to_collision = 0, time_to_cllision_prev = 0;;
 	void callbackObstracleWaypoint(const std_msgs::Int32::ConstPtr &msg)
 	{
-		obstracle_waypoint_ = msg->data;
+		//std::cout << "obs : " << msg->data << std::endl;
+		/*prev_obstracle_time_ = obstracle_time_;
+		obstracle_time_ = ros::Time::now();
+		prev_obstracle_waypoint_ = obstracle_waypoint_;
+		obstracle_waypoint_ = msg->data;*/
+		if(msg->data < 0)
+		{
+			obstracle_vec.clear();
+			obstracle_time_vec.clear();
+			time_to_collision = time_to_cllision_prev = 0;
+			return;
+		}
+
+		obstracle_vec.insert(obstracle_vec.begin(),msg->data - zentyo);
+		ros::Time nowtime = ros::Time::now();
+		double time = nowtime.sec + nowtime.nsec * 1E-9;
+		std::cout << "obs_time : " << time << std::endl;
+		obstracle_time_vec.insert(obstracle_time_vec.begin(),time);
+		if(obstracle_vec.size() > 20) obstracle_vec.pop_back();
+		if(obstracle_time_vec.size() > 20) obstracle_time_vec.pop_back();
+		std::cout << "size : " << obstracle_vec.size() << "," << obstracle_time_vec.size() << std::endl;
+		std::cout << "vec_list : ";
+		for(int i=0; i<obstracle_vec.size() ;i++)
+		{
+			std::cout << obstracle_vec[i] << ",";
+		}
+		std::cout << std::endl;
+
+		if(obstracle_vec.size() < 2)
+		{
+			obstracle_distance = obstracle_vec[0];//obstracle_waypoint_;
+		}
+		else
+		{
+			double obs_sum = 0, time_sum=0;
+			for(int i=0; i<obstracle_vec.size(); i++)
+			{
+				obs_sum += obstracle_vec[i];
+				time_sum += obstracle_time_vec[i];
+			}
+			double obs_ave = obs_sum/obstracle_vec.size();
+			double time_ave = time_sum/obstracle_time_vec.size();
+
+			double obs_var=0, obs_covar=0;
+			for(int i=0;i<obstracle_vec.size() ;i++)
+			{
+				double val = obstracle_vec[i] - obs_ave;
+				obs_var += val*val;
+				double timeval = obstracle_time_vec[i] - time_ave;
+				obs_covar += val * timeval;
+			}
+			obs_var /= obstracle_vec.size();
+			obs_covar /= obstracle_vec.size();
+
+			if(obs_var == 0)
+			{
+				obstracle_distance = obstracle_vec[0];//obstracle_waypoint_;
+				time_to_collision = obstracle_vec[0] / current_velocity_.twist.linear.x;
+				std::cout << "aaa : " << time_to_collision << "," << obstracle_vec[0] <<  std::endl;
+			}
+			else
+			{
+
+				double slope = obs_covar / obs_var;
+				double intercept = obs_ave - slope * time_ave;
+				obstracle_distance = time * slope + intercept;
+				time_to_collision = -intercept / slope - time;// - time;
+				time_to_collision /= 10;
+
+				std::cout << "ave : " << std::setprecision(10) << obs_ave << "," << time_ave << std::endl;
+				std::cout << "var : " << std::setprecision(10) << obs_var << "," << obs_covar << std::endl;
+				std::cout << "slope : " << std::setprecision(10) << slope << "," << intercept << std::endl;
+				std::cout << "distance : " << std::setprecision(20) << obstracle_distance << "," << time_to_collision << std::endl;
+			}
+
+
+		}
+
+		if(obstracle_waypoint_ != -1)
+		{
+			if(prev_obstracle_waypoint_ == -1)
+			{
+				//rel_mps_ = -current_velocity_.twist.linear.x;
+			}
+			else
+			{
+				/*int obs_sa = obstracle_waypoint_ - prev_obstracle_waypoint_;
+				ros::Duration rostime_sa = obstracle_time_ - prev_obstracle_time_;
+				double time_sa = rostime_sa.sec + rostime_sa.nsec * 1E-9;
+				rel_mps_ = obs_sa / time_sa;
+				std::cout << "rel_mps : " << std::setprecision(10) << obs_sa << "," << rel_mps_ << std::endl;*/
+			}
+		}
 	}
 
 	void callbackEControl(const std_msgs::Int8::ConstPtr &msg)
@@ -632,7 +744,8 @@ private:
 			{
 				if(zisoku_can - zisoku_twist >= braking_speed_th) brake_flag = true;
 			}
-			else {
+			else
+			{
 				if(zisoku_can - zisoku_twist <= 0.0) brake_flag = false;
 			}
 		}
@@ -702,6 +815,7 @@ private:
 	}
 
 	double econtrol_stop_value=0;
+	ros::Time prev_drive_time_;
 	void bufset_drive(unsigned char *buf)
 	{
 		/*double twist_drv = twist.twist.linear.x;
@@ -713,20 +827,60 @@ private:
 
 		if(brake_flag == true)
 		{
-			econtrol_stop_value -= 1;
-			if(obstracle_waypoint_ > 20)
+			/*econtrol_stop_value -= 4;
+			if(obstracle_waypoint_ == -1 || prev_obstracle_waypoint_ == -1)
 			{
-				if(econtrol_stop_value < -100) econtrol_stop_value = -100;
+				if(econtrol_stop_value < -500) econtrol_stop_value = -500;
+				short pedal_val = (short)econtrol_stop_value;
+				unsigned char *pedal_point = (unsigned char*)&pedal_val;
+				buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
 			}
-			else if(obstracle_waypoint_ <= 20 && obstracle_waypoint_ >=15)
+			else
 			{
-				if(econtrol_stop_value < -200) econtrol_stop_value = -200;
+
+
+			}*/
+
+			/*if(rel_mps_ > 0)
+			{
+				//econtrol_stop_value += 4;
+				return;
 			}
-			else if(obstracle_waypoint_ <= 15 && obstracle_waypoint_ >=10)
+			else if(rel_mps_ < 0)
 			{
-				if(econtrol_stop_value < -350) econtrol_stop_value = -350;
+				double time_to_collision = (obstracle_waypoint_ + zentyo) / rel_mps_;
+				std::cout << "time_to_collition : " << time_to_collision << std::endl;
+				double delta_t = time_to_collision / 500/4.0;
+				ros::Time drive_time = ros::Time::now();
+				ros::Duration ros_time_sa = drive_time - prev_drive_time_;
+				double time_sa = ros_time_sa.sec + ros_time_sa.nsec * 1E-9;
+				if(time_sa < delta_t) return;
+				econtrol_stop_value -= 4;
+				//sleep(time_to_collision / (500/4));
+			}
+			else if(obstracle_waypoint_ + zentyo < 22)
+			{
+				econtrol_stop_value -= 4;
+			}*/
+
+			const double time_to_collision_mokuhyo = 3.0;
+			if(time_to_collision < 0)
+			{
+				econtrol_stop_value += 4;
+			}
+			else
+			{
+				if(time_to_collision < time_to_collision_mokuhyo)
+				{
+					econtrol_stop_value -= 4;
+				}
+				else if(time_to_collision > time_to_collision_mokuhyo)
+				{
+					econtrol_stop_value += 2;
+				}
 			}
 			if(econtrol_stop_value < -500) econtrol_stop_value = -500;
+			if(econtrol_stop_value > 0) econtrol_stop_value = 0;
 			short pedal_val = (short)econtrol_stop_value;
 			unsigned char *pedal_point = (unsigned char*)&pedal_val;
 			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
@@ -757,8 +911,6 @@ private:
 			else drive_val = input_drive_;
 			if(can_receive_501_.drive_auto != autoware_can_msgs::MicroBusCan501::DRIVE_AUTO)
 				drive_val = 0;
-			if(can_receive_503_.clutch == false)
-				drive_val = can_receive_502_.velocity_actual;
 
 			unsigned char *drive_point = (unsigned char*)&drive_val;
 			buf[4] = drive_point[1];  buf[5] = drive_point[0];
@@ -1029,6 +1181,8 @@ public:
 	    , automatic_door_(0)
 	    , drive_gasu_breake_(false)
 	    , steer_gasu_breake_(false)
+	    , obstracle_waypoint_(-1)
+	    , prev_obstracle_waypoint_(-1)
 	{
 		can_receive_501_.emergency = true;
 		can_receive_501_.blinker_right = can_receive_501_.blinker_left = false;
@@ -1075,6 +1229,9 @@ public:
 		sub_drive_gasu_breake_ = nh_.subscribe("/microbus/drive_gasu_breake", 10, &kvaser_can_sender::callbackDriveGasuBreake, this);
 		sub_steer_gasu_breake_ = nh_.subscribe("/microbus/steer_gasu_breake", 10, &kvaser_can_sender::callbackSteerGasuBreake, this);
 		sub_econtrol_ = nh_.subscribe("/econtrol", 10, &kvaser_can_sender::callbackEControl, this);
+		sub_obtracle_waypoint_= nh_.subscribe("/obstacle_waypoint", 10, &kvaser_can_sender::callbackObstracleWaypoint, this);
+		sub_current_velocity_= nh_.subscribe("/current_velocity", 10, &kvaser_can_sender::callbackCurrentVelocity, this);
+		sub_current_pose_ = nh_.subscribe("/current_pose", 10, &kvaser_can_sender::callbackCurrentPose, this);
 
 		std::string safety_error_message = "";
 		publisStatus(safety_error_message);
