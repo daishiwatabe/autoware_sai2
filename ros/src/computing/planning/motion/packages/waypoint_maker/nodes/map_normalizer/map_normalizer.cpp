@@ -9,9 +9,14 @@
 #define _USE_MATH_DEFINES
 #include <math.h>//円周率用
 
-struct LimitDeviation
+struct LimitGnssDeviation
 {
     double lat,lon,alt;
+};
+
+struct LimitNdtParam
+{
+	double score, exe_time;
 };
 
 struct WayPoint
@@ -20,6 +25,7 @@ struct WayPoint
     {
         double np_x,np_y,np_z,nl_x,nl_y,nl_z;
         double np_yaw,velocity,change_flag;
+		double score, exe_time;
     } ndt;
     struct
     {
@@ -96,7 +102,8 @@ private:
         return std::string("OK");
     }
 
-    void csvRead(std::string path_list, LimitDeviation limit_deviation)
+	void csvRead(std::string path_list, LimitGnssDeviation limit_gnss_deviation,
+	             LimitNdtParam limit_ndt_param)
     {
         std::vector<std::string> pathArray = split(path_list,',');
         int path_cou;
@@ -231,23 +238,34 @@ private:
                     throw error.str();
                 }
                 if(map.find("std_lat") != map.end()) wp.rtk.std_lat = map["std_lat"];
-                else { std::cout << "warning : There is no std_lat.  set 5 : " << data_cou ; wp.rtk.std_lat = 5;}
+				else { std::cout << "warning : There is no std_lat.  set 1 : " << data_cou ; wp.rtk.std_lat = 1;}
                 if(map.find("std_lon") != map.end()) wp.rtk.std_lon = map["std_lon"];
-                else { std::cout << "warning : There is no std_lon.  set 5 : " << data_cou ; wp.rtk.std_lon = 5;}
+				else { std::cout << "warning : There is no std_lon.  set 1 : " << data_cou ; wp.rtk.std_lon = 1;}
                 if(map.find("std_alt") != map.end()) wp.rtk.std_alt = map["std_alt"];
-                else { std::cout << "warning : There is no std_alt.  set 5 : " << data_cou ; wp.rtk.std_alt = 5;}
+				else { std::cout << "warning : There is no std_alt.  set 1 : " << data_cou ; wp.rtk.std_alt = 1;}
+				if(map.find("ndt_score") != map.end()) wp.ndt.score = map["ndt_socre"];
+				else { std::cout << "warning : There is no ndt_score.  set 50 : " << data_cou ; wp.ndt.score = 50;}
+				if(map.find("ndt_exe_time") != map.end()) wp.ndt.exe_time = map["ndt_exe_time"];
+				else { std::cout << "warning : There is no ndt_exe_time.  set 50 : " << data_cou ; wp.ndt.exe_time = 50;}
 
                 allWaypoint.push_back(wp);
-                if(wp.rtk.std_lat <= limit_deviation.lat &&
-                   wp.rtk.std_lon <= limit_deviation.lon &&
-                   wp.rtk.std_alt <= limit_deviation.alt)
+				if(wp.rtk.std_lat <= limit_gnss_deviation.lat &&
+				   wp.rtk.std_lon <= limit_gnss_deviation.lon &&
+				   wp.rtk.std_alt <= limit_gnss_deviation.alt &&
+				   wp.ndt.score <= limit_ndt_param.score &&
+				   wp.ndt.exe_time <= limit_ndt_param.exe_time)
                 {
                     std::cout<<data_cou<<" : OK"<<std::endl;
                     waypoint.push_back(wp);
                 }
                 else
                 {
-                    std::cout<<data_cou<<" : Limit daviation over"<<std::endl;
+					std::cout << data_cou << " : Limit daviation over" << std::endl;
+					std::cout << "    std_lat : " << wp.rtk.std_lat << std::endl;
+					std::cout << "    std_lon : " << wp.rtk.std_lon << std::endl;
+					std::cout << "    std_alt : " << wp.rtk.std_alt << std::endl;
+					std::cout << "    ndt_socre : " << wp.ndt.score << std::endl;
+					std::cout << "    ndt_exe_time : " << wp.ndt.exe_time << std::endl;
                     continue;
                 }
             }
@@ -291,10 +309,11 @@ private:
         ofs_csv.close();
     }
 public:
-    MapNormalizer(std::string load_map_name, std::string load_csv_name, LimitDeviation limit_deviation)
+	MapNormalizer(std::string load_map_name, std::string load_csv_name,
+	              LimitGnssDeviation limit_gnss_deviation, LimitNdtParam limit_ndt_param)
     {
         try{
-            csvRead(load_csv_name, limit_deviation);
+			csvRead(load_csv_name, limit_gnss_deviation, limit_ndt_param);
             pcdPath = load_map_name;
             //pdcRead(load_map_name);
         }
@@ -441,17 +460,27 @@ int main(int argc, char **argv)
     private_nh_.param<std::string>("save_use_csv_name", save_use_csv_name, std::string("/tmp/normalize_use_path.csv"));
     private_nh_.param<std::string>("save_all_csv_name", save_all_csv_name, std::string("/tmp/normalize_all_path.csv"));
 
-    LimitDeviation limit_dev;
-    private_nh_.param<double>("limit_deviation_lat", limit_dev.lat, 0);
-    private_nh_.param<double>("limit_deviation_lon", limit_dev.lon, 0);
-    private_nh_.param<double>("limit_deviation_alt", limit_dev.alt, 0);
-    std::cout << "Limit_Deviationes" << std::endl;
-    std::cout << "    lat : " << limit_dev.lat << std::endl;
-    std::cout << "    lon : " << limit_dev.lon << std::endl;
-    std::cout << "    alt : " << limit_dev.alt << std::endl;
+	LimitGnssDeviation limit_gnss_dev;
+	private_nh_.param<double>("limit_gnss_deviation_lat", limit_gnss_dev.lat, 0);
+	private_nh_.param<double>("limit_gnss_deviation_lon", limit_gnss_dev.lon, 0);
+	private_nh_.param<double>("limit_gnss_deviation_alt", limit_gnss_dev.alt, 0);
+
+	LimitNdtParam limit_ndt_param;
+	private_nh_.param<double>("limit_ndt_score", limit_ndt_param.score, 0);
+	private_nh_.param<double>("limit_ndt_exe_time", limit_ndt_param.exe_time, 0);
+
+	//LimitNdtDeviation limit
+	//private_nh_.param<double>("limit_gnss_deviation_alt", limit_gnss_dev.alt, 0);
+	std::cout << "Limit_Gnss_Deviationes" << std::endl;
+	std::cout << "    lat : " << limit_gnss_dev.lat << std::endl;
+	std::cout << "    lon : " << limit_gnss_dev.lon << std::endl;
+	std::cout << "    alt : " << limit_gnss_dev.alt << std::endl;
+	std::cout << "Limit_Ndt_Param" << std::endl;
+	std::cout << "    score : " << limit_ndt_param.score << std::endl;
+	std::cout << "    exe_time : " << limit_ndt_param.exe_time << std::endl;
 
     try{
-        MapNormalizer norm(load_map_name, load_csv_name, limit_dev);
+		MapNormalizer norm(load_map_name, load_csv_name, limit_gnss_dev, limit_ndt_param);
         std::string result = norm.transform(save_map_name, save_use_csv_name, save_all_csv_name);
         if(result == "transform OK") std::cout << result << std::endl;
         else std::cerr << result << std::endl;

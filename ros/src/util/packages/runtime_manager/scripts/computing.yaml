@@ -798,7 +798,9 @@ subs :
          desc : map_normalizer desc sample
          cmd  : roslaunch waypoint_maker map_normalizer.launch
          param: map_normalizer
-
+         gui  :
+           dialog_width  : 600
+           dialog_height : 350
     - name : waypoint_planner
       desc : waypoint_planner desc sample
       subs :
@@ -6077,33 +6079,52 @@ params :
         var_name    : save_all_csv_name
         dash        : ''
         delim       : ':='
-    - name : limit_deviation_lat
-      desc : limit_deviation_lat each two waypoints
-      label: Limit Deviation Lat
+    - name : limit_gnss_deviation_lat
+      desc : limit_gnss_deviation_lat each two waypoints
+      label: Limit Gnss_Deviation Lat
       min  : 0.0
       max  : 5.0
       v    : 0.01
       cmd_param:
         dash     : ''
         delim    : ':='
-    - name : limit_deviation_lon
-      desc : limit_deviation_lon each two waypoints
-      label: Limit Deviation Lon
+    - name : limit_gnss_deviation_lon
+      desc : limit_gnss_deviation_lon each two waypoints
+      label: Limit Gnss_Deviation Lon
       min  : 0.0
       max  : 5.0
       v    : 0.01
       cmd_param:
         dash     : ''
         delim    : ':='
-    - name : limit_deviation_alt
-      desc : limit_deviation_alt each two waypoints
-      label: Limit Deviation Alt
+    - name : limit_gnss_deviation_alt
+      desc : limit_gnss_deviation_alt each two waypoints
+      label: Limit Gnss_Deviation Alt
       min  : 0.0
       max  : 5.0
       v    : 0.01
       cmd_param:
         dash     : ''
         delim    : ':='
+    - name : limit_ndt_score
+      desc : limit_ndt_score each two waypoints
+      label: Limit Ndt Score
+      min  : 0.0
+      max  : 10
+      v    : 0.01
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : limit_ndt_exe_time
+      desc : limit_ndt_exe_time each two waypoints
+      label: Limit Ndt Exe Time
+      min  : 0.0
+      max  : 100.0
+      v    : 0.01
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+
   - name  : microbus_can
     topic : /config/microbus_can
     msg   : ConfigMicroBusCan

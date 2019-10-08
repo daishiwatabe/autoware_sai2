@@ -89,8 +89,6 @@ Visualization Manager:
         All Enabled: true
         base_link:
           Value: true
-        camera:
-          Value: true
         esr_1:
           Value: true
         gps:
@@ -99,15 +97,17 @@ Visualization Manager:
           Value: true
         me_viz:
           Value: true
+        ndt_base_link:
+          Value: true
         rtk_base_link:
           Value: true
         velodyne:
           Value: true
-        velodyne_left:
+        velodyne1:
           Value: true
-        velodyne_right:
+        velodyne2:
           Value: true
-        velodyne_top:
+        velodyne3:
           Value: true
         world:
           Value: true
@@ -125,15 +125,16 @@ Visualization Manager:
               me_viz:
                 {}
               velodyne:
-                camera:
-                  {}
-              velodyne_left:
                 {}
-              velodyne_right:
+              velodyne1:
                 {}
-              velodyne_top:
+              velodyne2:
+                {}
+              velodyne3:
                 {}
             gps:
+              {}
+            ndt_base_link:
               {}
             rtk_base_link:
               {}
@@ -174,7 +175,7 @@ Visualization Manager:
       Marker Topic: /vector_map
       Name: Vector Map
       Namespaces:
-        signal: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Camera
@@ -231,8 +232,8 @@ Visualization Manager:
     - Alpha: 0.300000012
       Autocompute Intensity Bounds: true
       Autocompute Value Bounds:
-        Max Value: 96.1514893
-        Min Value: 56.4721375
+        Max Value: 14.1599236
+        Min Value: -1.22024369
         Value: true
       Axis: Z
       Channel Name: intensity
@@ -323,10 +324,7 @@ Visualization Manager:
       Marker Topic: /detection_range
       Name: Detection Range
       Namespaces:
-        Crosswalk Detection: true
-        Decelerate Detection: true
-        Stop Detection: true
-        Stop Line: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -334,7 +332,7 @@ Visualization Manager:
       Marker Topic: /next_target_mark
       Name: Next Waypoint Mark
       Namespaces:
-        next_target_marker: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -342,7 +340,7 @@ Visualization Manager:
       Marker Topic: /trajectory_circle_mark
       Name: PP Trajectory Mark
       Namespaces:
-        trajectory_circle_marker: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -363,11 +361,6 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        base_link:
-          Alpha: 1
-          Show Axes: false
-          Show Trail: false
-          Value: true
       Name: Vehicle Model
       Robot Description: robot_description
       TF Prefix: ""
@@ -409,9 +402,7 @@ Visualization Manager:
       Marker Topic: /local_waypoints_mark
       Name: Local Waypoints
       Namespaces:
-        local_path_marker: true
-        local_point_marker: true
-        local_waypoint_velocity: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/MarkerArray
@@ -419,9 +410,7 @@ Visualization Manager:
       Marker Topic: /global_waypoints_mark
       Name: Global Waypoints
       Namespaces:
-        global_change_flag_lane_1: true
-        global_lane_waypoint_orientation_marker_1: true
-        global_velocity_lane_1: true
+        {}
       Queue Size: 100
       Value: true
     - Class: rviz/Marker
@@ -755,26 +744,21 @@ Visualization Manager:
   Value: true
   Views:
     Current:
-      Class: rviz/ThirdPersonFollower
-      Distance: 25.9855499
+      Angle: 0
+      Class: rviz/TopDownOrtho
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.0599999987
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
-      Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
-      Focal Shape Fixed Size: true
-      Focal Shape Size: 0.0500000007
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.00999999978
-      Pitch: 0.595398307
-      Target Frame: gps
-      Value: ThirdPersonFollower (rviz)
-      Yaw: 3.16039968
+      Scale: 10
+      Target Frame: world
+      Value: TopDownOrtho (rviz)
+      X: 0
+      Y: 0
     Saved: ~
 Window Geometry:
   Camera:

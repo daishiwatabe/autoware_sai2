@@ -13,10 +13,13 @@ int main(int argc, char *argv[])
 
     //return a.exec();
 
-    //ros::Rate loop_rate(20);
+    ros::Rate loop_rate(100);
     while (ros::ok()){
       ros::spinOnce();
       a.processEvents();
-      //loop_rate.sleep();
+
+      w.window_updata();
+
+      loop_rate.sleep();
     }
 }

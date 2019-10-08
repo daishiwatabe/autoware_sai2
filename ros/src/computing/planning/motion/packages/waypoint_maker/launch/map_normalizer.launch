@@ -6,9 +6,11 @@
     <arg name="save_use_csv_name" default="/tmp/normalize_use_path.csv" />
     <arg name="save_all_csv_name" default="/tmp/normalize_all_path.csv" />
 
-    <arg name="limit_deviation_lat" default="0.5" />
-    <arg name="limit_deviation_lon" default="0.5" />
-    <arg name="limit_deviation_alt" default="0.5" />
+    <arg name="limit_gnss_deviation_lat" default="1" />
+    <arg name="limit_gnss_deviation_lon" default="1" />
+    <arg name="limit_gnss_deviation_alt" default="1" />
+	<arg name="limit_ndt_score" default="0.1" />
+	<arg name="limit_ndt_exe_time" default="50" />
 
     <node pkg="waypoint_maker" type="map_normalizer" name="map_normalizer" output="log">
         <param name="load_map_name" value="$(arg load_map_name)" />
@@ -16,8 +18,10 @@
         <param name="save_map_name" value="$(arg save_map_name)" />
         <param name="save_use_csv_name" value="$(arg save_use_csv_name)" />
         <param name="save_all_csv_name" value="$(arg save_all_csv_name)" />
-        <param name="limit_deviation_lat" value="$(arg limit_deviation_lat)" />
-        <param name="limit_deviation_lon" value="$(arg limit_deviation_lon)" />
-        <param name="limit_deviation_alt" value="$(arg limit_deviation_alt)" />
+        <param name="limit_gnss_deviation_lat" value="$(arg limit_gnss_deviation_lat)" />
+        <param name="limit_gnss_deviation_lon" value="$(arg limit_gnss_deviation_lon)" />
+        <param name="limit_gnss_deviation_alt" value="$(arg limit_gnss_deviation_alt)" />
+		<param name="limit_ndt_score" value="$(arg limit_ndt_score)" />
+		<param name="limit_ndt_exe_time" value="$(arg limit_ndt_exe_time)" />
     </node>
 </launch>

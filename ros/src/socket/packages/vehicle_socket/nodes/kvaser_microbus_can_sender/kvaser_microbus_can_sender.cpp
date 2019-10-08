@@ -143,7 +143,7 @@ private:
 	ros::NodeHandle nh_, private_nh_;
 	ros::Subscriber sub_microbus_drive_mode_, sub_microbus_steer_mode_, sub_twist_cmd_;
 	ros::Subscriber sub_microbus_can_501_, sub_microbus_can_502_, sub_microbus_can_503_;
-	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_mode_;
+	ros::Subscriber sub_emergency_reset_, sub_stroke_mode_, sub_velocity_mode_, sub_drive_control_;
 	ros::Subscriber sub_input_steer_flag_, sub_input_drive_flag_, sub_input_steer_value_, sub_input_drive_value_;
 	ros::Subscriber sub_waypoint_param_, sub_position_checker_, sub_config_microbus_can_;
 	ros::Subscriber sub_shift_auto_, sub_shift_position_;
@@ -275,6 +275,21 @@ private:
 	{
 		std::cout << "sub VelocityMode" << std::endl;
 		drive_control_mode_ = MODE_VERLOCITY;
+	}
+
+	void callbackDriveControl(const std_msgs::Int8::ConstPtr &msg)
+	{
+		if(msg->data == autoware_can_msgs::MicroBusCan501::DRIVE_MODE_VELOCITY)
+		{
+			std::cout << "sub VelocityMode" << std::endl;
+			drive_control_mode_ = MODE_VERLOCITY;
+		}
+		else if(msg->data == autoware_can_msgs::MicroBusCan501::DRIVE_MODE_STROKE)
+		{
+			std::cout << "sub StrokeMode" << std::endl;
+			drive_control_mode_ = MODE_STROKE;
+		}
+		else std::cout << "Control mode flag error" << std::endl;
 	}
 
 	void callbackShiftAuto(const std_msgs::Bool::ConstPtr &msg)
@@ -619,21 +634,23 @@ private:
 	}
 
 	const double braking_speed_th = 5.0;//km/h
+	const double braking_separate_speed_th = 0.0;
 	bool brake_flag = false;
 	void brake_mode_changer()
 	{
 		double zisoku_twist = twist_.ctrl_cmd.linear_velocity * 3.6;
 		double zisoku_can = can_receive_502_.velocity_actual / 100.0;
 		std::cout << "brake : " << zisoku_twist << "," << zisoku_can << "," << (int)brake_flag << std::endl;
-		if(zisoku_can <= 2.0) brake_flag = false;
-		else if(econtrol == EControl::STOP)
+		if(zisoku_can <= 2.0) {brake_flag = false; return;}
+		if(econtrol == EControl::STOP)
 		{
 			if(brake_flag == false)
 			{
 				if(zisoku_can - zisoku_twist >= braking_speed_th) brake_flag = true;
 			}
-			else {
-				if(zisoku_can - zisoku_twist <= 0.0) brake_flag = false;
+			else
+			{
+				if(zisoku_twist - zisoku_can >= braking_separate_speed_th) brake_flag = false;
 			}
 		}
 	}
@@ -713,8 +730,9 @@ private:
 
 		if(brake_flag == true)
 		{
-			econtrol_stop_value -= 1;
-			if(obstracle_waypoint_ > 20)
+			econtrol_stop_value -= 3;
+			std::cout << "obstracle : " << obstracle_waypoint_ << std::endl;
+			if(obstracle_waypoint_ >= 20)
 			{
 				if(econtrol_stop_value < -100) econtrol_stop_value = -100;
 			}
@@ -726,7 +744,7 @@ private:
 			{
 				if(econtrol_stop_value < -350) econtrol_stop_value = -350;
 			}
-			if(econtrol_stop_value < -500) econtrol_stop_value = -500;
+			else if(econtrol_stop_value < -500) econtrol_stop_value = -500;
 			short pedal_val = (short)econtrol_stop_value;
 			unsigned char *pedal_point = (unsigned char*)&pedal_val;
 			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
@@ -1054,6 +1072,7 @@ public:
 		sub_input_drive_value_ = nh_.subscribe("/microbus/input_drive_value", 10, &kvaser_can_sender::callbackInputDriveValue, this);
 		sub_stroke_mode_ = nh_.subscribe("/microbus/set_stroke_mode", 10, &kvaser_can_sender::callbackStrokeMode, this);
 		sub_velocity_mode_ = nh_.subscribe("/microbus/set_velocity_mode", 10, &kvaser_can_sender::callbackVelocityMode, this);
+		sub_drive_control_ = nh_.subscribe("/microbus/drive_control_", 10, &kvaser_can_sender::callbackDriveControl, this);
 		sub_waypoint_param_ = nh_.subscribe("/waypoint_param", 10, &kvaser_can_sender::callbackWaypointParam, this);
 		sub_position_checker_ = nh_.subscribe("/position_checker", 10, &kvaser_can_sender::callbackPositionChecker, this);
 		sub_config_microbus_can_ = nh_.subscribe("/config/microbus_can", 10, &kvaser_can_sender::callbackConfigMicroBusCan, this);
@@ -1075,6 +1094,7 @@ public:
 		sub_drive_gasu_breake_ = nh_.subscribe("/microbus/drive_gasu_breake", 10, &kvaser_can_sender::callbackDriveGasuBreake, this);
 		sub_steer_gasu_breake_ = nh_.subscribe("/microbus/steer_gasu_breake", 10, &kvaser_can_sender::callbackSteerGasuBreake, this);
 		sub_econtrol_ = nh_.subscribe("/econtrol", 10, &kvaser_can_sender::callbackEControl, this);
+		sub_obtracle_waypoint_ = nh_.subscribe("/obstacle_waypoint", 10, &kvaser_can_sender::callbackObstracleWaypoint, this);
 
 		std::string safety_error_message = "";
 		publisStatus(safety_error_message);

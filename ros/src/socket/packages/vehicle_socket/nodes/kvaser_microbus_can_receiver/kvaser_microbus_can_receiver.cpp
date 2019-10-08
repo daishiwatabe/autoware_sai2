@@ -78,12 +78,12 @@ public:
 					}*/
 					switch(dmode1)
 					{
-					case 0x0A:
-						can.drive_auto = 0xA;
+					case autoware_can_msgs::MicroBusCan501::STEER_AUTO:
+						can.drive_auto = autoware_can_msgs::MicroBusCan501::STEER_AUTO;
 						can.drive_mode = autoware_can_msgs::MicroBusCan501::DRIVE_MODE_STROKE;
 						break;
-					case 0x0B:
-						can.drive_auto = 0xA;
+					case autoware_can_msgs::MicroBusCan501::STEER_AUTO+1:
+						can.drive_auto = autoware_can_msgs::MicroBusCan501::STEER_AUTO;
 						can.drive_mode = autoware_can_msgs::MicroBusCan501::DRIVE_MODE_VELOCITY;
 						break;
 					default:

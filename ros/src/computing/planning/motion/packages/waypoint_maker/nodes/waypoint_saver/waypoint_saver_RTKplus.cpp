@@ -64,7 +64,7 @@ private:
   void displayMarker(geometry_msgs::Pose pose, double velocity) const;
   void outputProcessing(geometry_msgs::Pose ndt_pose, double velocity, geometry_msgs::Pose ndt_localizer,
                         geometry_msgs::Pose rtk_pose, geometry_msgs::Pose rtk_localizer,
-                        autoware_msgs::GnssStandardDeviation) const;
+                        autoware_msgs::GnssStandardDeviation, autoware_msgs::NDTStat ndt_stat) const;
 
   // handle
   ros::NodeHandle nh_;
@@ -123,12 +123,12 @@ WaypointSaver::~WaypointSaver()
 void WaypointSaver::ndt_and_RTK_callback(const autoware_msgs::NdtPoseAndRTKPose::ConstPtr& pose_msg) const
 {
   outputProcessing(pose_msg->ndt_pose.pose, mps2kmph(pose_msg->ndt_twist.twist.linear.x), pose_msg->ndt_localizer_pose.pose,
-                   pose_msg->RTK_pose.pose, pose_msg->RTK_localizer_pose.pose, pose_msg->RTK_standard_deviation);
+                   pose_msg->RTK_pose.pose, pose_msg->RTK_localizer_pose.pose, pose_msg->RTK_standard_deviation, pose_msg->ndt_stat);
 }
 
 void WaypointSaver::outputProcessing(geometry_msgs::Pose ndt_pose, double velocity, geometry_msgs::Pose ndt_localizer,
                                      geometry_msgs::Pose rtk_pose, geometry_msgs::Pose rtk_localizer,
-                                     autoware_msgs::GnssStandardDeviation rtk_deviation) const
+                                     autoware_msgs::GnssStandardDeviation rtk_deviation, autoware_msgs::NDTStat ndt_stat) const
 {
   std::ofstream ofs(filename_.c_str(), std::ios::app);
   static geometry_msgs::Pose previous_pose;
@@ -136,15 +136,16 @@ void WaypointSaver::outputProcessing(geometry_msgs::Pose ndt_pose, double veloci
   // first subscribe
   if (!receive_once)
   {
-    ofs << "x,y,z,yaw,velocity,change_flag,nl_x,nl_y,nl_z,rp_x,rp_y,rp_z,rl_x,rl_y,rl_z,std_lat,std_lon,std_alt" << std::endl;
+	ofs << "x,y,z,yaw,velocity,change_flag,nl_x,nl_y,nl_z,rp_x,rp_y,rp_z,rl_x,rl_y,rl_z,std_lat,std_lon,std_alt,ndt_score,ndt_exe_time" << std::endl;
     ofs << std::fixed << std::setprecision(4) << ndt_pose.position.x << "," << ndt_pose.position.y << ","
         << ndt_pose.position.z << "," << tf::getYaw(ndt_pose.orientation) << ",0,0,"
         << ndt_localizer.position.x << "," << ndt_localizer.position.y << "," << ndt_localizer.position.z << ","
         << rtk_pose.position.x << "," << rtk_pose.position.y << "," << rtk_pose.position.z << ","
         << rtk_localizer.position.x << "," << rtk_localizer.position.y << "," << rtk_localizer.position.z << ","
-        << rtk_deviation.lat_std << "," << rtk_deviation.lon_std << "," << rtk_deviation.alt_std << std::endl;
+	    << rtk_deviation.lat_std << "," << rtk_deviation.lon_std << "," << rtk_deviation.alt_std << ","
+	    << ndt_stat.score << "," << ndt_stat.exe_time << std::endl;
     receive_once = true;
-    displayMarker(ndt_pose, 0);
+	displayMarker(ndt_pose, 0);
     previous_pose = ndt_pose;
   }
   else
@@ -160,7 +161,8 @@ void WaypointSaver::outputProcessing(geometry_msgs::Pose ndt_pose, double veloci
           << ndt_localizer.position.x << "," << ndt_localizer.position.y << "," << ndt_localizer.position.z << ","
           << rtk_pose.position.x << "," << rtk_pose.position.y << "," << rtk_pose.position.z << ","
           << rtk_localizer.position.x << "," << rtk_localizer.position.y << "," << rtk_localizer.position.z << ","
-          << rtk_deviation.lat_std << "," << rtk_deviation.lon_std << "," << rtk_deviation.alt_std << std::endl;
+	      << rtk_deviation.lat_std << "," << rtk_deviation.lon_std << "," << rtk_deviation.alt_std << ","
+	      << ndt_stat.score << "," << ndt_stat.exe_time << std::endl;
 
 
       displayMarker(ndt_pose, velocity);

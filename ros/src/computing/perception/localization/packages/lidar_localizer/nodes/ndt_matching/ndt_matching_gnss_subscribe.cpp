@@ -1434,6 +1434,15 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
 
     estimate_twist_pub.publish(estimate_twist_msg);
 
+	// Set values for /ndt_stat
+	ndt_stat_msg.header.stamp = current_scan_time;
+	ndt_stat_msg.exe_time = time_ndt_matching.data;
+	ndt_stat_msg.iteration = iteration;
+	ndt_stat_msg.score = fitness_score;
+	ndt_stat_msg.velocity = current_velocity;
+	ndt_stat_msg.acceleration = current_accel;
+	ndt_stat_msg.use_predict_pose = 0;
+
 	autoware_msgs::NdtPoseAndRTKPose ndtpose_and_rtkpose;
     ndtpose_and_rtkpose.header.frame_id = "/map";
     ndtpose_and_rtkpose.header.stamp = current_scan_time;
@@ -1486,6 +1495,7 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
     ndtpose_and_rtkpose.RTK_standard_deviation.lat_std = RTK_standard_deviation_msg.lat_std;
     ndtpose_and_rtkpose.RTK_standard_deviation.lon_std = RTK_standard_deviation_msg.lon_std;
     ndtpose_and_rtkpose.RTK_standard_deviation.alt_std = RTK_standard_deviation_msg.alt_std;
+	ndtpose_and_rtkpose.ndt_stat = ndt_stat_msg;
     NdtPoseAndRTKPose_pub.publish(ndtpose_and_rtkpose);
 
     geometry_msgs::Vector3Stamped estimate_vel_msg;
@@ -1494,15 +1504,6 @@ static void points_callback(const sensor_msgs::PointCloud2::ConstPtr& input)
     node_status_publisher_ptr_->CHECK_MAX_VALUE("/value/estimate_twist/linear",current_velocity,5,10,15,"value linear estimated twist is too high.");
     node_status_publisher_ptr_->CHECK_MAX_VALUE("/value/estimate_twist/angular",angular_velocity,5,10,15,"value linear angular twist is too high.");
     estimated_vel_pub.publish(estimate_vel_msg);
-
-    // Set values for /ndt_stat
-    ndt_stat_msg.header.stamp = current_scan_time;
-    ndt_stat_msg.exe_time = time_ndt_matching.data;
-    ndt_stat_msg.iteration = iteration;
-    ndt_stat_msg.score = fitness_score;
-    ndt_stat_msg.velocity = current_velocity;
-    ndt_stat_msg.acceleration = current_accel;
-    ndt_stat_msg.use_predict_pose = 0;
 
     ndt_stat_pub.publish(ndt_stat_msg);
     /* Compute NDT_Reliability */

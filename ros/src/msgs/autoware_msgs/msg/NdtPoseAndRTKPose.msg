@@ -5,3 +5,4 @@ geometry_msgs/TwistStamped ndt_twist
 geometry_msgs/PoseStamped RTK_pose
 geometry_msgs/PoseStamped RTK_localizer_pose
 autoware_msgs/GnssStandardDeviation RTK_standard_deviation
+autoware_msgs/NDTStat ndt_stat

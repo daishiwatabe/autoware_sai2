@@ -18,7 +18,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
+      <y>30</y>
       <width>801</width>
       <height>621</height>
      </rect>
@@ -31,12 +31,15 @@
       <string>Tab 1</string>
      </attribute>
      <widget class="QGroupBox" name="groupBox_drive">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>10</x>
         <y>10</y>
         <width>331</width>
-        <height>491</height>
+        <height>501</height>
        </rect>
       </property>
       <property name="palette">
@@ -107,13 +110,13 @@
        <bool>true</bool>
       </property>
       <property name="title">
-       <string>drive_inf</string>
+       <string>DRIVE_INFOMATION</string>
       </property>
       <widget class="QLabel" name="lb_drive_mode">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
+         <y>40</y>
          <width>91</width>
          <height>17</height>
         </rect>
@@ -126,7 +129,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>60</y>
+         <y>80</y>
          <width>101</width>
          <height>16</height>
         </rect>
@@ -139,7 +142,7 @@
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>110</y>
          <width>101</width>
          <height>17</height>
         </rect>
@@ -151,11 +154,14 @@
       <widget class="QTextEdit" name="tx_drive_mode">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>60</x>
          <y>30</y>
-         <width>71</width>
-         <height>21</height>
+         <width>121</width>
+         <height>41</height>
         </rect>
+       </property>
+       <property name="autoFillBackground">
+        <bool>true</bool>
        </property>
        <property name="lineWidth">
         <number>0</number>
@@ -177,7 +183,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>60</y>
+         <y>80</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -199,7 +205,7 @@
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>90</y>
+         <y>110</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -218,10 +224,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_drive_mode_manual">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>30</y>
+         <y>40</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -231,10 +240,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_drive_mode_program">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>30</y>
+         <y>40</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -244,10 +256,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_drive_control_mode_velocity">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>60</y>
+         <y>80</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -257,10 +272,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_drive_control_mode_stroke">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>60</y>
+         <y>80</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -270,10 +288,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_drive_input_mode_direct">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>90</y>
+         <y>110</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -283,10 +304,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_drive_input_mode_autoware">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>90</y>
+         <y>110</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -296,10 +320,13 @@
        </property>
       </widget>
       <widget class="QGroupBox" name="gb_velocity">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>140</y>
          <width>311</width>
          <height>91</height>
         </rect>
@@ -865,10 +892,13 @@
        </widget>
       </widget>
       <widget class="QGroupBox" name="gb_stroke">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>230</y>
+         <y>240</y>
          <width>311</width>
          <height>91</height>
         </rect>
@@ -1434,10 +1464,13 @@
        </widget>
       </widget>
       <widget class="QGroupBox" name="gb_shift">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>330</y>
+         <y>340</y>
          <width>311</width>
          <height>151</height>
         </rect>
@@ -1903,6 +1936,9 @@
         <bool>false</bool>
        </property>
        <widget class="QPushButton" name="bt_shift_P">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>40</x>
@@ -1921,6 +1957,9 @@
         </property>
        </widget>
        <widget class="QPushButton" name="bt_shift_R">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>100</x>
@@ -2013,12 +2052,15 @@
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_steer">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>350</x>
         <y>10</y>
         <width>331</width>
-        <height>231</height>
+        <height>211</height>
        </rect>
       </property>
       <property name="palette">
@@ -2089,13 +2131,13 @@
        <bool>true</bool>
       </property>
       <property name="title">
-       <string>drive_inf</string>
+       <string>STEER_INFOMATION</string>
       </property>
       <widget class="QLabel" name="lb_steer_mode">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>30</y>
+         <y>40</y>
          <width>91</width>
          <height>17</height>
         </rect>
@@ -2104,24 +2146,11 @@
         <string>mode</string>
        </property>
       </widget>
-      <widget class="QLabel" name="lb_steer_control_mode">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>60</y>
-         <width>101</width>
-         <height>16</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>control_mode</string>
-       </property>
-      </widget>
       <widget class="QLabel" name="lb_steer_input_mode">
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>90</y>
+         <y>80</y>
          <width>101</width>
          <height>17</height>
         </rect>
@@ -2130,14 +2159,17 @@
         <string>input mode</string>
        </property>
       </widget>
-      <widget class="QTextEdit" name="tx_drive_mode_2">
+      <widget class="QTextEdit" name="tx_steer_mode">
        <property name="geometry">
         <rect>
-         <x>110</x>
+         <x>60</x>
          <y>30</y>
-         <width>71</width>
-         <height>21</height>
+         <width>121</width>
+         <height>41</height>
         </rect>
+       </property>
+       <property name="autoFillBackground">
+        <bool>true</bool>
        </property>
        <property name="lineWidth">
         <number>0</number>
@@ -2155,33 +2187,11 @@
         <set>Qt::TextSelectableByMouse</set>
        </property>
       </widget>
-      <widget class="QTextEdit" name="tx_drive_control_mode_2">
+      <widget class="QTextEdit" name="tx_steer_input_mode">
        <property name="geometry">
         <rect>
          <x>110</x>
-         <y>60</y>
-         <width>71</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="lineWidth">
-        <number>0</number>
-       </property>
-       <property name="verticalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="horizontalScrollBarPolicy">
-        <enum>Qt::ScrollBarAlwaysOff</enum>
-       </property>
-       <property name="readOnly">
-        <bool>true</bool>
-       </property>
-      </widget>
-      <widget class="QTextEdit" name="tx_drive_input_mode_2">
-       <property name="geometry">
-        <rect>
-         <x>110</x>
-         <y>90</y>
+         <y>80</y>
          <width>71</width>
          <height>21</height>
         </rect>
@@ -2200,10 +2210,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_steer_mode_manual">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>30</y>
+         <y>40</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -2213,10 +2226,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_steer_mode_program">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>30</y>
+         <y>40</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -2225,37 +2241,14 @@
         <string>program</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="bt_steer_control_mode_velocity">
-       <property name="geometry">
-        <rect>
-         <x>190</x>
-         <y>60</y>
-         <width>61</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>velocity</string>
-       </property>
-      </widget>
-      <widget class="QPushButton" name="bt_steer_control_mode_stroke">
-       <property name="geometry">
-        <rect>
-         <x>260</x>
-         <y>60</y>
-         <width>61</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>stroke</string>
-       </property>
-      </widget>
       <widget class="QPushButton" name="bt_steer_input_mode_direct">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>190</x>
-         <y>90</y>
+         <y>80</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -2265,10 +2258,13 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_steer_input_mode_autoware">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>260</x>
-         <y>90</y>
+         <y>80</y>
          <width>61</width>
          <height>25</height>
         </rect>
@@ -2278,10 +2274,13 @@
        </property>
       </widget>
       <widget class="QGroupBox" name="gb_angle">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>10</x>
-         <y>130</y>
+         <y>110</y>
          <width>311</width>
          <height>91</height>
         </rect>
@@ -2848,10 +2847,13 @@
       </widget>
      </widget>
      <widget class="QGroupBox" name="groupBox_other">
+      <property name="enabled">
+       <bool>true</bool>
+      </property>
       <property name="geometry">
        <rect>
         <x>350</x>
-        <y>250</y>
+        <y>230</y>
         <width>331</width>
         <height>251</height>
        </rect>
@@ -2924,7 +2926,7 @@
        <bool>true</bool>
       </property>
       <property name="title">
-       <string>other</string>
+       <string>OTHER_INFOMATION</string>
       </property>
       <widget class="QLabel" name="lb_blinker_right">
        <property name="geometry">
@@ -2940,6 +2942,9 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_blinker_right_on">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>110</x>
@@ -2953,6 +2958,9 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_blinker_right_off">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>180</x>
@@ -2979,6 +2987,9 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_blinker_left_on">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>110</x>
@@ -2992,6 +3003,9 @@
        </property>
       </widget>
       <widget class="QPushButton" name="bt_blinker_left_off">
+       <property name="enabled">
+        <bool>false</bool>
+       </property>
        <property name="geometry">
         <rect>
          <x>180</x>
@@ -3004,19 +3018,6 @@
         <string>OFF</string>
        </property>
       </widget>
-      <widget class="QPushButton" name="bt_emergency_clear">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>100</y>
-         <width>101</width>
-         <height>25</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>安全機能解除</string>
-       </property>
-      </widget>
      </widget>
     </widget>
     <widget class="QWidget" name="tab_2">
@@ -3024,6 +3025,19 @@
       <string>Tab 2</string>
      </attribute>
     </widget>
+   </widget>
+   <widget class="QPushButton" name="bt_emergency_clear">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>0</y>
+      <width>101</width>
+      <height>25</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>安全機能解除</string>
+    </property>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
