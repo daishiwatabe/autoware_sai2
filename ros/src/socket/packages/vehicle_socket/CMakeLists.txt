@@ -84,6 +84,15 @@ add_dependencies(kvaser_microbus_can_sender
   ${catkin_EXPORTED_TARGETS}
   )
 
+add_executable(kvaser_microbus_can_sender_stroke
+	nodes/kvaser_microbus_can_sender/kvaser_microbus_can_sender_stroke.cpp)
+target_link_libraries(kvaser_microbus_can_sender_stroke
+  ${catkin_LIBRARIES}
+  canlib)
+add_dependencies(kvaser_microbus_can_sender_stroke
+  ${catkin_EXPORTED_TARGETS}
+  )
+
 add_executable(kvaser_microbus_can_receiver
 	nodes/kvaser_microbus_can_receiver/kvaser_microbus_can_receiver.cpp)
 target_link_libraries(kvaser_microbus_can_receiver
@@ -137,7 +146,7 @@ catkin_install_python(PROGRAMS
 
 install(TARGETS vehicle_sender vehicle_receiver bus_socket
                 #kvaser_can_receiver kvaser_can_sender
-                kvaser_microbus_can_sender kvaser_microbus_can_receiver
+                kvaser_microbus_can_sender kvaser_microbus_can_sender_stroke kvaser_microbus_can_receiver
                 kvaser_prius_can_receiver kvaser_prius_can_sender
                 rs232_microbus_can_receiver
                 canusbz_prius_can_receiver
@@ -150,9 +159,11 @@ install(FILES
 		#scripts/kvaser_can_receiver.launch
 		#scripts/kvaser_can_sender.launch
         scripts/kvaser_microbus_can_sender.launch
+        scripts/kvaser_microbus_can_sender_stroke.launch
         scripts/kvaser_microbus_can_receiver.launch
         scripts/kvaser_prius_can_receiver.launch
         scripts/kvaser_prius_can_sender.launch
         scripts/kvaser_microbus.launch
+		scripts/kvaser_microbus_stroke.launch
 		DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
 		)

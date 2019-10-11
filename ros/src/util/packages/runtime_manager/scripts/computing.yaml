@@ -994,6 +994,10 @@ subs :
       desc : microbus can desc sample
       cmd  : roslaunch vehicle_socket kvaser_microbus.launch
       param: microbus_can
+    - name : microbus can stroke
+      desc : microbus can stroke desc sample
+      cmd  : roslaunch vehicle_socket kvaser_microbus_stroke.launch
+      param: microbus_can
 
 buttons:
   car_dpm :
@@ -6140,3 +6144,129 @@ params :
       - not use position_checker
       - use position_checker
       v     : 1
+    - name : speed_limit
+      desc : speed_limit
+      label: speed_limit
+      min  : 0.0
+      max  : 150.0
+      v    : 50
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : velocity_limit
+      desc : velocity_limit
+      label: velocity_limit
+      min  : 0.0
+      max  : 150.0
+      v    : 50
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : velocity_stop_th
+      desc : velocity_stop_th
+      label: velocity_stop_th
+      min  : 0.0
+      max  : 10
+      v    : 4
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : accel_max_i
+      desc : accel_max_i
+      label: accel_max_i
+      min  : 0.0
+      max  : 10000
+      v    : 3000
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : brake_max_i
+      desc : brake_max_i
+      label: brake_max_i
+      min  : 0.0
+      max  : 2000
+      v    : 500
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : k_accel_i_until
+      desc : k_accel_i_until
+      label: k_accel_i_until
+      min  : 0.0
+      max  : 150.0
+      v    : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : k_accel_d_until
+      desc : k_accel_d_until
+      label: k_accel_d_until
+      min  : 0.0
+      max  : 150.0
+      v    : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : k_brake_p_until
+      desc : k_brake_p_until
+      label: k_brake_p_until
+      min  : 0.0
+      max  : 150.0
+      v    : 40
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : k_brake_i_until
+      desc : k_brake_i_until
+      label: k_brake_i_until
+      min  : 0.0
+      max  : 150.0
+      v    : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : k_brake_d_until
+      desc : k_brake_d_until
+      label: k_brake_d_until
+      min  : 0.0
+      max  : 150.0
+      v    : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : pedal_stroke_center
+      desc : pedal_stroke_center
+      label: pedal_stroke_center
+      min  : -30
+      max  : 30
+      v    : 0
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : pedal_stroke_max
+      desc : pedal_stroke_max
+      label: pedal_stroke_max
+      min  : 700
+      max  : 1000
+      v    : 850
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : pedal_stroke_min
+      desc : pedal_stroke_min
+      label: pedal_stroke_min
+      min  : -600
+      max  : -300
+      v    : -500
+      cmd_param:
+        dash     : ''
+        delim    : ':='
+    - name : brake_stroke_stopping_med
+      desc : brake_stroke_stopping_med
+      label: brake_stroke_stopping_med
+      min  : -600
+      max  : -300
+      v    : -400
+      cmd_param:
+        dash     : ''
+        delim    : ':='

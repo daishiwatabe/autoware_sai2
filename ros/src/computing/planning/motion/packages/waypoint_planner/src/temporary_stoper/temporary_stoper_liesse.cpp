@@ -124,7 +124,7 @@ public:
 		config_.acceleration = 1;
 		config_.number_of_zeros_ahead = 5;
 		config_.number_of_zeros_behind = 5;
-		config_.stop_speed_threshold = 200;
+		config_.stop_speed_threshold = 150;
 
 		timer_ = ros::Time::now();
 		can_.velocity_actual = 0;

@@ -1,7 +1,13 @@
 Header header
+float64 cycle_time
 int16 angle_actual
 float64 angle_deg
 int16 velocity_actual
+int16 velocity_average
+int16 velocity_median
+int16 acceleration_actual
+int16 acceleration_average
+int16 acceleration_median
 float64 velocity_mps
 bool clutch
 uint32 read_counter

@@ -27,14 +27,17 @@ private:
 		bool read501, read502;
 	} read_id_flag_;
 
-	std::vector<short> velocity_list;
-	std::vector<short> angle_list;
+	std::vector<short> velocity_list_;
+	std::vector<short> acceleration_list_;
+	std::vector<short> angle_list_;
+	ros::Time prev_time_502_;
 	const int list_pushback_size = 5;
 public:
 	kvaser_can_receiver(ros::NodeHandle nh, ros::NodeHandle p_nh, int kvaser_channel)
 	    : nh_(nh)
 	    , private_nh_(p_nh)
 	{
+		prev_time_502_ = ros::Time::now();
 		read_id_flag_.read501 = read_id_flag_.read502 = false;
 		kc.init(kvaser_channel, canBITRATE_500K);
 
@@ -138,21 +141,52 @@ public:
 			    }
 			case 0x502:
 			    {
+				    ros::Time nowtime = ros::Time::now();
+
 				    unsigned char data[KVASER_CAN::READ_DATA_SIZE];
 					kc.get_read_data(data);
 					autoware_can_msgs::MicroBusCan502 can;
-					can.header.stamp = ros::Time::now();
+					can.header.stamp = nowtime;
 
 					unsigned char *vel_tmp = (unsigned char*)&can.velocity_actual;
 					vel_tmp[0] = data[7];  vel_tmp[1] = data[6];
-					velocity_list.push_back(can.velocity_actual);
-					if(velocity_list.size() > list_pushback_size) velocity_list.resize(list_pushback_size);
+
+					short acceleration = 0;
+					can.cycle_time = nowtime.toSec() - prev_time_502_.toSec();
+					if(velocity_list_.size() != 0)
+					{
+						short acc = (velocity_list_[0] - can.velocity_actual) / can.cycle_time;
+						can.acceleration_actual = acc;
+						acceleration_list_.insert(acceleration_list_.begin(), acc);
+						if(acceleration_list_.size() > list_pushback_size) acceleration_list_.resize(list_pushback_size);
+						int sum = 0;
+						for(int i=0; i<acceleration_list_.size(); i++) sum += acceleration_list_[i];
+						can.acceleration_average = sum / acceleration_list_.size();
+
+						std::vector<short> acceleration_med(acceleration_list_.size());
+						std::copy(acceleration_list_.begin(), acceleration_list_.end(), acceleration_med.begin());
+						std::sort(acceleration_med.begin(), acceleration_med.end());
+						can.acceleration_median = acceleration_med[(int)std::round(acceleration_med.size()/(double)2.0)];
+					}
+
+
+					velocity_list_.insert(velocity_list_.begin(), can.velocity_actual);
+					if(velocity_list_.size() > list_pushback_size) velocity_list_.resize(list_pushback_size);
+					int sum = 0;
+					for(int i=0; i<velocity_list_.size(); i++) sum += velocity_list_[i];
+					can.velocity_average = sum / velocity_list_.size();
+
+					std::vector<short> velocity_med(velocity_list_.size());
+					std::copy(velocity_list_.begin(), velocity_list_.end(), velocity_med.begin());
+					std::sort(velocity_med.begin(), velocity_med.end());
+					can.velocity_median = velocity_med[(int)std::round(velocity_med.size()/(double)2.0)];
+
 					can.velocity_mps = (double)can.velocity_actual / (100.0);
 
 					unsigned char *str_tmp = (unsigned char*)&can.angle_actual;
 					str_tmp[0] = data[5];  str_tmp[1] = data[4];
-					angle_list.push_back(can.angle_actual);
-					if(angle_list.size() == list_pushback_size) angle_list.resize(list_pushback_size);
+					angle_list_.insert(angle_list_.begin(), can.angle_actual);
+					if(angle_list_.size() == list_pushback_size) angle_list_.resize(list_pushback_size);
 					if(can.velocity_actual >= 0) can.angle_deg = can.angle_actual * angle_magn_left;
 					else can.angle_deg = can.angle_actual * angle_magn_right;
 
@@ -163,6 +197,7 @@ public:
 
 					pub_microbus_can_502_.publish(can);
 				    read_id_flag_.read502 = true;
+					prev_time_502_ = nowtime;
 					break;
 			    }
 			case 0x503:

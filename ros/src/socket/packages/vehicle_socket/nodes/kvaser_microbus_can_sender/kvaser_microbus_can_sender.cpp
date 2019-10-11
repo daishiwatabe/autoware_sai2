@@ -381,7 +381,6 @@ private:
 				flag = true;
 				std::cout << "Denger! current angle limit over" << std::endl;
 			}
-
 			//long long time_sa = vstate.tstamp - stamp_backup;
 			ros::Duration rostime = can_receive_502_.header.stamp - msg->header.stamp;
 			double time_sa = rostime.sec + rostime.nsec * 1E-9;
@@ -392,7 +391,6 @@ private:
 				flag = true;
 				std::cout << "Denger! actual angle over" << std::endl;
 			}
-
 			if(flag == true)
 			{
 				std::stringstream safety_error_message;
@@ -661,6 +659,9 @@ private:
 		if(flag_drive_mode_ == true)
 		{
 			if(brake_flag == true) mode |= 0x0A;
+			else if(twist_.ctrl_cmd.linear_velocity == 0 && can_receive_501_.drive_auto == 0x0A
+			        && input_drive_mode_ == false)
+				mode |= 0x0A;
 			else mode |= drive_control_mode_;
 		}
 		if(flag_steer_mode_ == true) mode |= 0xA0;
@@ -695,14 +696,14 @@ private:
 				steer_val = twist_deg * actual_max / angle;
 				steer_val *= 3;
 			}*/
-			
+
 			double wheel_ang = twist_.ctrl_cmd.steering_angle;
 			double zisoku = twist_.ctrl_cmd.linear_velocity * 3.6;
 			double ratio = ((handle_control_ratio - 1.0) * (zisoku - handle_control_min_speed))
 			        / (handle_control_max_speed - handle_control_min_speed) + 1;
 			if(wheel_ang > 0)
 			{
-			    steer_val = wheel_ang * wheelrad_to_steering_can_value_left;// * 2;
+				steer_val = wheel_ang * wheelrad_to_steering_can_value_left;// * 2;
 				//if(zisoku > handle_control_min_speed) steer_val *= ratio;
 			}
 			else
@@ -710,6 +711,7 @@ private:
 				steer_val = wheel_ang * wheelrad_to_steering_can_value_right;// * 2;
 				//if(zisoku > handle_control_min_speed) steer_val *= ratio;
 			}
+			steer_val -= 150;
 		}
 		else steer_val = input_steer_;
 		if(can_receive_501_.steer_auto != autoware_can_msgs::MicroBusCan501::STEER_AUTO) steer_val = 0;
@@ -719,6 +721,7 @@ private:
 	}
 
 	double econtrol_stop_value=0;
+	double twist_zero_stroke_value=0;
 	void bufset_drive(unsigned char *buf)
 	{
 		/*double twist_drv = twist.twist.linear.x;
@@ -750,8 +753,19 @@ private:
 			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
 			return;
 		}
-
 		econtrol_stop_value = 0;
+
+		if(twist_.ctrl_cmd.linear_velocity == 0 && can_receive_501_.drive_auto == 0x0A && input_drive_mode_ == false)
+		{
+			twist_zero_stroke_value -= 3;
+			if(twist_zero_stroke_value < -500) twist_zero_stroke_value = -500;
+			short pedal_val = (short)twist_zero_stroke_value;
+			unsigned char *pedal_point = (unsigned char*)&pedal_val;
+			buf[4] = pedal_point[1];  buf[5] = pedal_point[0];
+			return;
+		}
+		twist_zero_stroke_value = 0;
+
 		if(drive_control_mode_ == MODE_VERLOCITY)
 		{
 			short drive_val;

@@ -1,0 +1,14 @@
+<launch>
+	<arg name="kvaser_channel" default="0"/>
+
+	<node pkg="vehicle_socket" type="kvaser_microbus_can_receiver" name="kvaser_microbus_can_receiver" output="screen">
+		<param name="kvaser_channel" value="$(arg kvaser_channel)"/>
+	</node>
+
+	<node pkg="vehicle_socket" type="kvaser_microbus_can_sender_stroke" name="kvaser_microbus_can_sender_stroke" output="screen">
+		<param name="kvaser_channel" value="$(arg kvaser_channel)"/>
+	</node>
+
+	<node pkg="vehicle_socket" type="microbus_can_topic_sender.py" name="microbus_can_topic_sender" output="screen">
+	</node>
+</launch>

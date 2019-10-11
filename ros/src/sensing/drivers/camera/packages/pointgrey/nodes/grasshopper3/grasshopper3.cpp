@@ -34,7 +34,7 @@
 #include <tf/transform_datatypes.h>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
-
+#include <cv_bridge/cv_bridge.h>
 #include <signal.h>
 
 static volatile int running = 1;
@@ -371,7 +371,7 @@ void getMatricesFromFile(const ros::NodeHandle& nh, sensor_msgs::CameraInfo &cam
  * @param format[out] Read value from the console raw or rgb
  * @param timeout[out] Read value from the console timeout in ms
  */
-void ros_get_params(const ros::NodeHandle& private_nh, int& fps, int& mode, std::string& format, int& timeout)
+void ros_get_params(const ros::NodeHandle& private_nh, int& fps, int& mode, std::string& format, int& timeout, bool &flip)
 {
 	if (private_nh.getParam("fps", fps))
 	{
@@ -405,6 +405,15 @@ void ros_get_params(const ros::NodeHandle& private_nh, int& fps, int& mode, std:
 		ROS_INFO("No param received, defaulting timeout to %d ms", timeout);
 	}
 
+	int flipflag;
+	if (private_nh.getParam("flip", flipflag))
+	{
+		ROS_INFO("flip set to %d ms", flipflag);
+	} else {
+		flipflag = 0;
+		ROS_INFO("No param received, defaulting flip to %d ms", flipflag);
+	}
+	flip = (flipflag == 0) ? false : true;
 }
 
 int main(int argc, char **argv)
@@ -421,8 +430,9 @@ int main(int argc, char **argv)
 
 	int fps, camera_mode, timeout;
 	std::string pixel_format;
+	bool flip;
 
-	ros_get_params(private_nh, fps, camera_mode, pixel_format, timeout);
+	ros_get_params(private_nh, fps, camera_mode, pixel_format, timeout, flip);
 
 	//
 	FlyCapture2::Mode desired_mode;
@@ -518,7 +528,13 @@ int main(int argc, char **argv)
 			msg.data.resize(image_size);
 			memcpy(msg.data.data(), image.GetData(), image_size);
 
-			pub[i].publish(msg);
+			if(flip == true)
+			{
+				cv_bridge::CvImagePtr cv_ptr = cv_bridge::toCvCopy(msg, encoding_pattern);
+				cv::flip(cv_ptr->image, cv_ptr->image, -1);
+				pub[i].publish(cv_ptr->toImageMsg());
+			}
+			else pub[i].publish(msg);
 			i++;
 		}
 
